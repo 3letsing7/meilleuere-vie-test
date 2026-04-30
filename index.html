@@ -598,17 +598,28 @@ async function generatePR() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt })
     });
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error(`HTTP ${resp.status} ${resp.statusText}\n${errText}`);
+    }
     const json = await resp.json();
+    if (json.error) throw new Error(JSON.stringify(json.error, null, 2));
     const text = (json.content||[]).map(i=>i.text||'').join('');
     const clean = text.replace(/```json|```/g,'').trim();
     results = JSON.parse(clean);
     activeTab = 0;
     renderResult();
   } catch(e) {
+    const statusText = e.status ? ` (HTTP ${e.status})` : '';
+    const detail = e.message || String(e);
     getApp().innerHTML = `
-      <div style="text-align:center;padding:2rem 0">
-        <p style="color:#b84040;margin-bottom:1.5rem;font-size:0.9rem">生成中にエラーが発生しました。<br>もう一度お試しください。</p>
-        <button class="btn" onclick="restart()">最初からやり直す</button>
+      <div style="padding:2rem 0">
+        <p style="color:#b84040;font-weight:500;margin-bottom:0.75rem;font-size:0.95rem">⚠️ 生成中にエラーが発生しました${statusText}</p>
+        <pre style="background:#fdf2f2;border:1px solid #f0d0d0;border-radius:8px;padding:1rem;font-size:0.78rem;color:#7a3030;white-space:pre-wrap;word-break:break-all;margin-bottom:1.5rem;line-height:1.6">${detail}</pre>
+        <div style="display:flex;gap:8px;">
+          <button class="btn primary" onclick="renderLoading();generatePR()">再試行する</button>
+          <button class="btn" onclick="restart()">最初からやり直す</button>
+        </div>
       </div>`;
   }
 }
