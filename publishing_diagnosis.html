@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>無料出版適性診断</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:#f5f4f0;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem}
+.card{background:#fff;border-radius:16px;padding:2rem;max-width:600px;width:100%;box-shadow:0 2px 12px rgba(0,0,0,0.07)}
+.header{margin-bottom:1.5rem}
+.header h1{font-size:20px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.header p{font-size:13px;color:#888}
+.prog-wrap{margin-bottom:1.75rem}
+.prog-bar{height:4px;background:#e8e6e0;border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:#378ADD;border-radius:2px;transition:width 0.4s ease}
+.prog-label{font-size:11px;color:#aaa;margin-top:6px;text-align:right}
+.q-block{display:none}
+.q-block.on{display:block}
+.q-num{font-size:11px;color:#aaa;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em}
+.q-text{font-size:17px;font-weight:500;color:#1a1a1a;margin-bottom:1.25rem;line-height:1.5}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border:1px solid #e8e6e0;border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:border-color 0.15s,background 0.15s;width:100%}
+.opt:hover{border-color:#c8c6c0;background:#fafaf8}
+.opt.sel{border-color:#378ADD;background:#EAF4FC}
+.opt-icon{width:34px;height:34px;border-radius:8px;background:#f5f4f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px}
+.opt-title{font-size:14px;font-weight:500;color:#1a1a1a;line-height:1.4}
+.opt-sub{font-size:12px;color:#888;margin-top:2px;line-height:1.4}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem}
+.btn{padding:9px 20px;border-radius:8px;border:1px solid #d4d2cc;background:#fff;color:#333;font-size:13px;cursor:pointer;transition:background 0.15s}
+.btn:hover{background:#f5f4f0}
+.btn.pri{background:#378ADD;border-color:#378ADD;color:#fff;font-weight:500}
+.btn.pri:hover{background:#185FA5;border-color:#185FA5}
+.btn:disabled{opacity:0.35;cursor:default;pointer-events:none}
+.hint{font-size:12px;color:#aaa}
+/* result */
+.result{display:none}
+.score-ring{display:block;margin:0 auto 1.25rem}
+.res-title{font-size:20px;font-weight:600;text-align:center;color:#1a1a1a;margin-bottom:0.5rem}
+.res-sub{font-size:14px;color:#666;text-align:center;margin-bottom:1.5rem;line-height:1.7}
+.bars{display:flex;flex-direction:column;gap:11px;margin-bottom:1.5rem}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-lbl{font-size:12px;color:#666;width:90px;flex-shrink:0}
+.bar-track{flex:1;height:6px;background:#e8e6e0;border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px}
+.bar-n{font-size:12px;color:#888;width:32px;text-align:right;flex-shrink:0}
+.adv{background:#f5f4f0;border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.adv-h{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.adv-b{font-size:13px;color:#555;line-height:1.6}
+.restart{display:block;margin:1.25rem auto 0;padding:9px 24px;border-radius:8px;border:1px solid #d4d2cc;background:#fff;color:#666;font-size:13px;cursor:pointer;transition:background 0.15s}
+.restart:hover{background:#f5f4f0}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;margin-bottom:1rem}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <h1>📖 無料出版適性診断</h1>
+    <p>8つの質問に答えるだけで、あなたの出版適性を診断します</p>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-bar"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+    <div class="prog-label" id="plbl">0 / 8 完了</div>
+  </div>
+  <div id="qs"></div>
+  <div class="result" id="res"></div>
+</div>
+
+<script>
+const QS=[
+  {id:"content",text:"伝えたいコンテンツ・テーマはありますか？",cat:"readiness",opts:[
+    {v:3,ic:"💡",t:"明確にある",s:"具体的なテーマや伝えたいことが決まっている"},
+    {v:2,ic:"🔍",t:"なんとなくある",s:"方向性はあるが、まだ曖昧な部分も"},
+    {v:1,ic:"🌱",t:"これから考える",s:"出版したい気持ちはあるがテーマ未定"},
+    {v:0,ic:"❓",t:"まだわからない",s:"出版自体を検討中の段階"},
+  ]},
+  {id:"audience",text:"読者ターゲットをイメージできていますか？",cat:"marketability",opts:[
+    {v:3,ic:"🎯",t:"明確にイメージできる",s:"年齢層・職業・悩みまで具体的に描けている"},
+    {v:2,ic:"👥",t:"ある程度イメージできる",s:"大まかな読者像はある"},
+    {v:1,ic:"🤔",t:"漠然としている",s:"みんなに読んでほしいという感じ"},
+    {v:0,ic:"❓",t:"考えていなかった",s:"読者をあまり意識していない"},
+  ]},
+  {id:"originality",text:"コンテンツの独自性・差別化ポイントは？",cat:"marketability",opts:[
+    {v:3,ic:"⭐",t:"明確な独自性がある",s:"他の本と差別化できる強みがある"},
+    {v:2,ic:"✨",t:"やや独自性がある",s:"似た本はあるが、自分なりの切り口がある"},
+    {v:1,ic:"📚",t:"一般的な内容が多い",s:"既存の情報と大きく変わらないかも"},
+    {v:0,ic:"🔄",t:"わからない",s:"独自性について考えたことがない"},
+  ]},
+  {id:"volume",text:"書けるコンテンツの量はどのくらいですか？",cat:"readiness",opts:[
+    {v:3,ic:"📖",t:"十分すぎるほどある",s:"書き始めたら止まらないくらいある"},
+    {v:2,ic:"📝",t:"ある程度ある",s:"一冊分はなんとかなりそう"},
+    {v:1,ic:"🗒️",t:"少し不安",s:"ページ数を埋めるのが大変かも"},
+    {v:0,ic:"😅",t:"全然足りない",s:"まだ素材が少ない"},
+  ]},
+  {id:"writing",text:"文章を書くことはどう感じますか？",cat:"execution",opts:[
+    {v:3,ic:"✍️",t:"得意・好き",s:"定期的に書いていて苦にならない"},
+    {v:2,ic:"🙂",t:"普通・どちらでもない",s:"書くことは問題ないが特別得意でもない"},
+    {v:1,ic:"😓",t:"やや苦手",s:"書くのに時間がかかる・億劫に感じる"},
+    {v:0,ic:"🚫",t:"とても苦手",s:"文章を書くことに強い苦手意識がある"},
+  ]},
+  {id:"deadline",text:"出版に向けて動けるリソースは？",cat:"execution",opts:[
+    {v:3,ic:"🚀",t:"今すぐ動ける",s:"時間も意欲もあり、すぐ着手できる"},
+    {v:2,ic:"📅",t:"3〜6ヶ月以内に動ける",s:"準備を整えながら進めていける"},
+    {v:1,ic:"⏰",t:"1年以内ならできそう",s:"まず環境を整える必要がある"},
+    {v:0,ic:"🕐",t:"いつになるかわからない",s:"現時点では動くのが難しい"},
+  ]},
+  {id:"platform",text:"SNSやブログなど情報発信をしていますか？",cat:"marketability",opts:[
+    {v:3,ic:"📣",t:"積極的に発信中",s:"フォロワーやファンがいる"},
+    {v:2,ic:"📲",t:"たまに発信している",s:"小さいながらも継続中"},
+    {v:1,ic:"💤",t:"ほとんどしていない",s:"アカウントはあるが更新少ない"},
+    {v:0,ic:"🆕",t:"まったくしていない",s:"発信活動は未経験"},
+  ]},
+  {id:"goal",text:"出版の一番の目的は何ですか？",cat:"motivation",opts:[
+    {v:3,ic:"🏆",t:"信頼・ブランド構築",s:"専門家・著者としての権威を高めたい"},
+    {v:3,ic:"💌",t:"知識・経験を広く伝えたい",s:"多くの人の役に立ちたい"},
+    {v:2,ic:"💰",t:"収益・ビジネス拡大",s:"本を起点に収益やクライアントを増やしたい"},
+    {v:1,ic:"🎁",t:"自己実現・記念",s:"夢として一冊作りたい"},
+  ]},
+];
+const CNAMES={readiness:"コンテンツ準備度",marketability:"市場適性",execution:"実行力",motivation:"目的明確度"};
+const CCOLORS={readiness:"#378ADD",marketability:"#1D9E75",execution:"#D85A30",motivation:"#7F77DD"};
+let cur=0,ans={};
+
+function render(){
+  const c=document.getElementById("qs");
+  c.innerHTML="";
+  QS.forEach((q,i)=>{
+    const d=document.createElement("div");
+    d.className="q-block"+(i===cur?" on":"");
+    d.innerHTML=`<p class="q-num">質問 ${i+1} / ${QS.length}</p>
+<p class="q-text">${q.text}</p>
+<div class="opts">${q.opts.map((o,j)=>`<button type="button" class="opt${ans[q.id]===j?" sel":""}" data-qi="${i}" data-oi="${j}"><div class="opt-icon">${o.ic}</div><div><div class="opt-title">${o.t}</div><div class="opt-sub">${o.s}</div></div></button>`).join("")}</div>
+<div class="nav">
+<button type="button" class="btn" id="bk${i}" ${i===0?'style="visibility:hidden"':""}>← 戻る</button>
+<span class="hint">${ans[q.id]!==undefined?"✓ 選択済み":"選んでください"}</span>
+<button type="button" class="btn pri" id="nx${i}" ${ans[q.id]===undefined?"disabled":""}>${i===QS.length-1?"診断結果を見る →":"次へ →"}</button>
+</div>`;
+    c.appendChild(d);
+  });
+  const filled=Object.keys(ans).length;
+  document.getElementById("pf").style.width=Math.round((filled/QS.length)*100)+"%";
+  document.getElementById("plbl").textContent=filled+" / "+QS.length+" 完了";
+  document.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",function(){
+    const qi=+this.dataset.qi,oi=+this.dataset.oi;
+    ans[QS[qi].id]=oi;
+    document.querySelectorAll(`.opt[data-qi="${qi}"]`).forEach(x=>x.classList.remove("sel"));
+    this.classList.add("sel");
+    const nx=document.getElementById("nx"+qi);
+    if(nx)nx.removeAttribute("disabled");
+    const h=this.closest(".q-block").querySelector(".hint");
+    if(h)h.textContent="✓ 選択済み";
+  }));
+  QS.forEach((_,i)=>{
+    const nx=document.getElementById("nx"+i);
+    if(nx)nx.addEventListener("click",()=>i===QS.length-1?showRes():(cur=i+1,render()));
+    const bk=document.getElementById("bk"+i);
+    if(bk)bk.addEventListener("click",()=>i>0&&(cur=i-1,render()));
+  });
+}
+
+function showRes(){
+  document.getElementById("qs").style.display="none";
+  const el=document.getElementById("res");
+  el.style.display="block";
+  const cs={readiness:0,marketability:0,execution:0,motivation:0};
+  const cm={readiness:0,marketability:0,execution:0,motivation:0};
+  QS.forEach(q=>{
+    const ai=ans[q.id];
+    if(ai!==undefined){cs[q.cat]+=q.opts[ai].v;cm[q.cat]+=3;}
+  });
+  let tot=0,mx=0;
+  Object.keys(cs).forEach(k=>{tot+=cs[k];mx+=cm[k];});
+  const pct=Math.round((tot/mx)*100);
+  let title,color,emoji,desc,advs,badgeColor;
+  if(pct>=80){
+    title="出版に非常に向いています！";color="#1D9E75";emoji="🏆";badgeColor="#E1F5EE";
+    desc="コンテンツ・市場性・実行力のすべてが揃っています。\nすぐに出版に向けて動き出せる段階です。";
+    advs=[{h:"📌 次のステップ",b:"出版社へのアプローチ、または自費・電子書籍での自主出版を具体的に検討しましょう。"},{h:"✅ おすすめの行動",b:"まず企画書（3〜5枚）を作成し、出版エージェントや編集者に相談する機会を作ってみましょう。"}];
+  } else if(pct>=60){
+    title="出版に向いています";color="#378ADD";emoji="⭐";badgeColor="#E6F1FB";
+    desc="基礎はしっかりできています。\nいくつかの準備を進めると、さらに成功確率が上がります。";
+    advs=[{h:"📌 強化ポイント",b:"ターゲット読者とメッセージをより明確に絞り込むことで、出版企画の説得力が増します。"},{h:"✅ おすすめの行動",b:"同ジャンルのベストセラー3冊を分析し、自分のコンテンツとの差別化を言語化してみましょう。"}];
+  } else if(pct>=40){
+    title="もう少し準備が必要です";color="#BA7517";emoji="📝";badgeColor="#FAEEDA";
+    desc="出版への意欲は感じられます。\nコンテンツや環境を整えることで、出版への道が開けてきます。";
+    advs=[{h:"📌 優先すること",b:"まずテーマを一つに絞り、ブログやSNSで発信して反響を確かめましょう。"},{h:"✅ おすすめの行動",b:"出版セミナーへの参加や読書会で、業界の感覚を掴むことから始めましょう。"}];
+  } else {
+    title="出版の前に基礎固めを";color="#D85A30";emoji="🌱";badgeColor="#FAECE7";
+    desc="今は準備段階です。\n焦らず、土台となるコンテンツや発信活動を積み上げていきましょう。";
+    advs=[{h:"📌 まずやること",b:"「誰のどんな悩みを解決できるか」を一文で書いてみましょう。これが出版の核になります。"},{h:"✅ 長期的な視点で",b:"1〜2年かけてSNS・ブログで発信を続け、ファンとフィードバックを積み上げていくのが近道です。"}];
+  }
+  const C=2*Math.PI*44;
+  const sd=Math.round((pct/100)*C);
+  el.innerHTML=`
+<svg class="score-ring" width="130" height="130" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="44" fill="none" stroke="#e8e6e0" stroke-width="8"/>
+  <circle cx="50" cy="50" r="44" fill="none" stroke="${color}" stroke-width="8"
+    stroke-dasharray="${sd} ${C}" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+  <text x="50" y="44" text-anchor="middle" font-size="22" font-weight="600" fill="${color}" font-family="-apple-system,sans-serif">${pct}</text>
+  <text x="50" y="57" text-anchor="middle" font-size="9" fill="#aaa" font-family="-apple-system,sans-serif">/ 100点</text>
+</svg>
+<p style="font-size:11px;font-weight:500;color:${color};text-align:center;background:${badgeColor};display:inline-block;padding:3px 12px;border-radius:20px;margin:0 auto 12px;display:block;width:fit-content;margin:0 auto 12px">適性スコア ${pct}点</p>
+<p class="res-title">${emoji} ${title}</p>
+<p class="res-sub">${desc.replace(/\n/g,"<br>")}</p>
+<div class="bars">
+${Object.keys(cs).map(k=>{const s=cm[k]>0?Math.round((cs[k]/cm[k])*100):0;return`<div class="bar-row"><span class="bar-lbl">${CNAMES[k]}</span><div class="bar-track"><div class="bar-fill" style="width:${s}%;background:${CCOLORS[k]}"></div></div><span class="bar-n">${s}</span></div>`;}).join("")}
+</div>
+${advs.map(a=>`<div class="adv"><p class="adv-h">${a.h}</p><p class="adv-b">${a.b}</p></div>`).join("")}
+<button type="button" class="restart" id="rst">もう一度診断する</button>`;
+  document.getElementById("rst").addEventListener("click",()=>{
+    ans={};cur=0;
+    el.style.display="none";
+    document.getElementById("qs").style.display="block";
+    render();
+  });
+}
+render();
+</script>
+</body>
+</html>
