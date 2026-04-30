@@ -593,14 +593,10 @@ async function generatePR() {
 各バージョンは自然な日本語で、${purpose}に適したトーンで書いてください。強みと実績を具体的に盛り込み、説得力のある文章にしてください。`;
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: prompt }]
-      })
+      body: JSON.stringify({ prompt })
     });
     const json = await resp.json();
     const text = (json.content||[]).map(i=>i.text||'').join('');
