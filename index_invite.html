@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自己PR作成ツール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --text: #1A1814;
+    --text-muted: #7A7570;
+    --text-faint: #B0ABA5;
+    --border: #E2DDD8;
+    --border-hover: #C5BFB8;
+    --accent: #2C2520;
+    --accent-light: #F0EDE8;
+    --chip-active-bg: #2C2520;
+    --chip-active-text: #F7F5F0;
+    --serif: 'Noto Serif JP', serif;
+    --sans: 'Noto Sans JP', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .logo {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text);
+  }
+  .logo span {
+    font-family: var(--sans);
+    font-weight: 300;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: block;
+    letter-spacing: 0.06em;
+    margin-top: 1px;
+  }
+  .header-progress {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: 320px;
+    margin-left: auto;
+  }
+  .header-progress .track {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .header-progress .fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .header-progress .pct {
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 28px;
+    text-align: right;
+  }
+
+  /* Main layout */
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem 1.5rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 640px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Step indicator */
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-light);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 1.5rem;
+  }
+  .step-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+
+  .question {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text);
+    margin-bottom: 0.6rem;
+  }
+  .hint {
+    font-size: 0.825rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 1.75rem;
+  }
+
+  /* Inputs */
+  input[type=text], textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 0.9375rem;
+    font-family: var(--sans);
+    font-weight: 400;
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+    resize: vertical;
+    line-height: 1.7;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input[type=text]:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(44,37,32,0.08);
+  }
+  textarea { min-height: 120px; }
+
+  /* Chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  .chip {
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 7px 16px;
+    font-size: 0.8125rem;
+    font-family: var(--sans);
+    cursor: pointer;
+    color: var(--text-muted);
+    background: var(--surface);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .chip:hover {
+    border-color: var(--border-hover);
+    color: var(--text);
+  }
+  .chip.selected {
+    background: var(--chip-active-bg);
+    color: var(--chip-active-text);
+    border-color: var(--chip-active-bg);
+  }
+
+  /* Navigation */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .btn {
+    font-family: var(--sans);
+    font-size: 0.875rem;
+    font-weight: 400;
+    padding: 10px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .btn:hover:not(:disabled) {
+    background: var(--accent-light);
+    border-color: var(--border-hover);
+  }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn.primary {
+    background: var(--accent);
+    color: var(--chip-active-text);
+    border-color: var(--accent);
+  }
+  .btn.primary:hover {
+    background: #3d342d;
+    border-color: #3d342d;
+  }
+  .btn.primary:active { transform: scale(0.98); }
+
+  .error {
+    color: #b84040;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    min-height: 1.2rem;
+  }
+
+  /* Loading */
+  .loading-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 0;
+    gap: 1.5rem;
+  }
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-msg {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-family: var(--serif);
+    letter-spacing: 0.04em;
+  }
+
+  /* Result */
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  .result-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .result-icon svg { fill: var(--chip-active-text); }
+  .result-title {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .vtabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .vtab {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .vtab:hover { color: var(--text); border-color: var(--border-hover); }
+  .vtab.active {
+    background: var(--accent);
+    color: var(--chip-active-text);
+    border-color: var(--accent);
+  }
+
+  .result-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    min-height: 120px;
+  }
+  .result-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .result-text {
+    font-size: 0.9375rem;
+    line-height: 1.9;
+    color: var(--text);
+    white-space: pre-wrap;
+    font-weight: 300;
+  }
+
+  .action-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .copy-feedback {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding-top: 0.5rem;
+    height: 1.2rem;
+    transition: opacity 0.3s;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.75rem;
+    color: var(--text-faint);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .card { padding: 2rem 1.5rem; }
+    .question { font-size: 1.2rem; }
+    main { padding: 2rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    自己PR作成ツール
+    <span>SELF PR GENERATOR</span>
+  </div>
+  <div class="header-progress">
+    <div class="track"><div class="fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="pct" id="prog-pct">0%</div>
+  </div>
+</header>
+
+<main>
+  <div class="card" id="app"></div>
+</main>
+
+<footer>
+  Powered by Claude AI &nbsp;·&nbsp; あなたの情報は外部に保存されません
+</footer>
+
+<script>
+const QUESTIONS = [
+  {
+    id: 'role',
+    question: '現在のお仕事・職種を教えてください',
+    hint: '例：マーケティング担当、エンジニア、営業職、学生など',
+    type: 'text',
+    placeholder: '例：Webエンジニア（経験5年）',
+  },
+  {
+    id: 'strength',
+    question: 'あなたの一番の強みは何ですか？',
+    hint: '複数選んでもOK。自由入力と組み合わせることもできます',
+    type: 'chips+text',
+    chips: ['論理的思考力', 'コミュニケーション力', 'リーダーシップ', '粘り強さ', '創造性・発想力', '分析力', '行動力', 'チームワーク', '問題解決力', '学習意欲'],
+    placeholder: 'その他、自分の言葉で書く場合はこちら',
+  },
+  {
+    id: 'achievement',
+    question: 'これまでの一番の実績・経験を教えてください',
+    hint: '数字や具体的なエピソードがあると、より説得力のある文章になります',
+    type: 'textarea',
+    placeholder: '例：チームをまとめてプロジェクトを予定より2週間早く完了させた。売上を前年比120%に伸ばした。など',
+  },
+  {
+    id: 'value',
+    question: '仕事で大切にしていることは何ですか？',
+    hint: 'あなたの価値観や仕事への姿勢を教えてください',
+    type: 'chips+text',
+    chips: ['スピード', '品質へのこだわり', 'チームへの貢献', '誠実さ', '挑戦する姿勢', 'ユーザー視点', '継続的な成長', '報連相の徹底', 'コスト意識'],
+    placeholder: 'その他、自分の言葉で',
+  },
+  {
+    id: 'goal',
+    question: 'これからどんなことに挑戦したいですか？',
+    hint: '将来のビジョンや目標を教えてください',
+    type: 'textarea',
+    placeholder: '例：マネージャーとしてチームを牽引したい。新規事業の立ち上げに携わりたい。専門性を深めてスペシャリストになりたい。など',
+  },
+  {
+    id: 'purpose',
+    question: '自己PRをどのような場面で使いますか？',
+    hint: '用途に合わせた文章スタイルで生成します',
+    type: 'chips',
+    chips: ['転職活動・面接', '就職活動・新卒', '社内評価・昇進', '名刺・プロフィール', 'SNS・ポートフォリオ', 'ビジネスの自己紹介'],
+  },
+];
+
+let currentStep = 0;
+let answers = {};
+let selectedChips = {};
+let results = null;
+let activeTab = 0;
+
+function updateProgress() {
+  const total = QUESTIONS.length;
+  const pct = Math.round((currentStep / total) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+}
+
+function getApp() { return document.getElementById('app'); }
+
+function renderQuestion() {
+  updateProgress();
+  const q = QUESTIONS[currentStep];
+  const stepNum = currentStep + 1;
+  const total = QUESTIONS.length;
+
+  let inputHtml = '';
+  if (q.type === 'text') {
+    const val = (answers[q.id] || '').replace(/"/g, '&quot;');
+    inputHtml = `<input type="text" id="ans" placeholder="${q.placeholder}" value="${val}">`;
+  } else if (q.type === 'textarea') {
+    const val = answers[q.id] || '';
+    inputHtml = `<textarea id="ans" placeholder="${q.placeholder}">${val}</textarea>`;
+  } else if (q.type === 'chips') {
+    const sel = selectedChips[q.id] || [];
+    inputHtml = `<div class="chips">${q.chips.map(c =>
+      `<div class="chip${sel.includes(c)?' selected':''}" onclick="toggleChip('${q.id}','${c.replace(/'/g,"\\'")}')">` + c + `</div>`
+    ).join('')}</div>`;
+  } else if (q.type === 'chips+text') {
+    const sel = selectedChips[q.id] || [];
+    const val = (answers[q.id] || '').replace(/"/g, '&quot;');
+    inputHtml = `<div class="chips">${q.chips.map(c =>
+      `<div class="chip${sel.includes(c)?' selected':''}" onclick="toggleChip('${q.id}','${c.replace(/'/g,"\\'")}')">` + c + `</div>`
+    ).join('')}</div>
+    <input type="text" id="ans" placeholder="${q.placeholder}" value="${val}">`;
+  }
+
+  getApp().innerHTML = `
+    <div class="step-badge"><div class="step-dot"></div>STEP ${stepNum} / ${total}</div>
+    <div class="question">${q.question}</div>
+    <div class="hint">${q.hint}</div>
+    ${inputHtml}
+    <div class="error" id="err"></div>
+    <div class="nav">
+      <button class="btn" onclick="goBack()" ${currentStep===0?'disabled':''}>← 戻る</button>
+      <button class="btn primary" onclick="goNext()">
+        ${currentStep === QUESTIONS.length-1 ? '自己PRを生成する →' : '次へ →'}
+      </button>
+    </div>
+  `;
+
+  const ansEl = document.getElementById('ans');
+  if (ansEl) ansEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target.tagName === 'INPUT') goNext();
+  });
+}
+
+function toggleChip(qid, chip) {
+  if (!selectedChips[qid]) selectedChips[qid] = [];
+  const idx = selectedChips[qid].indexOf(chip);
+  if (idx >= 0) selectedChips[qid].splice(idx, 1);
+  else selectedChips[qid].push(chip);
+  const prev = document.getElementById('ans');
+  const prevVal = prev ? prev.value : null;
+  renderQuestion();
+  if (prevVal !== null) {
+    const el = document.getElementById('ans');
+    if (el) el.value = prevVal;
+  }
+}
+
+function saveAnswer() {
+  const el = document.getElementById('ans');
+  if (el) answers[QUESTIONS[currentStep].id] = el.value.trim();
+}
+
+function validate() {
+  const q = QUESTIONS[currentStep];
+  if (q.type === 'chips') return (selectedChips[q.id] || []).length > 0;
+  const hasChip = (selectedChips[q.id] || []).length > 0;
+  const hasText = (answers[q.id] || '').length > 0;
+  if (q.type === 'chips+text') return hasChip || hasText;
+  return hasText;
+}
+
+function goNext() {
+  saveAnswer();
+  if (!validate()) {
+    document.getElementById('err').textContent = '入力または選択してください。';
+    return;
+  }
+  if (currentStep < QUESTIONS.length - 1) {
+    currentStep++;
+    renderQuestion();
+  } else {
+    renderLoading();
+    generatePR();
+  }
+}
+
+function goBack() {
+  saveAnswer();
+  if (currentStep > 0) { currentStep--; renderQuestion(); }
+}
+
+function renderLoading() {
+  updateProgress();
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('prog-pct').textContent = '100%';
+  getApp().innerHTML = `
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <div class="loading-msg">あなたの自己PRを生成しています...</div>
+    </div>
+  `;
+}
+
+async function generatePR() {
+  const role = answers.role || '';
+  const strength = [...(selectedChips.strength||[]), answers.strength||''].filter(Boolean).join('、');
+  const achievement = answers.achievement || '';
+  const value = [...(selectedChips.value||[]), answers.value||''].filter(Boolean).join('、');
+  const goal = answers.goal || '';
+  const purpose = (selectedChips.purpose||[]).join('、') || '';
+
+  const prompt = `あなたは採用のプロフェッショナルです。以下の情報をもとに、自己PRを3パターン作成してください。
+
+【基本情報】
+職種・役割: ${role}
+強み: ${strength}
+実績・経験: ${achievement}
+仕事で大切にしていること: ${value}
+今後の目標: ${goal}
+使用場面: ${purpose}
+
+【出力形式】
+以下のJSON形式のみで出力してください（マークダウン不要）：
+{
+  "versions": [
+    {"label": "簡潔版（150字程度）", "text": "..."},
+    {"label": "標準版（300字程度）", "text": "..."},
+    {"label": "詳細版（500字程度）", "text": "..."}
+  ]
+}
+
+各バージョンは自然な日本語で、${purpose}に適したトーンで書いてください。強みと実績を具体的に盛り込み、説得力のある文章にしてください。`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const json = await resp.json();
+    const text = (json.content||[]).map(i=>i.text||'').join('');
+    const clean = text.replace(/```json|```/g,'').trim();
+    results = JSON.parse(clean);
+    activeTab = 0;
+    renderResult();
+  } catch(e) {
+    getApp().innerHTML = `
+      <div style="text-align:center;padding:2rem 0">
+        <p style="color:#b84040;margin-bottom:1.5rem;font-size:0.9rem">生成中にエラーが発生しました。<br>もう一度お試しください。</p>
+        <button class="btn" onclick="restart()">最初からやり直す</button>
+      </div>`;
+  }
+}
+
+function renderResult() {
+  const versions = results.versions;
+  const current = versions[activeTab];
+
+  const tabs = versions.map((v,i) =>
+    `<button class="vtab${i===activeTab?' active':''}" onclick="switchTab(${i})">${v.label}</button>`
+  ).join('');
+
+  getApp().innerHTML = `
+    <div class="result-header">
+      <div class="result-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+      </div>
+      <div class="result-title">自己PRが完成しました</div>
+    </div>
+    <div class="vtabs">${tabs}</div>
+    <div class="result-box">
+      <div class="result-label">${current.label}</div>
+      <div class="result-text" id="result-text">${current.text}</div>
+    </div>
+    <div class="action-row">
+      <button class="btn primary" onclick="copyText()">コピーする</button>
+      <button class="btn" onclick="restart()">最初からやり直す</button>
+    </div>
+    <div class="copy-feedback" id="copy-msg"></div>
+  `;
+}
+
+function switchTab(i) {
+  activeTab = i;
+  renderResult();
+}
+
+function copyText() {
+  const t = document.getElementById('result-text');
+  if (!t) return;
+  navigator.clipboard.writeText(t.textContent).then(() => {
+    const m = document.getElementById('copy-msg');
+    if (m) { m.textContent = 'クリップボードにコピーしました'; setTimeout(()=>m.textContent='',2500); }
+  });
+}
+
+function restart() {
+  currentStep = 0;
+  answers = {};
+  selectedChips = {};
+  results = null;
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
