@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>自己分析ツール — 転職者向け</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F7F5F0;
+      --surface: #FFFFFF;
+      --surface2: #F0EDE6;
+      --ink: #1A1814;
+      --ink2: #5C5850;
+      --ink3: #9C9890;
+      --accent: #2A4D3E;
+      --accent-light: #E0EDE8;
+      --accent2: #C4763A;
+      --accent2-light: #FAF0E6;
+      --border: rgba(26,24,20,0.12);
+      --border-strong: rgba(26,24,20,0.22);
+      --r: 10px;
+      --r-lg: 16px;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    /* Header */
+    header {
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 0 2rem;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .header-inner {
+      max-width: 760px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .logo {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 15px; font-weight: 600;
+      color: var(--accent); letter-spacing: 0.04em;
+    }
+    .header-badge {
+      font-size: 11px; padding: 3px 10px;
+      background: var(--accent-light); color: var(--accent);
+      border-radius: 20px; font-weight: 500;
+    }
+
+    /* Layout */
+    main {
+      max-width: 760px; margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+
+    /* Screens */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* Intro */
+    .intro-eyebrow {
+      font-size: 12px; letter-spacing: 0.12em; font-weight: 500;
+      color: var(--accent); text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .intro-heading {
+      font-family: 'Noto Serif JP', serif;
+      font-size: clamp(26px, 5vw, 38px);
+      font-weight: 600; line-height: 1.3;
+      color: var(--ink); margin-bottom: 1rem;
+    }
+    .intro-body {
+      font-size: 15px; color: var(--ink2); max-width: 520px;
+      line-height: 1.8; margin-bottom: 2rem;
+    }
+    .intro-cards {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px; margin-bottom: 2.5rem;
+    }
+    .intro-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 1rem 1.1rem;
+    }
+    .intro-card-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      margin-bottom: 0.6rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .intro-card-icon.green { background: var(--accent-light); }
+    .intro-card-icon.orange { background: var(--accent2-light); }
+    .intro-card-icon.gray { background: var(--surface2); }
+    .intro-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .intro-card p { font-size: 12px; color: var(--ink3); }
+    .intro-note {
+      font-size: 12px; color: var(--ink3);
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 1rem;
+    }
+
+    /* Progress */
+    .progress-wrap { margin-bottom: 2rem; }
+    .progress-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
+    }
+    .progress-step { font-size: 12px; font-weight: 500; color: var(--accent); }
+    .progress-count { font-size: 12px; color: var(--ink3); }
+    .progress-track {
+      height: 3px; background: var(--border); border-radius: 2px;
+    }
+    .progress-fill {
+      height: 100%; background: var(--accent);
+      border-radius: 2px; transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .progress-dots { display: flex; gap: 6px; margin-top: 8px; }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--border-strong); transition: all 0.3s;
+    }
+    .dot.done { background: var(--accent); }
+    .dot.active { background: var(--accent); transform: scale(1.4); }
+
+    /* Question */
+    .q-label {
+      display: inline-block;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--accent);
+      background: var(--accent-light); padding: 3px 10px;
+      border-radius: 20px; margin-bottom: 0.75rem;
+    }
+    .q-text {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 20px; font-weight: 600;
+      color: var(--ink); margin-bottom: 0.5rem; line-height: 1.5;
+    }
+    .q-hint { font-size: 13px; color: var(--ink3); margin-bottom: 1.25rem; }
+    textarea {
+      width: 100%; min-height: 130px;
+      padding: 14px 16px; font-size: 14px;
+      font-family: 'Noto Sans JP', sans-serif;
+      line-height: 1.7; color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--r); resize: vertical;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(42,77,62,0.1);
+    }
+    .error-msg {
+      font-size: 12px; color: #C4763A; margin-top: 6px; display: none;
+    }
+    .btn-row {
+      display: flex; gap: 10px; align-items: center; margin-top: 1.25rem;
+    }
+    .btn {
+      padding: 11px 26px; border-radius: var(--r);
+      font-size: 14px; font-weight: 500;
+      font-family: 'Noto Sans JP', sans-serif;
+      cursor: pointer; transition: all 0.2s; border: none;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #1e3a2e; transform: translateY(-1px); }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-ghost {
+      background: transparent; color: var(--ink2);
+      border: 1px solid var(--border-strong);
+    }
+    .btn-ghost:hover { background: var(--surface2); }
+    .btn-back {
+      background: none; border: none;
+      font-size: 13px; color: var(--ink3); cursor: pointer;
+      padding: 0; font-family: 'Noto Sans JP', sans-serif;
+    }
+    .btn-back:hover { color: var(--ink); }
+
+    /* Analyzing */
+    .analyzing-wrap {
+      text-align: center; padding: 4rem 0;
+    }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .analyzing-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 18px; font-weight: 600; margin-bottom: 0.5rem;
+    }
+    .analyzing-sub { font-size: 13px; color: var(--ink3); }
+
+    /* Result */
+    .result-header { margin-bottom: 2rem; }
+    .result-eyebrow {
+      font-size: 11px; letter-spacing: 0.1em; font-weight: 700;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem;
+    }
+    .result-title {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 26px; font-weight: 600; color: var(--ink);
+    }
+
+    .result-block { margin-bottom: 1.75rem; }
+    .block-label {
+      font-size: 11px; letter-spacing: 0.1em; font-weight: 700;
+      text-transform: uppercase; color: var(--ink3);
+      margin-bottom: 0.6rem;
+    }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag {
+      font-size: 13px; padding: 5px 14px;
+      border-radius: 20px; font-weight: 500;
+    }
+    .tag-s { background: var(--accent-light); color: var(--accent); border: 1px solid rgba(42,77,62,0.15); }
+    .tag-w { background: #FAF0E6; color: #8B4513; border: 1px solid rgba(196,118,58,0.2); }
+    .tag-v { background: #F0EDE6; color: #4A3F35; border: 1px solid rgba(26,24,20,0.12); }
+    .tag-c { background: #EBF3FA; color: #1C4A6E; border: 1px solid rgba(28,74,110,0.15); }
+
+    .chart-section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 1.5rem;
+      margin-bottom: 1.75rem;
+    }
+    .chart-title { font-size: 13px; font-weight: 700; margin-bottom: 1rem; color: var(--ink2); }
+    .chart-wrap { position: relative; width: 100%; height: 280px; }
+
+    .summary-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--r) var(--r) 0;
+      padding: 1.1rem 1.25rem;
+      font-size: 14px; line-height: 1.8; color: var(--ink2);
+      margin-bottom: 1.75rem;
+    }
+
+    .cta-row {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+    /* Responsive */
+    @media (max-width: 540px) {
+      main { padding: 1.5rem 1rem 3rem; }
+      header { padding: 0 1rem; }
+      .q-text { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">自己分析ツール</div>
+    <div class="header-badge">転職者向け</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── Intro ── -->
+  <div class="screen active" id="screen-intro">
+    <div class="intro-eyebrow">Self Analysis Tool</div>
+    <h1 class="intro-heading">あなたの強みを、<br>言葉にしよう。</h1>
+    <p class="intro-body">5つの質問に答えるだけで、AIがあなたの強み・弱み・価値観・キャリア方向性を整理し、レーダーチャートで可視化します。転職活動の軸づくりに。</p>
+
+    <div class="intro-cards">
+      <div class="intro-card">
+        <div class="intro-card-icon green">💪</div>
+        <h3>強み・スキル</h3>
+        <p>得意なこと、活かせる能力</p>
+      </div>
+      <div class="intro-card">
+        <div class="intro-card-icon orange">📈</div>
+        <h3>弱み・課題</h3>
+        <p>成長が必要な部分</p>
+      </div>
+      <div class="intro-card">
+        <div class="intro-card-icon gray">🧭</div>
+        <h3>価値観・軸</h3>
+        <p>仕事で大切にしたいこと</p>
+      </div>
+      <div class="intro-card">
+        <div class="intro-card-icon green">🎯</div>
+        <h3>キャリア方向性</h3>
+        <p>目指したい姿・方向性</p>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="startQuiz()">はじめる →</button>
+    <p class="intro-note">⏱ 所要時間：約5〜10分 ・ 入力内容は外部に保存されません</p>
+  </div>
+
+  <!-- ── Questions ── -->
+  <div class="screen" id="screen-q">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span class="progress-step" id="step-label"></span>
+        <span class="progress-count" id="step-count"></span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-dots" id="progress-dots"></div>
+    </div>
+
+    <div class="q-label" id="q-label"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-hint" id="q-hint"></div>
+    <textarea id="q-answer" placeholder="ここに入力してください..."></textarea>
+    <div class="error-msg" id="q-error">回答を入力してください</div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="next-btn" onclick="nextQ()">次へ →</button>
+      <button class="btn-back" onclick="prevQ()">← 戻る</button>
+    </div>
+  </div>
+
+  <!-- ── Analyzing ── -->
+  <div class="screen" id="screen-analyzing">
+    <div class="analyzing-wrap">
+      <div class="spinner"></div>
+      <div class="analyzing-title">AIが分析中です...</div>
+      <div class="analyzing-sub">あなたの回答をもとに自己分析レポートを生成しています</div>
+    </div>
+  </div>
+
+  <!-- ── Result ── -->
+  <div class="screen" id="screen-result">
+    <div class="result-header">
+      <div class="result-eyebrow">Analysis Result</div>
+      <div class="result-title">自己分析レポート</div>
+    </div>
+
+    <div class="chart-section">
+      <div class="chart-title">総合スコア</div>
+      <div class="chart-wrap">
+        <canvas id="radarChart" role="img" aria-label="自己分析レーダーチャート">強み・スキル、成長意欲、価値観の明確さ、コミュニケーション力、主体性の5軸スコア</canvas>
+      </div>
+    </div>
+
+    <div class="result-block" id="res-strengths"></div>
+    <div class="divider"></div>
+    <div class="result-block" id="res-weaknesses"></div>
+    <div class="divider"></div>
+    <div class="result-block" id="res-values"></div>
+    <div class="divider"></div>
+    <div class="result-block" id="res-career"></div>
+    <div class="divider"></div>
+
+    <div class="summary-box" id="res-summary"></div>
+
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="goWrite('志望動機')">志望動機を作る →</button>
+      <button class="btn btn-primary" onclick="goWrite('自己PR')">自己PRを作る →</button>
+      <button class="btn btn-ghost" onclick="restart()">もう一度分析する</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const questions = [
+  { label: "強み・得意なこと", text: "これまでの仕事で「これは得意だった」「評価された」と感じることは何ですか？", hint: "具体的なエピソードや業務内容を交えて教えてください（例：チームをまとめること、数字の分析、顧客折衝など）" },
+  { label: "弱み・課題", text: "仕事で「苦手だった」「もっと改善したい」と感じることは何ですか？", hint: "正直に書いてください。弱みを理解することが成長につながります" },
+  { label: "価値観・働き方の軸", text: "仕事において「これだけは譲れない」「大切にしたい」ことは何ですか？", hint: "例：成長できる環境、チームワーク、社会貢献、ワークライフバランス、裁量の大きさなど" },
+  { label: "転職理由・動機", text: "なぜ今転職を考えているのですか？現職への不満や、求めている変化を教えてください。", hint: "正直な気持ちで構いません。ここが自己分析の核になります" },
+  { label: "理想のキャリア・将来像", text: "3〜5年後、どんなキャリアを歩んでいたいですか？なりたい姿や目標を教えてください。", hint: "「こんな仕事がしたい」「こんな人になりたい」という形でもOKです" }
+];
+
+let current = 0;
+const answers = [];
+let resultData = null;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startQuiz() {
+  showScreen('screen-q');
+  renderQ(0);
+}
+
+function renderQ(idx) {
+  current = idx;
+  const q = questions[idx];
+  document.getElementById('step-label').textContent = q.label;
+  document.getElementById('step-count').textContent = `${idx + 1} / ${questions.length}`;
+  document.getElementById('q-label').textContent = q.label;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-hint').textContent = q.hint;
+  document.getElementById('q-answer').value = answers[idx] || '';
+  document.getElementById('q-error').style.display = 'none';
+  document.getElementById('progress-fill').style.width = `${(idx / questions.length) * 100}%`;
+  document.getElementById('next-btn').textContent = idx === questions.length - 1 ? '分析する →' : '次へ →';
+
+  const dots = document.getElementById('progress-dots');
+  dots.innerHTML = '';
+  questions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < idx ? ' done' : i === idx ? ' active' : '');
+    dots.appendChild(d);
+  });
+}
+
+function nextQ() {
+  const val = document.getElementById('q-answer').value.trim();
+  if (!val) { document.getElementById('q-error').style.display = 'block'; return; }
+  answers[current] = val;
+  if (current < questions.length - 1) { renderQ(current + 1); }
+  else { analyze(); }
+}
+
+function prevQ() {
+  const val = document.getElementById('q-answer').value.trim();
+  if (val) answers[current] = val;
+  if (current === 0) { showScreen('screen-intro'); return; }
+  renderQ(current - 1);
+}
+
+async function analyze() {
+  showScreen('screen-analyzing');
+
+  const prompt = `あなたは転職支援の専門家です。以下は転職希望者の自己分析回答です。
+
+質問1（強み）: ${answers[0]}
+質問2（弱み）: ${answers[1]}
+質問3（価値観）: ${answers[2]}
+質問4（転職理由）: ${answers[3]}
+質問5（将来像）: ${answers[4]}
+
+以下のJSON形式のみで回答してください。前置きやマークダウン記法は不要です。
+
+{
+  "strengths": ["強み1", "強み2", "強み3"],
+  "weaknesses": ["弱み1", "弱み2"],
+  "values": ["価値観1", "価値観2", "価値観3"],
+  "careerDirection": ["方向性1", "方向性2"],
+  "summary": "この人の転職に向けた自己分析まとめ（150字程度）",
+  "scores": {
+    "強み・スキル": 数値0-100,
+    "成長意欲": 数値0-100,
+    "価値観の明確さ": 数値0-100,
+    "コミュニケーション力": 数値0-100,
+    "主体性": 数値0-100
+  }
+}`;
+
+  try {
+    const res = await fetch('/api/generate_analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const text = data.content.map(i => i.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    resultData = JSON.parse(clean);
+    showResult(resultData);
+  } catch (e) {
+    showScreen('screen-q');
+    renderQ(questions.length - 1);
+    const err = document.getElementById('q-error');
+    err.textContent = '分析中にエラーが発生しました。しばらくしてから再度お試しください。';
+    err.style.display = 'block';
+  }
+}
+
+function makeTags(arr, cls) {
+  return `<div class="tag-row">${arr.map(t => `<span class="tag ${cls}">${t}</span>`).join('')}</div>`;
+}
+
+function showResult(d) {
+  showScreen('screen-result');
+
+  document.getElementById('res-strengths').innerHTML = `<div class="block-label">強み・スキル</div>${makeTags(d.strengths, 'tag-s')}`;
+  document.getElementById('res-weaknesses').innerHTML = `<div class="block-label">成長課題</div>${makeTags(d.weaknesses, 'tag-w')}`;
+  document.getElementById('res-values').innerHTML = `<div class="block-label">価値観・軸</div>${makeTags(d.values, 'tag-v')}`;
+  document.getElementById('res-career').innerHTML = `<div class="block-label">キャリア方向性</div>${makeTags(d.careerDirection, 'tag-c')}`;
+  document.getElementById('res-summary').textContent = d.summary;
+
+  const labels = Object.keys(d.scores);
+  const values = Object.values(d.scores);
+
+  new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'スコア',
+        data: values,
+        backgroundColor: 'rgba(42,77,62,0.12)',
+        borderColor: '#2A4D3E',
+        borderWidth: 2,
+        pointBackgroundColor: '#2A4D3E',
+        pointRadius: 5,
+        pointHoverRadius: 7
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { stepSize: 25, font: { size: 10, family: "'Noto Sans JP', sans-serif" }, color: '#9C9890' },
+          grid: { color: 'rgba(26,24,20,0.08)' },
+          angleLines: { color: 'rgba(26,24,20,0.08)' },
+          pointLabels: { font: { size: 12, family: "'Noto Sans JP', sans-serif" }, color: '#1A1814' }
+        }
+      }
+    }
+  });
+}
+
+function goWrite(type) {
+  if (!resultData) return;
+  const s = resultData.strengths.join('、');
+  const v = resultData.values.join('、');
+  const c = resultData.careerDirection.join('、');
+  const msg = `以下の自己分析をもとに、転職活動用の${type}を作成してください。\n\n強み：${s}\n価値観：${v}\nキャリア方向性：${c}\n総評：${resultData.summary}`;
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({ type: 'sendPrompt', text: msg }, '*');
+  } else {
+    navigator.clipboard.writeText(msg).then(() => alert(`${type}作成用のプロンプトをクリップボードにコピーしました。AIチャットに貼り付けてご利用ください。`));
+  }
+}
+
+function restart() {
+  answers.length = 0;
+  resultData = null;
+  const old = document.getElementById('radarChart');
+  if (old) { const ctx = old.getContext('2d'); Chart.getChart(old) && Chart.getChart(old).destroy(); }
+  showScreen('screen-intro');
+}
+</script>
+</body>
+</html>
