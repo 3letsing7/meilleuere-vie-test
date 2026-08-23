@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#001D4A">
+<title>社長の背中SNS(仮) プロトタイプ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#001D4A;
+  --navy-2:#173A6D;
+  --navy-3:#42618F;
+  --ink:#15181D;
+  --ink-2:#565C66;
+  --ink-3:#8B9099;
+  --paper:#EBEDE9;
+  --card:#FFFFFF;
+  --line:#DCDEDA;
+  --line-2:#C6C9C4;
+  --seal:#AE3524;
+  --seal-tint:#F4E5E1;
+  --navy-tint:#E4E9F1;
+  --r:10px;
+  --sans:"Noto Sans JP",system-ui,sans-serif;
+  --serif:"Noto Serif JP",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.7;
+  font-feature-settings:"palt" 1;
+}
+:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,textarea,select{font:inherit;color:inherit}
+
+/* ---------- chrome ---------- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ---------- phone ---------- */
+.phone{width:392px;flex-shrink:0;background:var(--card);border:1px solid var(--line-2);border-radius:26px;overflow:hidden;box-shadow:0 1px 2px rgba(0,29,74,.05),0 10px 34px rgba(0,29,74,.09)}
+.status{height:26px;background:var(--navy);display:flex;align-items:center;justify-content:center}
+.status i{width:52px;height:4px;border-radius:2px;background:rgba(255,255,255,.28);display:block}
+.appbar{padding:13px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.appbar .t{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--navy);letter-spacing:.02em;white-space:nowrap}
+.appbar .s{font-size:10.5px;color:var(--ink-3);letter-spacing:.06em}
+.appbar .back{font-size:12.5px;color:var(--navy-2)}
+.screen{min-height:530px;padding:15px 17px 22px;display:none}
+.screen.on{display:block}
+.scroll{max-height:530px;overflow-y:auto}
+
+/* ---------- feed ---------- */
+.prompt{background:var(--navy);color:#fff;border-radius:var(--r);padding:15px 17px;margin-bottom:15px}
+.prompt .eyebrow{font-size:10px;letter-spacing:.16em;color:rgba(255,255,255,.6);margin-bottom:7px}
+.prompt .q{font-family:var(--serif);font-size:16px;line-height:1.75;font-weight:400}
+.prompt .n{font-size:11px;color:rgba(255,255,255,.62);margin-top:10px}
+
+.post{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;background:var(--card)}
+.who{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.av{width:36px;height:36px;border-radius:50%;background:var(--navy-tint);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
+.who .nm{font-size:13px;font-weight:500;line-height:1.4}
+.who .co{font-size:11px;color:var(--ink-2);line-height:1.5}
+.tag{font-size:10px;letter-spacing:.06em;padding:3px 9px;border-radius:3px;background:var(--navy);color:#fff;white-space:nowrap}
+.tag.quiet{background:transparent;border:1px solid var(--line-2);color:var(--ink-2)}
+.body{font-size:13.5px;line-height:1.95;color:var(--ink)}
+.acts{display:flex;gap:17px;margin-top:12px;font-size:11.5px;color:var(--ink-2)}
+.acts b{font-weight:400}
+.acts .hand{color:var(--navy);font-weight:500}
+
+.article{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:12px}
+.article .cap{background:var(--paper);padding:8px 16px;font-size:10.5px;letter-spacing:.1em;color:var(--ink-2)}
+.article .in{padding:14px 16px}
+.article h3{font-family:var(--serif);font-size:14.5px;font-weight:600;line-height:1.7;margin-bottom:6px}
+.article .lnk{font-size:11.5px;color:var(--navy-2)}
+.reply{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;gap:9px}
+.reply .av{width:28px;height:28px;font-size:10px}
+.reply p{font-size:12px;color:var(--ink-2);line-height:1.85}
+.reply p b{color:var(--ink);font-weight:500}
+
+.event{border:1px solid var(--navy-3);border-radius:var(--r);padding:14px 16px}
+.event .eyebrow{font-size:10.5px;letter-spacing:.1em;color:var(--navy-2);margin-bottom:6px}
+.event h3{font-family:var(--serif);font-size:14.5px;font-weight:600;line-height:1.7;margin-bottom:11px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.seats{font-size:11.5px;color:var(--ink-2)}
+
+.btn{background:var(--navy);color:#fff;padding:8px 18px;border-radius:6px;font-size:12.5px;font-weight:500;transition:.16s}
+.btn:hover{background:var(--navy-2)}
+.btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--line-2)}
+.btn.ghost:hover{border-color:var(--navy);background:transparent}
+.btn.seal{background:var(--seal)}
+.btn.seal:hover{background:#932C1E}
+.btn.wide{display:block;width:100%;text-align:center;padding:12px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+
+.fab{position:sticky;bottom:12px;margin-left:auto;width:52px;height:52px;border-radius:50%;background:var(--navy);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,29,74,.3)}
+
+/* ---------- nav ---------- */
+.tabs{display:flex;border-top:1px solid var(--line);background:var(--card)}
+.tab{flex:1;padding:9px 0 11px;text-align:center;color:var(--ink-3);transition:.14s}
+.tab .g{font-size:18px;line-height:1.35;font-family:var(--serif)}
+.tab .l{font-size:9.5px;letter-spacing:.04em}
+.tab[aria-current="true"]{color:var(--navy)}
+.tab[aria-current="true"] .l{font-weight:500}
+
+/* ---------- search / list ---------- */
+.field{width:100%;padding:9px 12px;border:1px solid var(--line-2);border-radius:6px;font-size:13px;background:var(--card)}
+.field::placeholder{color:var(--ink-3)}
+.field:focus{outline:none;border-color:var(--navy-3)}
+textarea.field{resize:none;line-height:1.9}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin:11px 0 15px}
+.f{font-size:11px;padding:4px 11px;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-2)}
+.f.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.member{display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.member:hover .nm{color:var(--navy)}
+.member .nm{font-size:13px;font-weight:500}
+.member .co{font-size:11px;color:var(--ink-2)}
+.dist{font-size:10px;color:var(--ink-3);white-space:nowrap;text-align:right;line-height:1.6}
+.chain{display:inline-flex;align-items:center;gap:3px;vertical-align:-1px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--seal)}
+.dot.o{background:transparent;border:1px solid var(--line-2)}
+.link{width:9px;height:1px;background:var(--line-2)}
+
+/* ---------- profile ---------- */
+.phead{display:flex;gap:14px;align-items:center;margin-bottom:16px}
+.phead .av{width:58px;height:58px;font-size:16px}
+.phead h2{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.4}
+.phead .co{font-size:12px;color:var(--ink-2);margin-top:3px}
+.box{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:11px}
+.box .eyebrow{font-size:10px;letter-spacing:.14em;color:var(--ink-3);margin-bottom:8px}
+.kv{font-size:12.5px;color:var(--ink-2);line-height:2.15}
+.kv b{color:var(--ink);font-weight:500}
+.quote{font-family:var(--serif);font-size:14px;line-height:2;color:var(--ink);padding-left:13px;border-left:2px solid var(--navy)}
+
+/* ---------- seal (signature) ---------- */
+.sealwrap{display:flex;flex-direction:column;align-items:center;padding:26px 0 8px}
+.stamp{width:112px;height:112px;border-radius:50%;border:3px solid var(--seal);color:var(--seal);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--serif);font-weight:600;letter-spacing:.22em;background:var(--seal-tint)}
+.stamp .a{font-size:19px;line-height:1.5}
+.stamp .b{font-size:9.5px;letter-spacing:.14em;margin-top:3px;opacity:.85}
+.pressed{animation:press .5s cubic-bezier(.2,.9,.3,1)}
+@keyframes press{0%{transform:scale(1.5) rotate(-9deg);opacity:0}55%{transform:scale(.94) rotate(1deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+.certificate{border:1px solid var(--seal);border-radius:var(--r);padding:18px 17px;background:var(--seal-tint);text-align:center}
+.certificate .k{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--seal);letter-spacing:.1em;margin-bottom:9px}
+.certificate .c{font-family:var(--sans);font-size:19px;letter-spacing:.24em;color:var(--ink);padding:9px 0;border-top:1px solid rgba(174,53,36,.28);border-bottom:1px solid rgba(174,53,36,.28);margin-bottom:10px}
+.certificate .n{font-size:11.5px;color:var(--ink-2);line-height:1.85}
+
+/* ---------- steps ---------- */
+.steps{display:flex;gap:6px;margin-bottom:16px}
+.step{flex:1;height:2px;background:var(--line-2);border-radius:1px}
+.step.on{background:var(--navy)}
+.step.on.s{background:var(--seal)}
+.choice{width:100%;text-align:left;border:1px solid var(--line-2);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;transition:.16s}
+.choice:hover{border-color:var(--navy);background:var(--navy-tint)}
+.choice .h{font-size:13.5px;font-weight:500;margin-bottom:3px}
+.choice .d{font-size:11.5px;color:var(--ink-2);line-height:1.75}
+.hint{font-size:11px;color:var(--ink-3);line-height:1.8;margin-top:9px}
+.count{font-size:11px;color:var(--ink-3);text-align:right;margin-top:5px}
+
+.notice{display:flex;gap:11px;padding:13px 0;border-bottom:1px solid var(--line)}
+.notice .d{font-size:12.5px;line-height:1.8;color:var(--ink-2)}
+.notice .d b{color:var(--ink);font-weight:500}
+.notice .t{font-size:10.5px;color:var(--ink-3);margin-top:3px}
+
+/* ---------- admin ---------- */
+.admin{flex:1;min-width:0;background:var(--card);border:1px solid var(--line-2);border-radius:12px;overflow:hidden;box-shadow:0 10px 34px rgba(0,29,74,.09);display:none}
+.admin.on{display:block}
+.abar{background:var(--navy);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.abar .t{font-family:var(--serif);font-size:14.5px;letter-spacing:.06em}
+.abar .u{font-size:11px;color:rgba(255,255,255,.62)}
+.abody{display:flex}
+.aside{width:158px;border-right:1px solid var(--line);padding:14px 0;flex-shrink:0}
+.aside a{display:block;padding:8px 20px;font-size:12.5px;color:var(--ink-2);text-decoration:none}
+.aside a.on{color:var(--navy);font-weight:500;border-left:2px solid var(--navy);padding-left:18px}
+.amain{flex:1;padding:20px 22px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:22px}
+.kpi{background:var(--paper);border-radius:8px;padding:13px 14px}
+.kpi .l{font-size:10.5px;color:var(--ink-2);letter-spacing:.04em}
+.kpi .v{font-size:23px;font-weight:500;line-height:1.5;margin-top:2px}
+.kpi .v small{font-size:12px;color:var(--ink-2);font-weight:400}
+.kpi .d{font-size:10.5px;color:var(--ink-3)}
+.kpi.alert{background:var(--seal-tint)}
+.kpi.alert .v{color:var(--seal)}
+.ah{font-size:12px;font-weight:500;letter-spacing:.08em;color:var(--ink-2);margin:0 0 10px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{font-size:10.5px;font-weight:400;color:var(--ink-3);text-align:left;padding:0 8px 7px 0;letter-spacing:.06em}
+td{font-size:12.5px;padding:9px 8px 9px 0;border-top:1px solid var(--line);vertical-align:middle}
+td.r{text-align:right;padding-right:0}
+.mini{font-size:11px;padding:4px 11px;border-radius:5px}
+.pill{font-size:10px;padding:3px 8px;border-radius:3px;background:var(--navy-tint);color:var(--navy)}
+.pill.warn{background:var(--seal-tint);color:var(--seal)}
+.pill.ai{background:var(--navy);color:#fff;letter-spacing:.06em}
+.bars{display:flex;align-items:flex-end;gap:7px;height:74px;margin:14px 0 6px}
+.bar{flex:1;background:var(--navy-3);border-radius:2px 2px 0 0}
+.bar.now{background:var(--navy)}
+.barlab{display:flex;gap:7px;font-size:9.5px;color:var(--ink-3)}
+.barlab span{flex:1;text-align:center}
+
+
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+
+/* ================= mobile shell ================= */
+body{background:var(--paper);-webkit-text-size-adjust:100%;overflow-x:hidden}
+.wrap{max-width:392px;width:100%;margin:0 auto;background:var(--card);min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.switch{display:flex;background:var(--navy);flex-shrink:0}
+.switch button{flex:1;padding:9px 0 10px;font-size:11.5px;letter-spacing:.06em;color:rgba(255,255,255,.5);border-bottom:2px solid transparent}
+.switch button[aria-current="true"]{color:#fff;border-bottom-color:var(--seal)}
+.phone{width:100%;flex:1;display:flex;flex-direction:column;background:var(--card);border:none;border-radius:0;overflow:visible;box-shadow:none}
+.admin{width:100%;min-width:0;flex:1;border:none;border-radius:0;overflow:visible;box-shadow:none}
+.screen{flex:1;min-height:0;padding:15px 16px 96px}
+.scroll{max-height:none;overflow:visible}
+.tabs{position:sticky;bottom:0;z-index:5;padding-bottom:env(safe-area-inset-bottom)}
+.appbar{position:sticky;top:0;z-index:5;background:var(--card)}
+.fab{position:fixed;right:calc(50% - 196px + 16px);bottom:84px;z-index:6}
+
+/* 管理画面をスマホ幅に */
+.abar{flex-direction:column;align-items:flex-start;gap:3px;padding:11px 16px}
+.abar .u{font-size:10.5px}
+.abody{flex-direction:column;min-width:0}
+.amain,.aside{min-width:0;max-width:100%}
+.aside{width:100%;display:flex;gap:2px;overflow-x:auto;border-right:none;border-bottom:1px solid var(--line);padding:8px 12px;-webkit-overflow-scrolling:touch}
+.aside a{padding:5px 11px;white-space:nowrap;border-radius:999px;background:var(--paper);font-size:11.5px}
+.aside a.on{border-left:none;padding-left:11px;background:var(--navy);color:#fff}
+.amain{padding:16px 16px 30px}
+.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.kpi .v{font-size:20px}
+/* 管理画面の表は、スマホでは1件ずつのカードに畳む */
+.atbl thead,.atbl tr:first-child th{display:none}
+.atbl,.atbl tbody,.atbl tr,.atbl td{display:block;width:100%}
+.atbl tr{border-top:1px solid var(--line);padding:12px 0 13px}
+.atbl tr:first-child{border-top:none}
+.atbl td{border:none;padding:0;font-size:12px;color:var(--ink-2)}
+.atbl td:nth-child(1){font-size:13px;color:var(--ink);font-weight:500;line-height:1.6;margin-bottom:8px}
+.atbl td:nth-child(2),.atbl td:nth-child(3){display:inline-block;width:auto;vertical-align:middle;margin-right:9px}
+.atbl td:nth-child(4){margin-top:10px;text-align:left}
+.atbl td.r{text-align:left}
+.atbl td:nth-child(4) .btn{width:100%;text-align:center;padding:9px}
+
+@media (min-width:520px){
+  body{padding:22px 0 30px}
+  .wrap{min-height:0;border:1px solid var(--line-2);border-radius:20px;overflow:hidden;box-shadow:0 10px 34px rgba(0,29,74,.10)}
+  .screen{min-height:520px}
+  .tabs{position:static}
+  .appbar{position:static}
+  .fab{position:sticky;right:auto;bottom:12px;margin-left:auto}
+  .admin{min-width:0}
+  .wrap:has(#admin.on){max-width:720px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="switch" aria-label="画面切り替え">
+    <button data-v="member" aria-current="true">会員の画面</button>
+    <button data-v="admin">運営の画面</button>
+  </nav>
+
+<div class="phone" id="phone">
+    <div class="appbar">
+      <div>
+        <div class="t" id="barTitle">社長の背中SNS(仮)</div>
+        <div class="s" id="barSub">紹介制 ・ 会員212名</div>
+      </div>
+      <button class="back" id="barAction">通知</button>
+    </div>
+
+    <!-- HOME -->
+    <section class="screen on scroll" id="s-home" aria-label="ホーム">
+      <div class="prompt">
+        <div class="eyebrow">今週のお題 ／ 運営事務局</div>
+        <div class="q">今月いちばん眠れなかった意思決定は、なんでしたか。</div>
+        <div class="n">14名が書きました</div>
+      </div>
+
+      <article class="post">
+        <div class="who">
+          <div class="av">島田</div>
+          <div style="flex:1">
+            <div class="nm">島田 浩平</div>
+            <div class="co">株式会社K.SS ／ コンサル ／ 東京</div>
+          </div>
+          <span class="tag">お困りごと</span>
+        </div>
+        <p class="body">来期から製造ラインの原価管理を入れ直します。年商10億前後で実際に運用が回っている方、最終的にどのツールに落ち着きましたか。理想論ではなく、現場が使い続けられた話を聞きたいです。</p>
+        <div class="acts"><b>火 18</b><b>返信 7</b><b class="hand">手を挙げる</b></div>
+      </article>
+
+      <article class="article">
+        <div class="cap">新しいインタビューが公開されました</div>
+        <div class="in">
+          <h3>プロ仕様の"本物"を日常へ。笹木美保子氏のものづくりへの信念</h3>
+          <div class="lnk">記事を読む →</div>
+          <div class="reply">
+            <div class="av">笹木</div>
+            <p><b>笹木 美保子</b>　取材ありがとうございました。記事に書ききれなかった、二度目の在庫事故の話はここに書きます。</p>
+          </div>
+        </div>
+      </article>
+
+      <div class="event">
+        <div class="eyebrow">顧問Lounge ／ 11月開催</div>
+        <h3>GTO・湘南純愛組！ 藤沢とおる先生に学ぶ</h3>
+        <div class="row">
+          <span class="seats">残り8席 ・ 参加22名</span>
+          <button class="btn" data-go="lounge">参加する</button>
+        </div>
+      </div>
+
+      <button class="fab" data-go="compose" aria-label="投稿する">＋</button>
+    </section>
+
+    <!-- COMPOSE -->
+    <section class="screen" id="s-compose" aria-label="投稿する">
+      <div class="steps"><span class="step on" id="c1"></span><span class="step" id="c2"></span><span class="step" id="c3"></span></div>
+
+      <div id="c-step1">
+        <p class="body" style="margin-bottom:15px">何を書きますか。</p>
+        <button class="choice" data-kind="お困りごと">
+          <div class="h">お困りごと</div>
+          <div class="d">答えられそうな会員にお知らせが届きます。「手を挙げる」で名乗り出てもらえます。</div>
+        </button>
+        <button class="choice" data-kind="お題への回答">
+          <div class="h">今週のお題に答える</div>
+          <div class="d">今月いちばん眠れなかった意思決定は、なんでしたか。</div>
+        </button>
+        <button class="choice" data-kind="近況">
+          <div class="h">近況</div>
+          <div class="d">うまくいった話も、いかなかった話も。</div>
+        </button>
+        <button class="choice" data-kind="紹介したい人">
+          <div class="h">紹介したい人がいる</div>
+          <div class="d">会員のなかで、引き合わせたい人どうしを紹介できます。</div>
+        </button>
+      </div>
+
+      <div id="c-step2" style="display:none">
+        <div class="row" style="margin-bottom:12px">
+          <span class="tag" id="c-kind">お困りごと</span>
+          <button class="back" data-back="1" style="font-size:12px;color:var(--navy-2)">種類を変える</button>
+        </div>
+        <textarea class="field" id="c-text" rows="8" placeholder="実際に起きたことから書くと、返事が集まりやすくなります。"></textarea>
+        <div class="count"><span id="c-n">0</span> 字</div>
+        <div class="box" style="margin-top:14px;padding:12px 14px">
+          <div class="eyebrow">この投稿が届く相手</div>
+          <div class="kv">会員212名全員<br><span style="color:var(--ink-3);font-size:11.5px">ここに匿名の書き込みはありません。名前が分かるから、返事が返ってきます。</span></div>
+        </div>
+        <button class="btn wide" id="c-post" style="margin-top:14px">投稿する</button>
+      </div>
+
+      <div id="c-step3" style="display:none">
+        <div style="text-align:center;padding:34px 0 20px">
+          <div class="quote" style="display:inline-block;text-align:left;border-left-color:var(--seal)">投稿しました。<br>いま7名にお知らせが届いています。</div>
+        </div>
+        <div class="box">
+          <div class="eyebrow">お知らせを送った会員</div>
+          <div class="kv"><b>留岡 到</b>　製造 ／ 神奈川<br><b>慶野 勝実</b>　土木 ／ 群馬<br><b>原 恭彦</b>　金属加工 ／ 大阪</div>
+          <p class="hint">業種・年商・これまでの投稿から、答えられそうな方を選んでいます。全員には送りません。</p>
+        </div>
+        <button class="btn ghost wide" data-go="home" style="margin-top:12px">ホームに戻る</button>
+      </div>
+    </section>
+
+    <!-- FIND -->
+    <section class="screen scroll" id="s-find" aria-label="さがす">
+      <input class="field" type="search" placeholder="業種・地域・課題で探す">
+      <div class="filters">
+        <span class="f on">事業承継</span><span class="f">採用</span><span class="f">資金調達</span><span class="f">建設・不動産</span><span class="f">年商10億〜</span>
+      </div>
+      <button class="member" data-go="profile">
+        <div class="av">早川</div>
+        <div style="flex:1"><div class="nm">早川 泰広</div><div class="co">CSBパートナーズ ／ 不動産 ／ 東京</div></div>
+        <div class="dist">記事あり<br><span class="chain"><span class="dot"></span><span class="link"></span><span class="dot"></span></span> 直接</div>
+      </button>
+      <button class="member" data-go="profile">
+        <div class="av">留岡</div>
+        <div style="flex:1"><div class="nm">留岡 到</div><div class="co">ケイビー株式会社 ／ 警備 ／ 神奈川</div></div>
+        <div class="dist">記事あり<br><span class="chain"><span class="dot"></span><span class="link"></span><span class="dot o"></span><span class="link"></span><span class="dot o"></span></span> 2人経由</div>
+      </button>
+      <button class="member" data-go="profile">
+        <div class="av">木村</div>
+        <div style="flex:1"><div class="nm">木村 香織</div><div class="co">NATURA NUDY ／ 美容 ／ 東京</div></div>
+        <div class="dist">友達<br><span class="chain"><span class="dot"></span><span class="link"></span><span class="dot o"></span></span> 1人経由</div>
+      </button>
+      <button class="member" data-go="profile">
+        <div class="av">慶野</div>
+        <div style="flex:1"><div class="nm">慶野 勝実</div><div class="co">ゼネラルオーダー ／ 土木・農業 ／ 群馬</div></div>
+        <div class="dist"><br><span class="chain"><span class="dot"></span><span class="link"></span><span class="dot o"></span><span class="link"></span><span class="dot o"></span></span> 2人経由</div>
+      </button>
+      <p class="hint">赤い印は、その方まで何人を挟んでいるかを表します。誰の紹介で入った会員かは、全員が見られます。</p>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="screen scroll" id="s-profile" aria-label="プロフィール">
+      <div class="phead">
+        <div class="av">早川</div>
+        <div>
+          <h2>早川 泰広</h2>
+          <div class="co">株式会社CSBパートナーズ 代表取締役<br>不動産 ／ 東京 ／ 2025年入会</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="eyebrow">インタビュー</div>
+        <p class="quote">「三方良し」を不動産で実現し続ける。駐車場から広がる価値向上の哲学</p>
+        <p class="hint">2026.07.23 公開 ・ 閲覧 2,140</p>
+      </div>
+      <div class="box">
+        <div class="eyebrow">いま困っていること</div>
+        <div class="kv">・ 幹部層の世代交代<br>・ 地方拠点の採用<br>・ 二社目のM&amp;A検討</div>
+      </div>
+      <div class="box">
+        <div class="eyebrow">友達</div>
+        <div class="kv">この方とはまだ友達ではありません。<br><span style="color:var(--ink-3);font-size:11.5px">申請して、相手が承認すると友達になります。一方的にフォローすることはできません。</span></div>
+      </div>
+      <div class="box">
+        <div class="eyebrow">誰の紹介で入ったか</div>
+        <div class="kv">諸藤 哲耀 さん　<b>→</b>　あなた　<b>→</b>　早川 泰広 さん<br><span style="color:var(--ink-3);font-size:11.5px">あなたが招待した会員です。</span></div>
+      </div>
+      <div class="row" style="gap:9px">
+        <button class="btn ghost" style="flex:1">友達になる</button>
+        <button class="btn" style="flex:1">連絡をとる</button>
+      </div>
+      <p class="hint">連絡できるのは、3人以内を挟んだ相手だけです。知らない人からの営業が届かないことが、この場の価値です。</p>
+      <p class="hint" style="margin-top:6px">投稿を見る →</p>
+    </section>
+
+    <!-- LOUNGE -->
+    <section class="screen scroll" id="s-lounge" aria-label="顧問Lounge">
+      <div class="box" style="border-color:var(--navy-3)">
+        <div class="eyebrow">11月 ／ 港区 ／ 定員30名</div>
+        <h3 style="font-family:var(--serif);font-size:15px;font-weight:600;line-height:1.7;margin-bottom:10px">GTO・湘南純愛組！ 藤沢とおる先生に学ぶ</h3>
+        <div style="display:flex;gap:5px;margin-bottom:12px">
+          <div class="av" style="width:27px;height:27px;font-size:10px">島田</div>
+          <div class="av" style="width:27px;height:27px;font-size:10px">木村</div>
+          <div class="av" style="width:27px;height:27px;font-size:10px">早川</div>
+          <div class="av" style="width:27px;height:27px;font-size:10px;background:var(--paper);color:var(--ink-2)">+19</div>
+        </div>
+        <button class="btn wide">参加する</button>
+        <p class="hint">申し込むと、参加する方だけが書き込める場所が開きます。当日を名刺交換から始めなくて済みます。</p>
+      </div>
+      <div class="box">
+        <div class="eyebrow">9月 ／ オンライン</div>
+        <h3 style="font-family:var(--serif);font-size:15px;font-weight:600;line-height:1.7">西郷隆盛 本家 直系4代目に学ぶ</h3>
+        <p class="hint">開催まで26日。</p>
+      </div>
+    </section>
+
+    <!-- INVITE -->
+    <section class="screen" id="s-invite" aria-label="招待する">
+      <div class="steps"><span class="step on s" id="i1"></span><span class="step s" id="i2"></span><span class="step s" id="i3"></span></div>
+
+      <div id="i-step1">
+        <div class="box">
+          <div class="eyebrow">あなたが招いた会員</div>
+          <div class="kv"><b>早川 泰広</b>　投稿34 <br><b>木村 香織</b>　投稿12</div>
+        </div>
+        <button class="btn seal wide" id="i-next1">招待状を書く</button>
+      </div>
+
+      <div id="i-step2" style="display:none">
+        <p class="body" style="margin-bottom:13px">誰を招きますか。</p>
+        <input class="field" id="i-name" placeholder="お名前" style="margin-bottom:9px">
+        <input class="field" id="i-co" placeholder="会社名" style="margin-bottom:9px">
+        <textarea class="field" id="i-why" rows="4" placeholder="この方を招く理由を、ひとこと。会員全員が読めます。"></textarea>
+        <p class="hint">この理由は、審査に使うものではありません。招かれた方が初日から歓迎されるように、全員に見えるようにしています。</p>
+        <button class="btn seal wide" id="i-next2" style="margin-top:14px">印を押す</button>
+        <p id="i-err" style="display:none;font-size:12px;color:var(--seal);margin-top:9px">お名前を入れてください。</p>
+      </div>
+
+      <div id="i-step3" style="display:none">
+        <div class="sealwrap"><div class="stamp" id="i-stamp"><span class="a">紹介</span><span class="b">中西 光希</span></div></div>
+        <div class="certificate" style="margin-top:18px">
+          <div class="k">招待状</div>
+          <div class="c">7KQ2-J8XM</div>
+          <p class="n"><b id="i-out">佐藤 吉文</b> 様<br>有効期限 14日 ・ 一度きり有効</p>
+        </div>
+        <button class="btn ghost wide" style="margin-top:12px">招待状を送る</button>
+        <p class="hint">招待状のリンクを、メールなどで本人にお渡しください。</p>
+      </div>
+    </section>
+
+    <!-- NOTICE -->
+    <section class="screen scroll" id="s-notice" aria-label="通知">
+      <div class="notice">
+        <div class="av">留岡</div>
+        <div><p class="d"><b>留岡 到</b> があなたのお困りごとに手を挙げました。</p><div class="t">12分前</div></div>
+      </div>
+      <div class="notice">
+        <div class="av" style="background:var(--seal-tint);color:var(--seal)">祝</div>
+        <div><p class="d"><b>木村 香織</b> の会社が、今日で創業12年です。</p><div class="t">今日</div></div>
+      </div>
+      <div class="notice">
+        <div class="av" style="background:var(--paper);color:var(--ink-2)">題</div>
+        <div><p class="d">今週のお題が出ました。<b>今月いちばん眠れなかった意思決定は、なんでしたか。</b></p><div class="t">月曜 8:00</div></div>
+      </div>
+      <div class="notice">
+        <div class="av">笹木</div>
+        <div><p class="d"><b>笹木 美保子</b> のインタビューが公開されました。本人がコメント欄にいます。</p><div class="t">2日前</div></div>
+      </div>
+      <div class="notice">
+        <div class="av" style="background:var(--navy);color:#fff">L</div>
+        <div><p class="d">顧問Lounge 11月回、残り8席になりました。</p><div class="t">3日前</div></div>
+      </div>
+    </section>
+
+    <div class="tabs" id="tabs">
+      <button class="tab" data-s="home" aria-current="true"><div class="g">家</div><div class="l">ホーム</div></button>
+      <button class="tab" data-s="find"><div class="g">探</div><div class="l">さがす</div></button>
+      <button class="tab" data-s="lounge"><div class="g">會</div><div class="l">Lounge</div></button>
+      <button class="tab" data-s="invite"><div class="g">印</div><div class="l">招待</div></button>
+      <button class="tab" data-s="notice"><div class="g">報</div><div class="l">通知</div></button>
+    </div>
+  </div>
+
+<div class="admin" id="admin">
+    <div class="abar"><div class="t">社長の背中SNS(仮) ／ 運営事務局</div><div class="u">LIVE Doctor 事務局　小久保</div></div>
+    <div class="abody">
+      <nav class="aside">
+        <a href="#" class="on">今週の様子</a>
+        <a href="#">会員</a>
+        <a href="#">承認待ち</a>
+        <a href="#">お題（AI原案）</a>
+        <a href="#">顧問Lounge</a>
+        <a href="#">インタビュー連携</a>
+        <a href="#">通報</a>
+      </nav>
+      <div class="amain">
+        <div class="kpis">
+          <div class="kpi"><div class="l">会員数</div><div class="v">212</div><div class="d">今週 +4</div></div>
+          <div class="kpi"><div class="l">週次アクティブ率</div><div class="v">34<small>%</small></div><div class="d">72名 ／ 目標30%</div></div>
+          <div class="kpi alert"><div class="l">今週の投稿</div><div class="v">11</div><div class="d">先週21 ／ 危険水域</div></div>
+          <div class="kpi"><div class="l">未返信のお困りごと</div><div class="v">2</div><div class="d">最長 3日経過</div></div>
+        </div>
+
+        <p class="ah">週あたりの投稿数</p>
+        <div class="bars">
+          <div class="bar" style="height:38%"></div><div class="bar" style="height:56%"></div>
+          <div class="bar" style="height:74%"></div><div class="bar" style="height:62%"></div>
+          <div class="bar" style="height:88%"></div><div class="bar" style="height:70%"></div>
+          <div class="bar now" style="height:37%"></div>
+        </div>
+        <div class="barlab"><span>7/6</span><span>7/13</span><span>7/20</span><span>7/27</span><span>8/3</span><span>8/10</span><span>今週</span></div>
+
+        <p class="ah" style="margin-top:26px">運営やることリスト</p>
+        <table class="atbl">
+          <tr><th style="width:44%">項目</th><th style="width:26%">状態</th><th style="width:14%">経過</th><th></th></tr>
+          <tr>
+            <td>島田氏のお困りごとに返信ゼロ</td>
+            <td><span class="pill ai">AIが3名を選定済み</span></td><td>3日</td>
+            <td class="r"><button class="btn mini">確認して送る</button></td>
+          </tr>
+          <tr>
+            <td>来週のお題</td>
+            <td><span class="pill ai">AI原案 3案</span></td><td>月曜8時</td>
+            <td class="r"><button class="btn mini">選んで配信</button></td>
+          </tr>
+          <tr>
+            <td>笹木氏の記事を投稿として流す</td>
+            <td><span class="pill ai">AIが投稿文を作成済み</span></td><td>2日</td>
+            <td class="r"><button class="btn mini">確認して流す</button></td>
+          </tr>
+          <tr>
+            <td>90日以上ログインなし</td>
+            <td><span class="pill ai">AIが声かけ文を用意</span></td><td>18名</td>
+            <td class="r"><button class="btn mini">一覧</button></td>
+          </tr>
+          <tr>
+            <td>ログインできない会員から連絡</td>
+            <td><span class="pill warn">人の対応が必要</span></td><td>1件</td>
+            <td class="r"><button class="btn mini ghost">リンク発行</button></td>
+          </tr>
+        </table>
+
+        <p class="ah" style="margin-top:26px">招待の承認待ち</p>
+        <table class="atbl">
+          <tr><th style="width:26%">お名前</th><th style="width:28%">会社</th><th style="width:26%">紹介者</th><th></th></tr>
+          <tr>
+            <td>佐藤 吉文</td><td>COMMONS株式会社</td><td>中西 光希 <span class="pill">招待3人目</span></td>
+            <td class="r"><button class="btn mini">承認</button></td>
+          </tr>
+          <tr>
+            <td>大林 尚朝</td><td>株式会社Another works</td><td>諸藤 哲耀 <span class="pill">招待1人目</span></td>
+            <td class="r"><button class="btn mini">承認</button></td>
+          </tr>
+        </table>
+        <p style="font-size:11.5px;color:var(--ink-3);line-height:1.9;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">今週この画面で人が使った時間は　<b style="color:var(--ink)">1時間12分</b><br>うち42分は、AIが用意した文章を確かめて送る作業です。残りは招待の承認と、ログインできない方への対応です。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var screens=["home","compose","find","profile","lounge","invite","notice"];
+  var bar={home:["社長の背中SNS(仮)","紹介制 ・ 会員212名","通知"],compose:["投稿する","","閉じる"],find:["さがす","212名から","絞り込み"],profile:["","","戻る"],lounge:["顧問Lounge","開催予定 2件","履歴"],invite:["招待する","","規約"],notice:["通知","未読 3件","すべて既読"]};
+
+  function view(v){
+    var isAdmin=(v==="admin");
+    document.getElementById("phone").style.display=isAdmin?"none":"flex";
+    document.getElementById("admin").classList.toggle("on",isAdmin);
+    document.querySelectorAll(".switch button").forEach(function(b){
+      b.setAttribute("aria-current", b.dataset.v===v ? "true":"false");
+    });
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll(".switch button").forEach(function(b){
+    b.addEventListener("click",function(){ view(b.dataset.v); });
+  });
+
+  function go(k){
+    screens.forEach(function(s){ document.getElementById("s-"+s).classList.toggle("on", s===k); });
+    var b=bar[k]||["","",""];
+    document.getElementById("barTitle").textContent=b[0]||"社長の背中SNS(仮)";
+    document.getElementById("barSub").textContent=b[1]||"";
+    document.getElementById("barAction").textContent=b[2]||"";
+    document.querySelectorAll("#tabs .tab").forEach(function(t){
+      t.setAttribute("aria-current", t.dataset.s===k ? "true":"false");
+    });
+    if(k==="compose") resetCompose();
+    if(k==="invite") resetInvite();
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll("#tabs .tab").forEach(function(t){
+    t.addEventListener("click",function(){ go(t.dataset.s); });
+  });
+  document.querySelectorAll("[data-go]").forEach(function(el){
+    el.addEventListener("click",function(){ go(el.dataset.go); });
+  });
+
+  function mark(p,n){ for(var i=1;i<=3;i++){ document.getElementById(p+i).classList.toggle("on", i<=n); } }
+
+  function resetCompose(){
+    document.getElementById("c-step1").style.display="block";
+    document.getElementById("c-step2").style.display="none";
+    document.getElementById("c-step3").style.display="none";
+    document.getElementById("c-text").value="";
+    document.getElementById("c-n").textContent="0";
+    mark("c",1);
+  }
+  document.querySelectorAll("[data-kind]").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.getElementById("c-kind").textContent=b.dataset.kind;
+      document.getElementById("c-step1").style.display="none";
+      document.getElementById("c-step2").style.display="block";
+      mark("c",2);
+    });
+  });
+  document.querySelector("[data-back='1']").addEventListener("click",resetCompose);
+  document.getElementById("c-text").addEventListener("input",function(){
+    document.getElementById("c-n").textContent=this.value.length;
+  });
+  document.getElementById("c-post").addEventListener("click",function(){
+    document.getElementById("c-step2").style.display="none";
+    document.getElementById("c-step3").style.display="block";
+    mark("c",3);
+  });
+
+  function resetInvite(){
+    document.getElementById("i-step1").style.display="block";
+    document.getElementById("i-step2").style.display="none";
+    document.getElementById("i-step3").style.display="none";
+    document.getElementById("i-err").style.display="none";
+    mark("i",1);
+  }
+  document.getElementById("i-next1").addEventListener("click",function(){
+    document.getElementById("i-step1").style.display="none";
+    document.getElementById("i-step2").style.display="block";
+    mark("i",2);
+  });
+  document.getElementById("i-name").addEventListener("input",function(){
+    document.getElementById("i-err").style.display="none";
+  });
+  document.getElementById("i-next2").addEventListener("click",function(){
+    var v=document.getElementById("i-name").value.trim();
+    if(!v){ document.getElementById("i-err").style.display="block"; return; }
+    document.getElementById("i-out").textContent=v;
+    document.getElementById("i-step2").style.display="none";
+    document.getElementById("i-step3").style.display="block";
+    mark("i",3);
+    var st=document.getElementById("i-stamp");
+    st.classList.remove("pressed"); void st.offsetWidth; st.classList.add("pressed");
+  });
+
+  go("home"); view("member");
+})();
+</script>
+</body>
+</html>
