@@ -106,6 +106,10 @@ input,textarea,select{font:inherit;color:inherit}
 .reply p b{color:var(--ink);font-weight:500}
 
 .event{border:1px solid var(--navy-3);border-radius:var(--r);padding:14px 16px}
+.grp{font-size:11px;letter-spacing:.1em;color:var(--ink-3);margin:18px 0 9px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.grp:first-child{margin-top:0}
+.room.locked{border-style:dashed;background:var(--paper)}
+.room.locked .rt{color:var(--ink-2)}
 .event .eyebrow{font-size:10.5px;letter-spacing:.1em;color:var(--navy-2);margin-bottom:6px}
 .event h3{font-family:var(--serif);font-size:14.5px;font-weight:600;line-height:1.7;margin-bottom:11px}
 .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -456,6 +460,7 @@ body{background:var(--paper);-webkit-text-size-adjust:100%;overflow-x:hidden}
 
     <!-- LOUNGE -->
     <section class="screen scroll" id="s-lounge" aria-label="顧問Lounge">
+      <div class="grp">開催予定のイベント</div>
       <div class="box" style="border-color:var(--navy-3)">
         <div class="eyebrow">11月 ／ 港区 ／ 定員30名</div>
         <h3 style="font-family:var(--serif);font-size:15px;font-weight:600;line-height:1.7;margin-bottom:10px">GTO・湘南純愛組！ 藤沢とおる先生に学ぶ</h3>
@@ -473,6 +478,42 @@ body{background:var(--paper);-webkit-text-size-adjust:100%;overflow-x:hidden}
         <h3 style="font-family:var(--serif);font-size:15px;font-weight:600;line-height:1.7">西郷隆盛 本家 直系4代目に学ぶ</h3>
         <p class="hint">開催まで26日。</p>
       </div>
+
+      <div class="grp">テーマ別の部屋</div>
+
+      <div class="box room" style="border-color:var(--navy-3)">
+        <div class="row" style="margin-bottom:7px">
+          <span class="eyebrow" style="margin:0">参加中</span>
+          <span class="tag quiet">招待制</span>
+        </div>
+        <h3 class="rt" style="font-family:var(--serif);font-size:15px;font-weight:600;line-height:1.7;margin-bottom:10px">事業承継を考える会</h3>
+        <div style="display:flex;gap:5px;align-items:center;margin-bottom:11px">
+          <div class="av" style="width:27px;height:27px;font-size:9px;background:var(--navy);color:#fff">事務局</div>
+          <div class="av" style="width:27px;height:27px;font-size:10px">早川</div>
+          <div class="av" style="width:27px;height:27px;font-size:10px">慶野</div>
+          <div class="av" style="width:27px;height:27px;font-size:10px;background:var(--paper);color:var(--ink-2)">+3</div>
+          <span style="font-size:11px;color:var(--ink-2);margin-left:3px">6名</span>
+        </div>
+        <button class="btn wide">開く　・　新しい書き込み 3件</button>
+      </div>
+
+      <div class="box room locked">
+        <div class="row" style="margin-bottom:7px">
+          <span class="eyebrow" style="margin:0">招待されていません</span>
+          <span class="tag quiet">招待制</span>
+        </div>
+        <h3 class="rt" style="font-family:var(--serif);font-size:15px;font-weight:600;line-height:1.7;margin-bottom:10px">M&amp;Aの実務を持ち寄る会</h3>
+        <div style="display:flex;gap:5px;align-items:center">
+          <div class="av" style="width:27px;height:27px;font-size:9px;background:var(--line);color:var(--ink-2)">事務局</div>
+          <div class="av" style="width:27px;height:27px;font-size:10px;background:var(--line);color:var(--ink-2)">島田</div>
+          <div class="av" style="width:27px;height:27px;font-size:10px;background:var(--line);color:var(--ink-2)">木村</div>
+          <div class="av" style="width:27px;height:27px;font-size:10px;background:var(--paper);color:var(--ink-3)">+5</div>
+          <span style="font-size:11px;color:var(--ink-3);margin-left:3px">8名</span>
+        </div>
+        <p class="hint" style="margin-top:10px">中の会話は読めません。関心があれば事務局にご相談ください。</p>
+      </div>
+
+      <p class="hint" style="margin-top:14px">部屋の名前と参加者は、会員全員が見られます。読めないのは中の会話だけです。部屋を作れるのは事務局だけで、事務局は必ず参加します。</p>
     </section>
 
     <!-- INVITE -->
@@ -543,7 +584,7 @@ body{background:var(--paper);-webkit-text-size-adjust:100%;overflow-x:hidden}
   </div>
 
 <div class="admin" id="admin">
-    <div class="abar"><div class="t">社長の背中SNS(仮) ／ 運営事務局</div><div class="u">LIVE Doctor 事務局</div></div>
+    <div class="abar"><div class="t">社長の背中SNS(仮) ／ 運営事務局</div><div class="u">LIVE Doctor 事務局　小久保</div></div>
     <div class="abody">
       <nav class="aside">
         <a href="#" class="on">今週の様子</a>
@@ -613,6 +654,7 @@ body{background:var(--paper);-webkit-text-size-adjust:100%;overflow-x:hidden}
             <td class="r"><button class="btn mini">承認</button></td>
           </tr>
         </table>
+        <p style="font-size:11.5px;color:var(--ink-3);line-height:1.9;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">今週この画面で人が使った時間は　<b style="color:var(--ink)">1時間12分</b><br>うち42分は、AIが用意した文章を確かめて送る作業です。残りは招待の承認と、ログインできない方への対応です。</p>
       </div>
     </div>
   </div>
@@ -621,7 +663,7 @@ body{background:var(--paper);-webkit-text-size-adjust:100%;overflow-x:hidden}
 <script>
 (function(){
   var screens=["home","compose","find","profile","lounge","invite","notice"];
-  var bar={home:["社長の背中SNS(仮)","紹介制 ・ 会員212名","通知"],compose:["投稿する","","閉じる"],find:["さがす","212名から","絞り込み"],profile:["","","戻る"],lounge:["顧問Lounge","開催予定 2件","履歴"],invite:["招待する","","規約"],notice:["通知","未読 3件","すべて既読"]};
+  var bar={home:["社長の背中SNS(仮)","紹介制 ・ 会員212名","通知"],compose:["投稿する","","閉じる"],find:["さがす","212名から","絞り込み"],profile:["","","戻る"],lounge:["顧問Lounge","イベント2件 ・ 部屋2つ","履歴"],invite:["招待する","","規約"],notice:["通知","未読 3件","すべて既読"]};
 
   function view(v){
     var isAdmin=(v==="admin");
