@@ -1,0 +1,1553 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>社長の背中SNS モック</title>
+<style>
+/* ============================================================
+   外側（モックを置く台）— ここは実際のアプリには存在しません
+   ============================================================ */
+:root{
+  --navy:#001d4a; --navy-soft:#1a3561; --seal:#ae3524;
+  --ink:#1b1b1f; --ink-mid:#5a5f6b; --ink-weak:#8b909c;
+  --line:#e3e5ea; --bg:#f6f7f9; --card:#fff; --mine:#e8eef8;
+  --accent:#c9a227;
+  --r:12px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --header-h:52px; --tab-h:58px;
+  --serif:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP','Yu Gothic UI',Meiryo,sans-serif;
+
+  /* 台の色（ダークモードで変わるのはここだけ） */
+  --stage:#eceef2;
+  --stage-ink:#5a5f6b;
+  --stage-line:#d7dae1;
+  --stage-card:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --stage:#15171c;
+    --stage-ink:#9aa0ab;
+    --stage-line:#2a2e36;
+    --stage-card:#1d2026;
+  }
+}
+:root[data-theme="dark"]{
+  --stage:#15171c; --stage-ink:#9aa0ab; --stage-line:#2a2e36; --stage-card:#1d2026;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans);
+  background:var(--stage);
+  color:var(--stage-ink);
+  min-height:100vh;
+}
+
+/* 台の上の見出し（パソコンで見たときだけ出る） */
+.stage-head{
+  display:none;
+  text-align:center;
+  padding:26px 16px 14px;
+}
+.stage-head h1{
+  font-family:var(--serif);
+  font-size:19px; font-weight:600; letter-spacing:.06em;
+  margin:0 0 5px; color:var(--stage-ink);
+}
+.stage-head p{margin:0;font-size:12.5px;line-height:1.7;opacity:.8}
+
+/* 端末の枠 */
+.phone-wrap{display:flex;justify-content:center;padding:0}
+.phone{
+  width:100%;
+  max-width:420px;
+  background:var(--bg);
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+  min-height:100dvh;
+}
+@media (min-width:860px){
+  .stage-head{display:block}
+  .idx-btn{bottom:20px}
+  .phone-wrap{padding:0 16px 40px}
+  .phone{
+    height:844px;
+    min-height:0;
+    border-radius:38px;
+    border:9px solid #0d1117;
+    box-shadow:0 22px 60px rgba(0,0,0,.28);
+  }
+}
+
+/* 画面の入れ替え */
+.screen{display:none;position:relative;background:var(--bg)}
+.screen.on{
+  display:flex;
+  flex-direction:column;
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+/* 本文を伸ばして、下のタブを画面の底に置く */
+.body,.thread{flex:1 0 auto}
+
+/* 画面一覧を開くボタン */
+.idx-btn{
+  position:fixed; right:14px; bottom:calc(var(--tab-h) + 12px); z-index:300;
+  background:#0d1117; color:#fff; border:0;
+  border-radius:22px; padding:10px 16px;
+  font:inherit; font-size:12.5px; font-weight:700;
+  box-shadow:0 4px 16px rgba(0,0,0,.3); cursor:pointer;
+}
+.idx{
+  position:fixed; inset:0; z-index:310;
+  background:rgba(8,10,14,.92);
+  display:none; overflow-y:auto; padding:22px 16px 90px;
+}
+.idx.on{display:block}
+.idx h2{
+  font-family:var(--serif); color:#fff; font-size:16px;
+  text-align:center; margin:4px 0 4px; font-weight:600; letter-spacing:.05em;
+}
+.idx .idx-note{color:#8b909c;font-size:11.5px;text-align:center;margin:0 0 18px;line-height:1.7}
+.idx-group{
+  color:#8b909c; font-size:10.5px; font-weight:700; letter-spacing:.1em;
+  margin:18px 0 8px; padding-bottom:6px; border-bottom:1px solid #2a2e36;
+}
+.idx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.idx-grid button{
+  background:#1d2026; border:1px solid #2a2e36; color:#e8eaee;
+  border-radius:9px; padding:11px 12px; font:inherit; font-size:12.5px;
+  text-align:left; cursor:pointer; line-height:1.5;
+}
+.idx-grid button:hover{border-color:#4a5160;background:#23272e}
+.idx-grid button b{display:block;font-weight:600}
+.idx-grid button span{color:#8b909c;font-size:10.5px;font-family:ui-monospace,Menlo,monospace}
+.idx-close{
+  position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:320;
+  background:#fff; color:#0d1117; border:0; border-radius:22px;
+  padding:11px 26px; font:inherit; font-size:13px; font-weight:700; cursor:pointer;
+}
+
+/* ============================================================
+   ここから下は、実際のアプリと同じ見た目
+   （src/app/globals.css と同じ内容）
+   ============================================================ */
+.hd{
+  position:sticky;top:0;z-index:20;height:var(--header-h);
+  display:flex;align-items:center;gap:10px;padding:0 14px;
+  background:var(--navy);color:#fff;
+}
+.hd-title{
+  font-family:var(--serif);font-size:17px;font-weight:600;letter-spacing:.04em;
+  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.hd-sub{font-size:11px;color:rgba(255,255,255,.62);font-weight:400;margin-left:6px}
+.hd a,.hd button{
+  color:#fff;text-decoration:none;background:none;border:0;font:inherit;
+  font-size:13px;cursor:pointer;padding:6px;display:inline-flex;align-items:center;
+}
+.hd-back{font-size:20px;line-height:1;margin-left:-6px}
+
+.tabs{
+  position:sticky;bottom:0;z-index:20;height:var(--tab-h);
+  display:grid;grid-template-columns:repeat(4,1fr);
+  background:#fff;border-top:1px solid var(--line);
+}
+.tab{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  text-decoration:none;color:var(--ink-weak);font-size:10px;position:relative;
+  border:0;background:none;font-family:inherit;cursor:pointer;
+}
+.tab.on{color:var(--navy);font-weight:700}
+.tab-ic{font-size:19px;line-height:1}
+.tab-badge{
+  position:absolute;top:7px;left:50%;margin-left:6px;min-width:16px;height:16px;
+  padding:0 4px;border-radius:8px;background:var(--seal);color:#fff;
+  font-size:10px;font-weight:700;line-height:16px;text-align:center;
+}
+
+.body{padding-bottom:16px}
+.pad{padding:16px}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.sec-label{font-size:11px;font-weight:700;color:var(--ink-weak);letter-spacing:.08em;padding:16px 16px 7px}
+
+.conv-list{background:#fff}
+.conv{
+  display:flex;gap:12px;align-items:center;padding:13px 16px;
+  border-bottom:1px solid var(--line);text-decoration:none;color:inherit;
+  cursor:pointer;background:#fff;width:100%;border-left:0;border-right:0;border-top:0;
+  font-family:inherit;text-align:left;
+}
+.conv:last-child{border-bottom:0}
+.av{
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--navy);color:#fff;font-family:var(--serif);font-size:17px;font-weight:600;
+}
+.av.group{background:var(--navy-soft);font-size:18px;font-family:var(--sans)}
+.av.everyone{background:var(--seal)}
+.av.sm{width:36px;height:36px;font-size:14px}
+.av.lg{width:64px;height:64px;font-size:24px}
+.conv-main{flex:1;min-width:0}
+.conv-top{display:flex;align-items:baseline;gap:8px}
+.conv-name{font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.conv-when{font-size:11px;color:var(--ink-weak);margin-left:auto;flex-shrink:0}
+.conv-prev{font-size:12.5px;color:var(--ink-mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.conv-prev.none{color:var(--ink-weak)}
+.badge{
+  min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--seal);
+  color:#fff;font-size:11px;font-weight:700;line-height:20px;text-align:center;flex-shrink:0;
+}
+
+.thread{padding:14px 14px 16px;display:flex;flex-direction:column;gap:4px}
+.day{text-align:center;font-size:11px;color:var(--ink-weak);margin:14px 0 8px}
+.row{display:flex;gap:8px;align-items:flex-end;margin-top:8px}
+.row.me{flex-direction:row-reverse}
+.row.cont{margin-top:2px}
+.bubble-wrap{max-width:76%;display:flex;flex-direction:column;gap:3px}
+.row.me .bubble-wrap{align-items:flex-end}
+.who{font-size:11px;color:var(--ink-mid);padding:0 4px}
+.bubble{
+  background:#fff;border-radius:14px;padding:9px 13px;font-size:14.5px;line-height:1.65;
+  white-space:pre-wrap;word-break:break-word;box-shadow:var(--shadow);color:var(--ink);
+}
+.row.me .bubble{background:var(--mine)}
+.bubble.gone{color:var(--ink-weak);font-style:italic;background:#f0f1f4;box-shadow:none}
+.meta{font-size:10px;color:var(--ink-weak);padding:0 4px}
+.meta button{
+  background:none;border:0;padding:0;font:inherit;color:var(--ink-weak);
+  text-decoration:underline;cursor:pointer;
+}
+
+.composer{
+  position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:9px 12px;display:flex;gap:9px;align-items:flex-end;z-index:15;
+}
+.composer textarea{
+  flex:1;border:1px solid var(--line);border-radius:20px;padding:9px 14px;
+  font:inherit;font-size:15px;resize:none;max-height:120px;background:var(--bg);
+  outline:none;font-family:var(--sans);color:var(--ink);
+}
+.composer textarea:focus{border-color:var(--navy);background:#fff}
+.send{
+  width:38px;height:38px;border-radius:50%;border:0;background:var(--navy);
+  color:#fff;font-size:16px;cursor:pointer;flex-shrink:0;
+}
+.send:disabled{background:var(--line);color:var(--ink-weak);cursor:default}
+
+.row-item{
+  display:flex;gap:12px;align-items:center;padding:12px 16px;
+  border-bottom:1px solid var(--line);text-decoration:none;color:inherit;background:#fff;
+  width:100%;border-left:0;border-right:0;border-top:0;font-family:inherit;
+  text-align:left;cursor:pointer;
+}
+.row-item:last-child{border-bottom:0}
+.row-main{flex:1;min-width:0}
+.row-name{font-weight:600;font-size:14.5px;color:var(--ink)}
+.row-sub{font-size:12px;color:var(--ink-mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:11px 18px;border-radius:9px;border:1px solid var(--navy);
+  background:var(--navy);color:#fff;font:inherit;font-size:14.5px;font-weight:600;
+  text-decoration:none;cursor:pointer;font-family:inherit;
+}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.ghost{background:#fff;color:var(--navy)}
+.btn.quiet{background:#fff;color:var(--ink-mid);border-color:var(--line)}
+.btn.danger{background:#fff;color:var(--seal);border-color:var(--seal)}
+.btn.sm{padding:6px 12px;font-size:12.5px;border-radius:7px}
+.btn.wide{width:100%}
+
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;background:var(--bg);border:1px solid var(--line);font-size:11px;color:var(--ink-mid)}
+.tag.friend{background:#eef4ec;border-color:#cfe0ca;color:#3c6b32}
+.tag.wait{background:#fdf6e6;border-color:#efdfb4;color:#8a6d1c}
+.tag.admin{background:#f4ecea;border-color:#e0cac6;color:var(--seal)}
+
+.field{margin-bottom:15px}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-mid);margin-bottom:5px}
+.field .hint{font-size:11.5px;color:var(--ink-weak);font-weight:400;margin-top:3px}
+.field input,.field select,.field textarea{
+  width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;
+  font:inherit;font-size:15px;background:#fff;outline:none;font-family:var(--sans);color:var(--ink);
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--navy)}
+.field textarea{resize:vertical;min-height:92px}
+.field input:disabled{background:var(--bg);color:var(--ink-weak)}
+
+.search{padding:11px 14px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:var(--header-h);z-index:10}
+.search input{
+  width:100%;padding:9px 13px;border:1px solid var(--line);border-radius:20px;
+  font:inherit;font-size:14.5px;background:var(--bg);outline:none;color:var(--ink);
+}
+.search input:focus{border-color:var(--navy);background:#fff}
+
+.empty{text-align:center;padding:44px 28px;color:var(--ink-weak)}
+.empty-ic{font-size:34px;margin-bottom:10px}
+.empty-ttl{font-size:14.5px;color:var(--ink-mid);font-weight:600;margin-bottom:6px}
+.empty-txt{font-size:12.5px;line-height:1.8}
+
+.note{background:#fdf9ef;border:1px solid #efe3c6;border-radius:9px;padding:12px 14px;font-size:12.5px;line-height:1.8;color:#6b5b2a}
+.err{background:#fdf0ee;border:1px solid #e8cbc6;border-radius:9px;padding:12px 14px;font-size:13px;color:#8a2e1f;margin-bottom:14px}
+.ok{background:#eef4ec;border:1px solid #cfe0ca;border-radius:9px;padding:12px 14px;font-size:13px;color:#35602c;margin-bottom:14px}
+
+.sign{font-family:var(--serif);text-align:center;padding:34px 24px 22px}
+.sign-ttl{font-size:23px;font-weight:600;color:var(--navy);letter-spacing:.06em;margin-bottom:7px}
+.sign-sub{font-family:var(--sans);font-size:12.5px;color:var(--ink-mid);line-height:1.8}
+
+.link{color:var(--navy);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.code{
+  font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:17px;letter-spacing:.12em;
+  background:var(--bg);border:1px dashed var(--line);border-radius:9px;padding:13px;
+  text-align:center;font-weight:600;word-break:break-all;color:var(--ink);
+}
+.doc{font-size:13.5px;line-height:1.95;color:var(--ink)}
+.doc h2{font-family:var(--serif);font-size:16px;color:var(--navy);margin:26px 0 8px}
+.doc h2:first-child{margin-top:0}
+.doc ul{padding-left:1.3em}
+.sp{height:14px}
+.center{text-align:center}
+.muted{color:var(--ink-mid);font-size:12.5px;line-height:1.8}
+.rowflex{display:flex;gap:9px;align-items:center}
+.spread{display:flex;gap:9px;align-items:center;justify-content:space-between}
+
+.adm-nav{
+  display:flex;gap:7px;padding:11px 14px;background:#fff;border-bottom:1px solid var(--line);
+  overflow-x:auto;position:sticky;top:var(--header-h);z-index:10;
+}
+.adm-nav button{
+  flex-shrink:0;padding:6px 12px;border-radius:16px;border:1px solid var(--line);
+  font-size:12.5px;color:var(--ink-mid);white-space:nowrap;background:#fff;
+  font-family:inherit;cursor:pointer;
+}
+.adm-nav button.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:600}
+
+.snap{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px;font-size:12.5px;line-height:1.75;color:var(--ink)}
+.snap-row{padding:5px 0;border-bottom:1px dashed var(--line)}
+.snap-row:last-child{border-bottom:0}
+.snap-row.target{background:#fdf0ee;margin:0 -11px;padding:5px 11px}
+.snap-who{font-weight:700;color:var(--navy);font-size:11.5px}
+
+/* 画面内のお知らせ（モックだけの演出） */
+.toast{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:84px;z-index:120;
+  background:#0d1117;color:#fff;border-radius:9px;padding:10px 16px;
+  font-size:12.5px;max-width:86%;text-align:center;line-height:1.6;
+  opacity:0;pointer-events:none;transition:opacity .18s;
+}
+.toast.on{opacity:.95}
+</style>
+</head>
+<body>
+
+<div class="stage-head">
+  <h1>社長の背中SNS（仮）　画面の見本</h1>
+  <p>実際に作ったものと同じ見た目・同じ操作です。データは架空のものです。<br>
+     右下の「画面一覧」から、どの画面にも飛べます。</p>
+</div>
+
+<div class="phone-wrap">
+  <div class="phone" id="phone">
+
+<!-- ========================= ログイン ========================= -->
+<section class="screen" id="s-login">
+  <div class="sign">
+    <div class="sign-ttl">社長の背中SNS</div>
+    <div class="sign-sub">経営者のための、完全紹介制の場です。<br>ご登録のメールアドレスをご入力ください。</div>
+  </div>
+  <div class="pad">
+    <div class="card" style="padding:18px">
+      <div id="login-sent" style="display:none">
+        <div class="ok">nakamura@nakamura-seiki.co.jp にログインのリンクをお送りしました。メールをご確認ください。</div>
+        <div class="muted">メールが届かない場合は、迷惑メールのフォルダもご確認ください。それでも届かないときは、事務局へお知らせください。</div>
+        <div class="sp"></div>
+        <button class="btn wide ghost" onclick="go('home')">（見本）リンクを押したことにして進む</button>
+      </div>
+      <div id="login-form">
+        <div class="field">
+          <label>メールアドレス</label>
+          <input type="email" value="nakamura@nakamura-seiki.co.jp" autocomplete="off">
+        </div>
+        <button class="btn wide" onclick="document.getElementById('login-form').style.display='none';document.getElementById('login-sent').style.display='block'">ログインのリンクを受け取る</button>
+      </div>
+    </div>
+    <div class="sp"></div>
+    <div class="note">
+      <strong>パスワードはありません。</strong><br>
+      ご入力いただいたメールアドレスに、ログイン用のリンクをお送りします。そのリンクを押すだけでログインできます。<br>
+      一度ログインすると、しばらくの間は入力なしでお使いいただけます。
+    </div>
+    <div class="sp"></div>
+    <div class="center muted">
+      ご招待をお持ちの方は、ご案内のリンクからお手続きください。<br>
+      <span class="link" onclick="go('terms')">利用規約</span> ・ <span class="link" onclick="go('privacy')">プライバシーポリシー</span>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= ご招待（入会申し込み） ========================= -->
+<section class="screen" id="s-join">
+  <div class="sign">
+    <div class="sign-ttl">ご招待</div>
+    <div class="sign-sub">山田建設株式会社 山田 浩司 様より、<br>「社長の背中SNS」へのご招待です。</div>
+  </div>
+  <div class="pad">
+    <div class="note">経営者の方だけが集まる、完全紹介制の場です。<br>広告はありません。ご入会には事務局の確認がございます。</div>
+    <div class="sp"></div>
+    <div class="card" style="padding:18px">
+      <div class="field"><label>お名前 ※</label><input value="松本 和彦"></div>
+      <div class="field"><label>会社名 ※</label><input value="松本メディカル株式会社"></div>
+      <div class="field">
+        <label>メールアドレス ※</label>
+        <input type="email" value="matsumoto@matsumoto-medical.co.jp">
+        <div class="hint">ログインと、お知らせのお届けに使います。</div>
+      </div>
+      <div class="field"><label>業種</label>
+        <select><option>医療・介護・福祉</option><option>製造</option><option>建設・不動産</option><option>情報・通信・IT</option></select>
+      </div>
+      <div class="field"><label>地域</label>
+        <select><option>関東</option><option>東海</option><option>関西</option><option>九州・沖縄</option></select>
+      </div>
+      <div class="field">
+        <label style="display:flex;gap:9px;align-items:flex-start;font-weight:400">
+          <input type="checkbox" checked style="width:auto;margin-top:4px">
+          <span style="font-size:13px;line-height:1.7">
+            <span class="link" onclick="go('terms')">利用規約</span>と<span class="link" onclick="go('privacy')">プライバシーポリシー</span>に同意します
+          </span>
+        </label>
+      </div>
+      <button class="btn wide" onclick="go('pending')">この内容でお申し込みする</button>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= 承認待ち ========================= -->
+<section class="screen" id="s-pending">
+  <div class="sign">
+    <div class="sign-ttl">お申し込みを承りました</div>
+    <div class="sign-sub">松本メディカル株式会社 松本 和彦 様</div>
+  </div>
+  <div class="pad">
+    <div class="note">
+      ただいま事務局が確認をしております。<br>
+      確認が済みましたら、ご登録のメールアドレスへご連絡いたします。<br><br>
+      お時間をいただく場合がございます。このままお待ちいただければ、お手続きは不要です。
+    </div>
+    <div class="sp"></div>
+    <div class="muted center">確認が済んだあとは、同じメールアドレスでログインいただけます。</div>
+    <div class="sp"></div>
+    <button class="btn wide quiet" onclick="go('login')">ログアウトする</button>
+  </div>
+</section>
+
+<!-- ========================= やりとり一覧（トップ） ========================= -->
+<section class="screen" id="s-home">
+  <div class="hd">
+    <div class="hd-title">やりとり</div>
+    <button onclick="go('admin-pending')" style="font-size:12px">運営</button>
+  </div>
+  <div class="body">
+    <div id="home-reqs">
+      <div class="sec-label">友達の申し込みが届いています</div>
+      <div class="card" style="margin:0 16px">
+        <button class="row-item" onclick="openMember('kobayashi')">
+          <div class="av sm">小</div>
+          <div class="row-main">
+            <div class="row-name">小林 健吾</div>
+            <div class="row-sub">小林会計事務所</div>
+          </div>
+          <span class="tag wait">確認する</span>
+        </button>
+      </div>
+      <div class="sp"></div>
+    </div>
+    <div class="conv-list" id="conv-list"></div>
+  </div>
+  <nav class="tabs">
+    <button class="tab on" onclick="go('home')"><span class="tab-ic">✉️</span><span>やりとり</span><span class="tab-badge" id="tab-unread">3</span></button>
+    <button class="tab" onclick="go('members')"><span class="tab-ic">👥</span><span>会員をさがす</span><span class="tab-badge">1</span></button>
+    <button class="tab" onclick="go('invite')"><span class="tab-ic">✉</span><span>招待する</span></button>
+    <button class="tab" onclick="go('me')"><span class="tab-ic">⚙</span><span>自分の設定</span></button>
+  </nav>
+</section>
+
+<!-- ========================= 会話の画面 ========================= -->
+<section class="screen" id="s-thread">
+  <div class="hd">
+    <button class="hd-back" onclick="go('home')">‹</button>
+    <div class="hd-title"><span id="th-name"></span><span class="hd-sub" id="th-sub"></span></div>
+    <button id="th-prof" onclick="openMember(currentOther)" style="font-size:12px">プロフィール</button>
+  </div>
+  <div class="thread" id="th-body"></div>
+  <div class="composer">
+    <textarea id="th-input" rows="1" placeholder="メッセージを入力" oninput="onType()"></textarea>
+    <button class="send" id="th-send" onclick="sendMsg()" disabled>↑</button>
+  </div>
+  <div class="toast" id="th-toast"></div>
+</section>
+
+<!-- ========================= 会員をさがす ========================= -->
+<section class="screen" id="s-members">
+  <div class="hd"><div class="hd-title">会員をさがす</div></div>
+  <div class="body">
+    <div class="search">
+      <input id="mem-q" placeholder="お名前・会社名・業種・地域でさがす" oninput="renderMembers()">
+    </div>
+    <div id="mem-reqs">
+      <div class="sec-label">友達の申し込みが届いています</div>
+      <div class="row-item" style="cursor:default">
+        <div class="av sm">小</div>
+        <div class="row-main">
+          <div class="row-name">小林 健吾</div>
+          <div class="row-sub">小林会計事務所</div>
+        </div>
+        <div class="rowflex">
+          <button class="btn sm" onclick="acceptKobayashi()">友達になる</button>
+          <button class="btn sm quiet" onclick="declineKobayashi()">見送る</button>
+        </div>
+      </div>
+    </div>
+    <div class="sec-label" id="mem-count"></div>
+    <div id="mem-list"></div>
+  </div>
+  <nav class="tabs">
+    <button class="tab" onclick="go('home')"><span class="tab-ic">✉️</span><span>やりとり</span></button>
+    <button class="tab on" onclick="go('members')"><span class="tab-ic">👥</span><span>会員をさがす</span></button>
+    <button class="tab" onclick="go('invite')"><span class="tab-ic">✉</span><span>招待する</span></button>
+    <button class="tab" onclick="go('me')"><span class="tab-ic">⚙</span><span>自分の設定</span></button>
+  </nav>
+  <div class="toast" id="mem-toast"></div>
+</section>
+
+<!-- ========================= プロフィール ========================= -->
+<section class="screen" id="s-member">
+  <div class="hd">
+    <button class="hd-back" onclick="go('members')">‹</button>
+    <div class="hd-title">プロフィール</div>
+  </div>
+  <div class="body">
+    <div style="background:#fff;padding:26px 18px;text-align:center">
+      <div class="av lg" id="pf-av" style="margin:0 auto"></div>
+      <div style="font-family:var(--serif);font-size:19px;font-weight:600;margin-top:11px;color:var(--ink)" id="pf-name"></div>
+      <div class="muted" style="margin-top:3px" id="pf-co"></div>
+      <div class="rowflex" style="justify-content:center;margin-top:9px" id="pf-tags"></div>
+    </div>
+    <div class="pad" id="pf-actions"></div>
+  </div>
+  <nav class="tabs">
+    <button class="tab" onclick="go('home')"><span class="tab-ic">✉️</span><span>やりとり</span></button>
+    <button class="tab on" onclick="go('members')"><span class="tab-ic">👥</span><span>会員をさがす</span></button>
+    <button class="tab" onclick="go('invite')"><span class="tab-ic">✉</span><span>招待する</span></button>
+    <button class="tab" onclick="go('me')"><span class="tab-ic">⚙</span><span>自分の設定</span></button>
+  </nav>
+  <div class="toast" id="pf-toast"></div>
+</section>
+
+<!-- ========================= 招待する ========================= -->
+<section class="screen" id="s-invite">
+  <div class="hd"><div class="hd-title">招待する</div></div>
+  <div class="body">
+    <div class="pad">
+      <div class="note">
+        この場は完全紹介制です。<br>
+        ご一緒したい経営者の方がいらっしゃれば、ご招待のリンクを発行してお送りください。<br>
+        ご入会には事務局の確認がございます。
+      </div>
+      <div class="sp"></div>
+
+      <div class="card" style="padding:18px" id="inv-form">
+        <div class="field">
+          <label>お招きしたい理由（任意）</label>
+          <textarea rows="3" id="inv-reason" placeholder="例）同じ業界で長くお付き合いがあり、この場でもご一緒したい方です。"></textarea>
+          <div class="hint">事務局が確認のときに参考にします。ご本人やほかの会員には見えません。</div>
+        </div>
+        <button class="btn wide" onclick="issueInvite()">ご招待のリンクを発行する</button>
+      </div>
+
+      <div class="card" style="padding:18px;display:none" id="inv-done">
+        <div class="ok">ご招待のリンクを発行しました。</div>
+        <div class="code" id="inv-code">KHTM-7FQ2-RBXN</div>
+        <div class="sp"></div>
+        <div class="field">
+          <label>お送りする文面</label>
+          <textarea rows="10" readonly id="inv-text"></textarea>
+          <div class="hint">メールやメッセージアプリに貼り付けてお送りください。</div>
+        </div>
+        <button class="btn wide" onclick="toast('inv-toast','文面をコピーしました')">文面をコピーする</button>
+        <div class="sp"></div>
+        <button class="btn wide quiet" onclick="resetInvite()">続けて発行する</button>
+      </div>
+    </div>
+
+    <div class="sec-label">お送りしたご招待</div>
+    <div id="inv-list">
+      <div class="row-item" style="cursor:default">
+        <div class="row-main">
+          <div class="row-name" style="font-family:ui-monospace,Menlo,monospace;letter-spacing:.06em;font-size:13.5px">PQVD-3KM8-YTZR</div>
+          <div class="row-sub">2026/10/02 14:20 発行 ・ 長年お世話になっている先輩経営者です。</div>
+        </div>
+        <span class="tag friend">ご入会済み</span>
+      </div>
+      <div class="row-item" style="cursor:default">
+        <div class="row-main">
+          <div class="row-name" style="font-family:ui-monospace,Menlo,monospace;letter-spacing:.06em;font-size:13.5px">WFJN-6BQ4-HMXC</div>
+          <div class="row-sub">2026/10/18 09:05 発行</div>
+        </div>
+        <span class="tag wait">確認中</span>
+      </div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <button class="tab" onclick="go('home')"><span class="tab-ic">✉️</span><span>やりとり</span></button>
+    <button class="tab" onclick="go('members')"><span class="tab-ic">👥</span><span>会員をさがす</span></button>
+    <button class="tab on" onclick="go('invite')"><span class="tab-ic">✉</span><span>招待する</span></button>
+    <button class="tab" onclick="go('me')"><span class="tab-ic">⚙</span><span>自分の設定</span></button>
+  </nav>
+  <div class="toast" id="inv-toast"></div>
+</section>
+
+<!-- ========================= 自分の設定 ========================= -->
+<section class="screen" id="s-me">
+  <div class="hd">
+    <div class="hd-title">自分の設定</div>
+    <button onclick="go('admin-pending')" style="font-size:12px">運営</button>
+  </div>
+  <div class="body">
+    <div style="background:#fff;padding:22px 18px;text-align:center">
+      <div class="av lg" style="margin:0 auto">中</div>
+      <div style="font-family:var(--serif);font-size:18px;font-weight:600;margin-top:10px;color:var(--ink)">中村 誠一</div>
+      <div class="muted">nakamura@nakamura-seiki.co.jp</div>
+    </div>
+
+    <div class="sec-label">プロフィール</div>
+    <div class="pad" style="padding-top:0">
+      <div class="card" style="padding:18px">
+        <div class="field"><label>お名前</label><input value="中村 誠一"></div>
+        <div class="field"><label>会社名</label><input value="中村精機株式会社"></div>
+        <div class="field"><label>業種</label>
+          <select><option>製造</option><option>建設・不動産</option><option>情報・通信・IT</option></select>
+        </div>
+        <div class="field"><label>地域</label>
+          <select><option>東海</option><option>関東</option><option>関西</option></select>
+        </div>
+        <div class="field">
+          <label>メールアドレス</label>
+          <input value="nakamura@nakamura-seiki.co.jp" disabled>
+          <div class="hint">変更をご希望の場合は、事務局へお知らせください。</div>
+        </div>
+        <button class="btn wide" onclick="toast('me-toast','保存しました')">保存する</button>
+      </div>
+    </div>
+
+    <div class="sec-label">お知らせメール</div>
+    <div class="pad" style="padding-top:0">
+      <div class="card" style="padding:16px">
+        <div class="muted">
+          新しいメッセージが届いたとき、ご登録のメールアドレスへお知らせをお送りしています。<br><br>
+          ・まとめて1通でお送りします（10分ごと）<br>
+          ・メールの本文には、やりとりの中身は書きません<br><br>
+          お知らせの停止をご希望の場合は、事務局へお知らせください。
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-label">この場について</div>
+    <div class="pad" style="padding-top:0">
+      <div class="card">
+        <button class="row-item" onclick="go('terms')">
+          <div class="row-main"><div class="row-name">利用規約</div></div>
+          <span style="color:var(--ink-weak)">›</span>
+        </button>
+        <button class="row-item" onclick="go('privacy')">
+          <div class="row-main"><div class="row-name">プライバシーポリシー</div></div>
+          <span style="color:var(--ink-weak)">›</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="pad">
+      <button class="btn wide quiet" onclick="go('login')">ログアウトする</button>
+    </div>
+
+    <div class="sec-label">退会</div>
+    <div class="pad" style="padding-top:0">
+      <button class="btn wide danger" id="wd-open" onclick="openWithdraw()">退会の手続きをする</button>
+      <div class="card" style="padding:18px;display:none" id="wd-box">
+        <div class="muted">
+          退会されますと、次のようになります。<br><br>
+          ・会員一覧に表示されなくなります<br>
+          ・やりとりの画面が開けなくなります<br>
+          ・これまでのやりとりの記録は、相手の方の画面に残ります<br><br>
+          お続けになる場合は、下の欄に<strong>「退会する」</strong>とご入力ください。
+        </div>
+        <div class="sp"></div>
+        <div class="field"><input id="wd-input" placeholder="退会する" oninput="document.getElementById('wd-go').disabled = this.value!=='退会する'"></div>
+        <button class="btn wide danger" id="wd-go" disabled onclick="go('withdrawn')">退会する</button>
+        <div class="sp"></div>
+        <button class="btn wide quiet" onclick="document.getElementById('wd-box').style.display='none';document.getElementById('wd-open').style.display='flex'">やめる</button>
+      </div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <button class="tab" onclick="go('home')"><span class="tab-ic">✉️</span><span>やりとり</span></button>
+    <button class="tab" onclick="go('members')"><span class="tab-ic">👥</span><span>会員をさがす</span></button>
+    <button class="tab" onclick="go('invite')"><span class="tab-ic">✉</span><span>招待する</span></button>
+    <button class="tab on" onclick="go('me')"><span class="tab-ic">⚙</span><span>自分の設定</span></button>
+  </nav>
+  <div class="toast" id="me-toast"></div>
+</section>
+
+<!-- ========================= 退会済み ========================= -->
+<section class="screen" id="s-withdrawn">
+  <div class="sign"><div class="sign-ttl">ご退会の手続きが済んでいます</div></div>
+  <div class="pad">
+    <div class="note">
+      長らくありがとうございました。<br>
+      あらためてご参加をご希望の場合は、会員の方からのご招待が必要になります。事務局へお問い合わせください。
+    </div>
+    <div class="sp"></div>
+    <button class="btn wide quiet" onclick="go('login')">ログアウトする</button>
+  </div>
+</section>
+
+<!-- ========================= 利用規約 ========================= -->
+<section class="screen" id="s-terms">
+  <div class="hd"><button class="hd-back" onclick="go('me')">‹</button><div class="hd-title">利用規約</div></div>
+  <div class="body"><div class="pad">
+    <div class="note">※ この文面はたたき台です。公開前に運営元でご確認ください。</div>
+    <div class="sp"></div>
+    <div class="doc">
+      <h2>第1条（この規約について）</h2>
+      <p>この規約は、LIVE Doctor株式会社（以下「当社」）が運営する「社長の背中SNS」（以下「本サービス」）のご利用について定めるものです。</p>
+      <h2>第2条（入会）</h2>
+      <ul>
+        <li>本サービスは完全紹介制です。会員からの招待を受けた方のみお申し込みいただけます。</li>
+        <li>お申し込みののち、当社が確認を行い、承認した方に会員としてご利用いただきます。</li>
+        <li>会員は、経営者ご本人であることを前提とします。</li>
+      </ul>
+      <h2>第5条（やりとりについて）</h2>
+      <ul>
+        <li>1対1のやりとりは、相互に承認した会員同士の間でのみ行えます。</li>
+        <li>グループは当社が作成し、当社が招待した会員のみが参加できます。</li>
+        <li>当社は、会員同士の1対1のやりとりの内容を閲覧いたしません。ただし、会員から通報があった場合は、その前後を含むやりとりの写しを確認いたします。</li>
+      </ul>
+      <h2>第6条（してはいけないこと）</h2>
+      <ul>
+        <li>他の会員に対する誹謗中傷、嫌がらせ、脅迫</li>
+        <li>執拗な勧誘、強引な営業、ねずみ講・マルチ商法などの勧誘</li>
+        <li>他の会員の情報を、本サービス外へ無断で持ち出すこと</li>
+        <li>ご本人以外によるご利用、アカウントの貸与・譲渡</li>
+      </ul>
+      <p class="muted" style="margin-top:22px">（以下、第12条まで続きます）</p>
+    </div>
+  </div></div>
+</section>
+
+<!-- ========================= プライバシーポリシー ========================= -->
+<section class="screen" id="s-privacy">
+  <div class="hd"><button class="hd-back" onclick="go('me')">‹</button><div class="hd-title">プライバシーポリシー</div></div>
+  <div class="body"><div class="pad">
+    <div class="note">※ この文面はたたき台です。公開前に運営元でご確認ください。</div>
+    <div class="sp"></div>
+    <div class="doc">
+      <h2>1. お預かりする情報</h2>
+      <ul><li>お名前、会社名、業種、地域</li><li>メールアドレス</li><li>ご紹介者</li><li>本サービス内でお送りいただいたメッセージ</li></ul>
+      <h2>2. 何に使うか</h2>
+      <p>本サービスのご提供、お知らせのお届け、ご入会の確認、違反の確認と対応に使います。<br>
+      広告は掲載しません。お預かりした情報を、広告のために使うことはありません。</p>
+      <h2>3. メッセージの取り扱い</h2>
+      <p>会員同士の1対1のやりとりの内容は、当社では閲覧いたしません。データベースの仕組みとして、やりとりの当事者以外には表示されないようにしています。</p>
+      <p>ただし、会員から通報があった場合は、その前後を含むやりとりの写しが事務局に渡り、確認いたします。これは、嫌がらせや執拗な勧誘から会員をお守りするためです。</p>
+      <p class="muted" style="margin-top:22px">（以下、第9項まで続きます）</p>
+    </div>
+  </div></div>
+</section>
+
+<!-- ========================= 運営：承認待ち ========================= -->
+<section class="screen" id="s-admin-pending">
+  <div class="hd"><button class="hd-back" onclick="go('home')">‹</button><div class="hd-title">運営<span class="hd-sub">承認待ち</span></div></div>
+  <nav class="adm-nav">
+    <button class="on" onclick="go('admin-pending')">承認待ち</button>
+    <button onclick="go('admin-members')">会員管理</button>
+    <button onclick="go('admin-groups')">グループ</button>
+    <button onclick="go('admin-announce')">一斉連絡</button>
+    <button onclick="go('admin-reports')">通報</button>
+  </nav>
+  <div class="body"><div class="pad">
+    <div class="muted" style="margin-bottom:12px" id="ap-count">2件のお申し込みがあります。</div>
+    <div id="ap-list">
+      <div class="card" style="padding:16px;margin-bottom:13px" data-ap="1">
+        <div class="rowflex" style="margin-bottom:11px">
+          <div class="av sm">松</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:15px;color:var(--ink)">松本 和彦</div>
+            <div class="muted">松本メディカル株式会社</div>
+          </div>
+        </div>
+        <div class="snap" style="margin-bottom:13px">
+          <div><strong>メール</strong>：matsumoto@matsumoto-medical.co.jp</div>
+          <div><strong>業種</strong>：医療・介護・福祉 ／ <strong>地域</strong>：関東</div>
+          <div><strong>ご紹介者</strong>：山田建設株式会社 山田 浩司</div>
+          <div><strong>招く理由</strong>：地元の商工会でご一緒しており、人柄をよく存じ上げています。</div>
+          <div><strong>お申し込み</strong>：2026/10/22 11:34</div>
+        </div>
+        <div class="rowflex">
+          <button class="btn" style="flex:1" onclick="approve(1,'松本 和彦')">承認する</button>
+          <button class="btn quiet" style="flex:1" onclick="reject(1)">お断りする</button>
+        </div>
+        <div class="muted" style="margin-top:9px;font-size:11.5px">
+          承認すると、ご本人へご案内のメールが届き、「会員全員のグループ」に自動で入ります。
+        </div>
+      </div>
+
+      <div class="card" style="padding:16px;margin-bottom:13px" data-ap="2">
+        <div class="rowflex" style="margin-bottom:11px">
+          <div class="av sm">渡</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:15px;color:var(--ink)">渡辺 三郎</div>
+            <div class="muted">渡辺商事株式会社</div>
+          </div>
+        </div>
+        <div class="snap" style="margin-bottom:13px">
+          <div><strong>メール</strong>：watanabe@watanabe-shoji.co.jp</div>
+          <div><strong>業種</strong>：卸売・小売 ／ <strong>地域</strong>：関西</div>
+          <div><strong>ご紹介者</strong>：ササキフーズ株式会社 佐々木 隆</div>
+          <div><strong>招く理由</strong>：（記載なし）</div>
+          <div><strong>お申し込み</strong>：2026/10/23 08:12</div>
+        </div>
+        <div class="rowflex">
+          <button class="btn" style="flex:1" onclick="approve(2,'渡辺 三郎')">承認する</button>
+          <button class="btn quiet" style="flex:1" onclick="reject(2)">お断りする</button>
+        </div>
+      </div>
+    </div>
+    <div id="ap-empty" style="display:none">
+      <div class="empty">
+        <div class="empty-ic">✓</div>
+        <div class="empty-ttl">承認待ちはありません</div>
+        <div class="empty-txt">新しいお申し込みがあると、ここに表示されます。<br>メールでもお知らせします。</div>
+      </div>
+    </div>
+  </div></div>
+  <div class="toast" id="ap-toast"></div>
+</section>
+
+<!-- ========================= 運営：会員管理 ========================= -->
+<section class="screen" id="s-admin-members">
+  <div class="hd"><button class="hd-back" onclick="go('home')">‹</button><div class="hd-title">運営<span class="hd-sub">会員管理</span></div></div>
+  <nav class="adm-nav">
+    <button onclick="go('admin-pending')">承認待ち</button>
+    <button class="on" onclick="go('admin-members')">会員管理</button>
+    <button onclick="go('admin-groups')">グループ</button>
+    <button onclick="go('admin-announce')">一斉連絡</button>
+    <button onclick="go('admin-reports')">通報</button>
+  </nav>
+  <div class="body">
+    <div class="pad" style="padding-bottom:0">
+      <div class="snap">ご利用中 <strong>8名</strong> ／ 承認待ち <strong>2名</strong> ／ 退会 <strong>1名</strong></div>
+    </div>
+    <div class="search" style="margin-top:14px;top:auto;position:static">
+      <input placeholder="お名前・会社名・メールでさがす" id="am-q" oninput="renderAdminMembers()">
+    </div>
+    <div class="sec-label" id="am-count"></div>
+    <div id="am-list"></div>
+  </div>
+  <div class="toast" id="am-toast"></div>
+</section>
+
+<!-- ========================= 運営：グループ ========================= -->
+<section class="screen" id="s-admin-groups">
+  <div class="hd"><button class="hd-back" onclick="go('home')">‹</button><div class="hd-title">運営<span class="hd-sub">グループ</span></div></div>
+  <nav class="adm-nav">
+    <button onclick="go('admin-pending')">承認待ち</button>
+    <button onclick="go('admin-members')">会員管理</button>
+    <button class="on" onclick="go('admin-groups')">グループ</button>
+    <button onclick="go('admin-announce')">一斉連絡</button>
+    <button onclick="go('admin-reports')">通報</button>
+  </nav>
+  <div class="body">
+    <div class="pad">
+      <div class="note">
+        グループは事務局がつくり、お招きした方だけが参加できます。<br>
+        会員がご自身でグループをつくることはできません。
+      </div>
+      <div class="sp"></div>
+      <button class="btn wide" id="ag-new" onclick="openNewGroup()">新しいグループをつくる</button>
+      <div class="card" style="padding:18px;display:none" id="ag-form">
+        <div class="field">
+          <label>グループ名</label>
+          <input placeholder="例）東海エリアの会">
+        </div>
+        <div class="field">
+          <label>お招きする方</label>
+          <div style="max-height:200px;overflow-y:auto;border:1px solid var(--line);border-radius:9px" id="ag-picker"></div>
+          <div class="hint">あとから足したり、はずしたりできます。事務局（ご自身）は自動で参加します。</div>
+        </div>
+        <button class="btn wide" onclick="toast('ag-toast','グループを作りました');closeNewGroup()">このグループを作る</button>
+        <div class="sp"></div>
+        <button class="btn wide quiet" onclick="closeNewGroup()">やめる</button>
+      </div>
+    </div>
+
+    <div class="sec-label">グループ一覧（3件）</div>
+    <div id="ag-list"></div>
+  </div>
+  <div class="toast" id="ag-toast"></div>
+</section>
+
+<!-- ========================= 運営：一斉連絡 ========================= -->
+<section class="screen" id="s-admin-announce">
+  <div class="hd"><button class="hd-back" onclick="go('home')">‹</button><div class="hd-title">運営<span class="hd-sub">一斉連絡</span></div></div>
+  <nav class="adm-nav">
+    <button onclick="go('admin-pending')">承認待ち</button>
+    <button onclick="go('admin-members')">会員管理</button>
+    <button onclick="go('admin-groups')">グループ</button>
+    <button class="on" onclick="go('admin-announce')">一斉連絡</button>
+    <button onclick="go('admin-reports')">通報</button>
+  </nav>
+  <div class="body">
+    <div class="pad">
+      <div class="card" style="padding:18px">
+        <div class="note" style="margin-bottom:16px">
+          ご利用中の会員 <strong>8名</strong> のメールアドレスへ、一斉にお送りします。<br>
+          送信したあとの取り消しはできません。
+        </div>
+        <div class="field">
+          <label>件名</label>
+          <input id="an-subj" placeholder="例）新しい会員の方のご紹介" oninput="checkAnnounce()">
+          <div class="hint">メールの件名は「【社長の背中SNS】件名」の形でお届けします。</div>
+        </div>
+        <div class="field">
+          <label>本文</label>
+          <textarea id="an-body" rows="8" placeholder="いつもありがとうございます。&#10;事務局よりご連絡いたします。" oninput="checkAnnounce()"></textarea>
+          <div class="hint">冒頭に「○○ 様」が自動で入ります。末尾に「社長の背中SNS 事務局」が自動で入ります。</div>
+        </div>
+        <div class="field">
+          <label>確認のため「送信」とご入力ください</label>
+          <input id="an-confirm" placeholder="送信" oninput="checkAnnounce()">
+        </div>
+        <button class="btn wide" id="an-go" disabled onclick="toast('an-toast','8名へお送りしました')">会員全員へお送りする</button>
+      </div>
+    </div>
+    <div class="sec-label">これまでにお送りしたもの</div>
+    <div>
+      <div class="row-item" style="cursor:default">
+        <div class="row-main">
+          <div class="row-name">はじめまして。この場のご案内です</div>
+          <div class="row-sub">2026/10/05 10:00 ・ 6名へ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="an-toast"></div>
+</section>
+
+<!-- ========================= 運営：通報 ========================= -->
+<section class="screen" id="s-admin-reports">
+  <div class="hd"><button class="hd-back" onclick="go('home')">‹</button><div class="hd-title">運営<span class="hd-sub">通報</span></div></div>
+  <nav class="adm-nav">
+    <button onclick="go('admin-pending')">承認待ち</button>
+    <button onclick="go('admin-members')">会員管理</button>
+    <button onclick="go('admin-groups')">グループ</button>
+    <button onclick="go('admin-announce')">一斉連絡</button>
+    <button class="on" onclick="go('admin-reports')">通報</button>
+  </nav>
+  <div class="body">
+    <div class="pad">
+      <div class="note">
+        会員から「事務局に知らせる」が押されたときに、そのメッセージと前後のやりとりの<strong>写し</strong>がここに届きます。<br><br>
+        事務局は、会員同士の1対1のやりとりそのものを読むことはできません。通報があった分の写しだけを確認する仕組みです。
+      </div>
+    </div>
+    <div class="pad" style="padding-top:0">
+      <div class="muted" style="margin-bottom:12px">未対応 1件 ／ 全2件</div>
+
+      <div class="card" style="padding:16px;margin-bottom:13px" id="rep-1">
+        <div class="spread" style="margin-bottom:11px">
+          <span class="tag wait" id="rep-1-tag">未対応</span>
+          <span class="muted" style="font-size:11.5px">2026/10/21 19:42</span>
+        </div>
+        <div class="snap" style="margin-bottom:11px">
+          <div><strong>知らせた方</strong>：大西 由美（大西運輸株式会社）</div>
+          <div><strong>対象の方</strong>：藤本 剛（フジモトITソリューションズ）</div>
+          <div><strong>気になった点</strong>：断ったあとも投資のお誘いが続いています。</div>
+        </div>
+        <div class="sec-label" style="padding:0 0 6px">やりとりの写し（通報された時点のもの）</div>
+        <div class="snap" style="margin-bottom:13px">
+          <div class="snap-row">
+            <div class="snap-who">藤本 剛（フジモトITソリューションズ）<span style="color:var(--ink-weak);font-weight:400;margin-left:6px">19:21</span></div>
+            <div>先日のお話、ご検討いただけましたでしょうか。</div>
+          </div>
+          <div class="snap-row">
+            <div class="snap-who">大西 由美（大西運輸株式会社）<span style="color:var(--ink-weak);font-weight:400;margin-left:6px">19:33</span></div>
+            <div>申し訳ありませんが、今回は見送らせていただきます。</div>
+          </div>
+          <div class="snap-row target">
+            <div class="snap-who">藤本 剛（フジモトITソリューションズ）<span style="color:var(--ink-weak);font-weight:400;margin-left:6px">19:40</span><span style="color:var(--seal);font-weight:700;margin-left:6px">← 通報されたメッセージ</span></div>
+            <div>そうおっしゃらずに。今月中なら特別な条件をご用意できます。他の社長さんも皆さん入られていますよ。</div>
+          </div>
+        </div>
+        <div id="rep-1-actions">
+          <div class="rowflex" style="flex-wrap:wrap;margin-bottom:11px">
+            <button class="btn sm ghost" onclick="toast('rep-toast','メッセージを非表示にしました')">メッセージを非表示にする</button>
+            <button class="btn sm danger" onclick="toast('rep-toast','退会の処理をしました')">対象の方を退会させる</button>
+          </div>
+          <div class="field">
+            <label>対応の記録（あとから見返すため）</label>
+            <textarea rows="2" placeholder="例）お電話で状況を伺い、ご本人に注意をお伝えした。"></textarea>
+          </div>
+          <button class="btn wide quiet" onclick="closeReport()">対応済みにする</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:16px;margin-bottom:13px;opacity:.68">
+        <div class="spread" style="margin-bottom:11px">
+          <span class="tag friend">対応済み</span>
+          <span class="muted" style="font-size:11.5px">2026/09/28 14:05</span>
+        </div>
+        <div class="snap" style="margin-bottom:11px">
+          <div><strong>知らせた方</strong>：小林 健吾（小林会計事務所）</div>
+          <div><strong>対象の方</strong>：（退会済みの方）</div>
+          <div><strong>気になった点</strong>：保険の勧誘が繰り返し届きます。</div>
+        </div>
+        <div class="snap">
+          <div><strong>対応</strong>：2026/09/29 10:12 ／ 事務局</div>
+          <div><strong>記録</strong>：お電話で注意をお伝えし、ご本人の希望により退会となった。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="rep-toast"></div>
+</section>
+
+  </div>
+</div>
+
+<button class="idx-btn" onclick="openIndex()">画面一覧</button>
+
+<div class="idx" id="idx">
+  <h2>画面一覧</h2>
+  <p class="idx-note">実装した20画面です。どれでもお選びいただけます。</p>
+
+  <div class="idx-group">入り口</div>
+  <div class="idx-grid">
+    <button onclick="jump('login')"><b>ログイン</b><span>/login</span></button>
+    <button onclick="jump('join')"><b>ご招待・入会のお申し込み</b><span>/join/[コード]</span></button>
+    <button onclick="jump('pending')"><b>確認中</b><span>/pending</span></button>
+    <button onclick="jump('withdrawn')"><b>退会済み</b><span>/withdrawn</span></button>
+  </div>
+
+  <div class="idx-group">会員の画面</div>
+  <div class="idx-grid">
+    <button onclick="jump('home')"><b>やりとり一覧</b><span>/</span></button>
+    <button onclick="jumpThread('dm')"><b>1対1のやりとり</b><span>/t/[id]</span></button>
+    <button onclick="jumpThread('everyone')"><b>会員全員のグループ</b><span>/t/[id]</span></button>
+    <button onclick="jumpThread('tokai')"><b>グループのやりとり</b><span>/t/[id]</span></button>
+    <button onclick="jump('members')"><b>会員をさがす</b><span>/members</span></button>
+    <button onclick="jumpMember('yamada')"><b>プロフィール（友達）</b><span>/members/[id]</span></button>
+    <button onclick="jumpMember('sasaki')"><b>プロフィール（未申込）</b><span>/members/[id]</span></button>
+    <button onclick="jump('invite')"><b>招待する</b><span>/invite</span></button>
+    <button onclick="jump('me')"><b>自分の設定・退会</b><span>/me</span></button>
+    <button onclick="jump('terms')"><b>利用規約</b><span>/terms</span></button>
+    <button onclick="jump('privacy')"><b>プライバシーポリシー</b><span>/privacy</span></button>
+  </div>
+
+  <div class="idx-group">運営（事務局）の画面</div>
+  <div class="idx-grid">
+    <button onclick="jump('admin-pending')"><b>承認待ち</b><span>/admin</span></button>
+    <button onclick="jump('admin-members')"><b>会員管理</b><span>/admin/members</span></button>
+    <button onclick="jump('admin-groups')"><b>グループ</b><span>/admin/groups</span></button>
+    <button onclick="jump('admin-announce')"><b>一斉連絡</b><span>/admin/announce</span></button>
+    <button onclick="jump('admin-reports')"><b>通報</b><span>/admin/reports</span></button>
+  </div>
+
+  <button class="idx-close" onclick="closeIndex()">閉じる</button>
+</div>
+
+<script>
+'use strict';
+
+/* ---------------- 架空のデータ ---------------- */
+const ME = {id:'me', name:'中村 誠一', company:'中村精機株式会社'};
+
+const PEOPLE = {
+  jimukyoku:{id:'jimukyoku', name:'事務局', company:'LIVE Doctor株式会社', industry:'', area:'', rel:'none', admin:true},
+  yamada:{id:'yamada', name:'山田 浩司', company:'山田建設株式会社', industry:'建設・不動産', area:'関東', rel:'friend'},
+  sasaki:{id:'sasaki', name:'佐々木 隆', company:'ササキフーズ株式会社', industry:'飲食・宿泊', area:'関西', rel:'none'},
+  onishi:{id:'onishi', name:'大西 由美', company:'大西運輸株式会社', industry:'運輸・物流', area:'九州・沖縄', rel:'friend'},
+  fujimoto:{id:'fujimoto', name:'藤本 剛', company:'フジモトITソリューションズ', industry:'情報・通信・IT', area:'関東', rel:'sent'},
+  kobayashi:{id:'kobayashi', name:'小林 健吾', company:'小林会計事務所', industry:'士業・コンサルティング', area:'東海', rel:'received'},
+  takeda:{id:'takeda', name:'武田 信也', company:'武田農園株式会社', industry:'農林水産', area:'甲信越・北陸', rel:'none'},
+  me:{id:'me', name:'中村 誠一', company:'中村精機株式会社', industry:'製造', area:'東海', rel:'self'}
+};
+
+const CONV = {
+  yamada:{
+    id:'yamada', kind:'dm', other:'yamada', name:'山田 浩司', sub:'山田建設株式会社',
+    unread:2,
+    msgs:[
+      {who:'me', t:'10月20日（月）', at:'14:02', body:'山田社長、先日は展示会でお声がけいただきありがとうございました。'},
+      {who:'yamada', at:'14:31', body:'こちらこそ。御社の加工精度の話、たいへん勉強になりました。'},
+      {who:'yamada', at:'14:33', body:'うちの現場でも似た悩みを抱えておりまして、一度ゆっくり伺えませんか。'},
+      {who:'me', at:'15:10', body:'ぜひ。来月でしたら、第2週あたりが動きやすいです。'},
+      {who:'yamada', t:'10月23日（金）', at:'09:14', body:'ありがとうございます。11日の午後はいかがでしょう。'},
+      {who:'yamada', at:'09:15', body:'よろしければ、工場もご覧いただければと思います。'}
+    ]
+  },
+  everyone:{
+    id:'everyone', kind:'group', everyone:true, name:'会員全員のグループ', sub:'8名',
+    unread:1,
+    msgs:[
+      {who:'jimukyoku', t:'10月5日（月）', at:'10:00', body:'みなさま、はじめまして。事務局です。\n\nこの場は、社長の背中に登場いただいた経営者の方だけが集まる、完全紹介制の場です。広告はありません。\n\nまずは「会員をさがす」から、お知り合いを見つけてみてください。'},
+      {who:'onishi', at:'11:22', body:'大西運輸の大西です。よろしくお願いいたします。'},
+      {who:'yamada', at:'13:40', body:'山田建設の山田です。こういう場をお待ちしておりました。'},
+      {who:'jimukyoku', t:'10月22日（木）', at:'16:30', body:'新しく2名の方がご入会されました。プロフィールをご覧いただけます。'}
+    ]
+  },
+  tokai:{
+    id:'tokai', kind:'group', name:'東海エリアの会', sub:'4名',
+    unread:0,
+    msgs:[
+      {who:'kobayashi', t:'10月19日（日）', at:'20:05', body:'小林です。来月の集まりですが、名古屋駅の近くで会場を押さえられそうです。'},
+      {who:'me', at:'21:12', body:'ありがとうございます。助かります。'},
+      {who:'jimukyoku', at:'22:30', body:'事務局からも何名かお声がけしてみます。'}
+    ]
+  }
+};
+
+const ORDER = ['yamada','everyone','tokai'];
+const GROUPS = [
+  {name:'会員全員のグループ', everyone:true, when:'2026/10/01 09:00', roster:['事務局','中村 誠一','山田 浩司','佐々木 隆','大西 由美','藤本 剛','小林 健吾','武田 信也']},
+  {name:'東海エリアの会', everyone:false, when:'2026/10/12 15:20', roster:['事務局','中村 誠一','小林 健吾','武田 信也']},
+  {name:'ものづくり分科会', everyone:false, when:'2026/10/18 11:05', roster:['事務局','中村 誠一','山田 浩司']}
+];
+
+let currentConv = 'yamada';
+let currentOther = 'yamada';
+
+/* ---------------- 画面の切り替え ---------------- */
+let threadReady = false, memberReady = false;
+
+function go(id){
+  // 会話・プロフィールは中身を入れてから出す（直接飛んできた場合の備え）
+  if(id==='thread' && !threadReady) return openConv(currentConv);
+  if(id==='member' && !memberReady) return openMember(currentOther || 'yamada');
+
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  const el = document.getElementById('s-'+id);
+  if(el){ el.classList.add('on'); el.scrollTop = 0; }
+  const ph = document.getElementById('phone');
+  if(ph) ph.scrollTop = 0;
+  window.scrollTo(0,0);
+  if(id==='home') renderConvList();
+  if(id==='members') renderMembers();
+  if(id==='admin-members') renderAdminMembers();
+  if(id==='admin-groups') renderGroups();
+}
+function jump(id){ closeIndex(); go(id); }
+function jumpThread(c){ closeIndex(); openConv(c); }
+function jumpMember(m){ closeIndex(); openMember(m); }
+function openIndex(){ document.getElementById('idx').classList.add('on'); }
+function closeIndex(){ document.getElementById('idx').classList.remove('on'); }
+
+function toast(id,msg){
+  const t = document.getElementById(id);
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(t._tm);
+  t._tm = setTimeout(()=>t.classList.remove('on'), 2200);
+}
+
+function initial(name){ return (name||'？').trim().charAt(0); }
+
+/* ---------------- やりとり一覧 ---------------- */
+function renderConvList(){
+  const host = document.getElementById('conv-list');
+  host.innerHTML = '';
+  let total = 0;
+  ORDER.forEach(k=>{
+    const c = CONV[k];
+    total += c.unread;
+    const last = c.msgs[c.msgs.length-1];
+    const avCls = c.kind==='group' ? ('av group'+(c.everyone?' everyone':'')) : 'av';
+    const avTxt = c.kind==='group' ? (c.everyone?'全':'組') : initial(c.name);
+    const when = k==='yamada' ? '09:15' : (k==='everyone' ? '10/22' : '10/19');
+    const b = document.createElement('button');
+    b.className = 'conv';
+    b.onclick = ()=>openConv(k);
+    b.innerHTML =
+      '<div class="'+avCls+'">'+avTxt+'</div>'+
+      '<div class="conv-main">'+
+        '<div class="conv-top">'+
+          '<span class="conv-name">'+c.name+'</span>'+
+          (c.kind==='group' ? '<span style="font-size:11px;color:var(--ink-weak)">'+c.sub+'</span>' : '')+
+          '<span class="conv-when">'+when+'</span>'+
+        '</div>'+
+        '<div class="conv-prev">'+esc(last.body.replace(/\n/g,' ')).slice(0,40)+'…</div>'+
+      '</div>'+
+      (c.unread>0 ? '<span class="badge">'+c.unread+'</span>' : '');
+    host.appendChild(b);
+  });
+  const tb = document.getElementById('tab-unread');
+  if(total>0){ tb.textContent = total; tb.style.display=''; } else { tb.style.display='none'; }
+}
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------------- 会話の画面 ---------------- */
+function openConv(k){
+  currentConv = k;
+  const c = CONV[k];
+  c.unread = 0;
+  currentOther = c.other || null;
+  document.getElementById('th-name').textContent = c.name;
+  document.getElementById('th-sub').textContent = c.sub || '';
+  document.getElementById('th-prof').style.display = c.kind==='dm' ? '' : 'none';
+  renderThread();
+  threadReady = true;
+  go('thread');
+  const b = document.getElementById('th-body');
+  setTimeout(()=>{ b.scrollIntoView(false); const sc=document.getElementById('s-thread'); sc.scrollTop = sc.scrollHeight; }, 20);
+}
+
+function renderThread(){
+  const c = CONV[currentConv];
+  const host = document.getElementById('th-body');
+  host.innerHTML = '';
+  let lastWho = '';
+  c.msgs.forEach(m=>{
+    if(m.t){
+      const d = document.createElement('div');
+      d.className='day'; d.textContent=m.t; host.appendChild(d); lastWho='';
+    }
+    const mine = m.who==='me';
+    const cont = lastWho===m.who && !m.t;
+    lastWho = m.who;
+    const row = document.createElement('div');
+    row.className = 'row'+(mine?' me':'')+(cont?' cont':'');
+    const who = PEOPLE[m.who] ? PEOPLE[m.who].name : '';
+    row.innerHTML =
+      '<div class="bubble-wrap">'+
+        ((c.kind==='group' && !mine && !cont) ? '<div class="who">'+who+'</div>' : '')+
+        '<div class="bubble">'+esc(m.body)+'</div>'+
+        '<div class="meta">'+m.at+
+          (!mine ? ' ・ <button onclick="reportMsg()">事務局に知らせる</button>' : '')+
+        '</div>'+
+      '</div>';
+    host.appendChild(row);
+  });
+}
+
+function onType(){
+  const i = document.getElementById('th-input');
+  i.style.height='auto';
+  i.style.height = Math.min(i.scrollHeight,120)+'px';
+  document.getElementById('th-send').disabled = !i.value.trim();
+}
+
+function sendMsg(){
+  const i = document.getElementById('th-input');
+  const v = i.value.trim();
+  if(!v) return;
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  CONV[currentConv].msgs.push({who:'me', at:hh+':'+mm, body:v});
+  i.value=''; i.style.height='auto';
+  document.getElementById('th-send').disabled = true;
+  renderThread();
+  const sc = document.getElementById('s-thread');
+  setTimeout(()=>{ sc.scrollTop = sc.scrollHeight; }, 20);
+}
+
+function reportMsg(){
+  toast('th-toast','事務局にお知らせしました。前後のやりとりを含めて確認いたします。');
+}
+
+/* ---------------- 会員をさがす ---------------- */
+const REL_TAG = {
+  self:{l:'自分',c:'tag'},
+  friend:{l:'友達',c:'tag friend'},
+  sent:{l:'申し込み中',c:'tag wait'},
+  received:{l:'申し込みが届いています',c:'tag wait'},
+  none:null
+};
+
+function renderMembers(){
+  const q = (document.getElementById('mem-q').value||'').trim().toLowerCase();
+  const all = Object.values(PEOPLE);
+  const hits = all.filter(p=>!q || [p.name,p.company,p.industry,p.area].join(' ').toLowerCase().includes(q));
+  document.getElementById('mem-count').textContent =
+    '会員一覧（'+hits.length+'名'+(q?' / 全'+all.length+'名':'')+'）';
+  const host = document.getElementById('mem-list');
+  host.innerHTML='';
+  if(hits.length===0){
+    host.innerHTML = '<div class="empty"><div class="empty-ic">🔍</div><div class="empty-ttl">見つかりませんでした</div><div class="empty-txt">別のことばでお試しください。</div></div>';
+    return;
+  }
+  hits.forEach(p=>{
+    const tag = REL_TAG[p.rel];
+    const b = document.createElement('button');
+    b.className='row-item';
+    b.onclick = ()=>openMember(p.id);
+    b.innerHTML =
+      '<div class="av sm">'+initial(p.name)+'</div>'+
+      '<div class="row-main">'+
+        '<div class="row-name">'+p.name+(p.admin?' <span class="tag admin">事務局</span>':'')+'</div>'+
+        '<div class="row-sub">'+[p.company,p.industry,p.area].filter(Boolean).join(' ・ ')+'</div>'+
+      '</div>'+
+      (tag ? '<span class="'+tag.c+'">'+tag.l+'</span>' : '');
+    host.appendChild(b);
+  });
+}
+
+function acceptKobayashi(){
+  PEOPLE.kobayashi.rel='friend';
+  document.getElementById('mem-reqs').style.display='none';
+  document.getElementById('home-reqs').style.display='none';
+  renderMembers();
+  toast('mem-toast','友達になりました。');
+}
+function declineKobayashi(){
+  PEOPLE.kobayashi.rel='none';
+  document.getElementById('mem-reqs').style.display='none';
+  document.getElementById('home-reqs').style.display='none';
+  renderMembers();
+}
+
+/* ---------------- プロフィール ---------------- */
+function openMember(id){
+  const p = PEOPLE[id];
+  if(!p) return;
+  currentOther = id;
+  document.getElementById('pf-av').textContent = initial(p.name);
+  document.getElementById('pf-name').innerHTML = p.name + (p.admin?' <span class="tag admin">事務局</span>':'');
+  document.getElementById('pf-co').textContent = p.company;
+  document.getElementById('pf-tags').innerHTML =
+    (p.industry?'<span class="tag">'+p.industry+'</span>':'') +
+    (p.area?'<span class="tag">'+p.area+'</span>':'');
+
+  const canMsg = p.rel==='friend' || p.admin;
+  let h = '';
+  if(p.rel==='self'){
+    h = '<button class="btn wide ghost" onclick="go(\'me\')">自分の設定を開く</button>';
+  } else {
+    if(canMsg) h += '<button class="btn wide" onclick="openConvFor(\''+id+'\')">メッセージを送る</button><div class="sp"></div>';
+    if(p.rel==='none') h += '<button class="btn wide ghost" onclick="applyFriend(\''+id+'\')">友達の申し込みをする</button>';
+    if(p.rel==='sent') h += '<button class="btn wide quiet" disabled>申し込み中です</button><div class="sp"></div><button class="btn wide quiet" onclick="cancelFriend(\''+id+'\')">申し込みを取り消す</button>';
+    if(p.rel==='received') h += '<div class="rowflex"><button class="btn" style="flex:1" onclick="acceptFrom(\''+id+'\')">友達になる</button><button class="btn quiet" style="flex:1" onclick="cancelFriend(\''+id+'\')">見送る</button></div>';
+    if(p.rel==='friend') h += '<button class="btn wide quiet" onclick="unfriend(\''+id+'\')">友達の関係を解除する</button>';
+    h += '<div class="sp"></div><div class="muted" style="font-size:11.5px">※ この場では、友達になった方とだけ1対1のやりとりができます。'+(p.admin?'事務局へは、いつでもご連絡いただけます。':'')+'</div>';
+  }
+  document.getElementById('pf-actions').innerHTML = h;
+  memberReady = true;
+  go('member');
+}
+function applyFriend(id){ PEOPLE[id].rel='sent'; openMember(id); toast('pf-toast','お申し込みをお送りしました。'); }
+function cancelFriend(id){ PEOPLE[id].rel='none'; openMember(id); }
+function acceptFrom(id){ PEOPLE[id].rel='friend'; openMember(id); toast('pf-toast','友達になりました。'); }
+function unfriend(id){ PEOPLE[id].rel='none'; openMember(id); }
+function openConvFor(id){
+  if(CONV[id]) return openConv(id);
+  CONV[id] = {id:id, kind:'dm', other:id, name:PEOPLE[id].name, sub:PEOPLE[id].company, unread:0, msgs:[]};
+  if(!ORDER.includes(id)) ORDER.unshift(id);
+  openConv(id);
+}
+
+/* ---------------- 招待する ---------------- */
+function issueInvite(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s='';
+  for(let i=0;i<12;i++) s += chars[Math.floor(Math.random()*chars.length)];
+  const code = s.slice(0,4)+'-'+s.slice(4,8)+'-'+s.slice(8,12);
+  document.getElementById('inv-code').textContent = code;
+  document.getElementById('inv-text').value =
+    '中村 誠一 より、「社長の背中SNS」へのご招待です。\n\n'+
+    '経営者の方だけが集まる、完全紹介制の場です。\n'+
+    '下のリンクからお手続きいただけます。\n\n'+
+    'https://sns.livedoctor.jp/join/'+code+'\n\n'+
+    '※ このリンクはご本人のみお使いください。\n'+
+    '※ 30日でお使いいただけなくなります。';
+  document.getElementById('inv-form').style.display='none';
+  document.getElementById('inv-done').style.display='block';
+}
+function resetInvite(){
+  document.getElementById('inv-done').style.display='none';
+  document.getElementById('inv-form').style.display='block';
+  document.getElementById('inv-reason').value='';
+}
+
+/* ---------------- 自分の設定 ---------------- */
+function openWithdraw(){
+  document.getElementById('wd-open').style.display='none';
+  document.getElementById('wd-box').style.display='block';
+}
+
+/* ---------------- 運営 ---------------- */
+function approve(n,name){
+  const c = document.querySelector('[data-ap="'+n+'"]');
+  if(c) c.remove();
+  toast('ap-toast', name+' さんを承認しました。');
+  afterApprove();
+}
+function reject(n){
+  const c = document.querySelector('[data-ap="'+n+'"]');
+  if(c) c.remove();
+  toast('ap-toast','お断りの処理をしました。');
+  afterApprove();
+}
+function afterApprove(){
+  const left = document.querySelectorAll('[data-ap]').length;
+  document.getElementById('ap-count').textContent = left+'件のお申し込みがあります。';
+  if(left===0){
+    document.getElementById('ap-count').style.display='none';
+    document.getElementById('ap-empty').style.display='block';
+  }
+}
+
+const ADMIN_MEMBERS = [
+  {name:'事務局', co:'LIVE Doctor株式会社', mail:'office@livedoctor.jp', ind:'—', area:'—', by:'—', at:'2026/10/01 09:00', st:'active', admin:true},
+  {name:'中村 誠一', co:'中村精機株式会社', mail:'nakamura@nakamura-seiki.co.jp', ind:'製造', area:'東海', by:'事務局', at:'2026/10/03 10:15', st:'active'},
+  {name:'山田 浩司', co:'山田建設株式会社', mail:'yamada@yamada-kensetsu.co.jp', ind:'建設・不動産', area:'関東', by:'事務局', at:'2026/10/03 11:02', st:'active'},
+  {name:'佐々木 隆', co:'ササキフーズ株式会社', mail:'sasaki@sasaki-foods.co.jp', ind:'飲食・宿泊', area:'関西', by:'事務局', at:'2026/10/04 09:40', st:'active'},
+  {name:'大西 由美', co:'大西運輸株式会社', mail:'onishi@onishi-unyu.co.jp', ind:'運輸・物流', area:'九州・沖縄', by:'山田 浩司', at:'2026/10/08 14:22', st:'active'},
+  {name:'藤本 剛', co:'フジモトITソリューションズ', mail:'fujimoto@fujimoto-it.co.jp', ind:'情報・通信・IT', area:'関東', by:'佐々木 隆', at:'2026/10/11 16:50', st:'active'},
+  {name:'小林 健吾', co:'小林会計事務所', mail:'kobayashi@kobayashi-kaikei.jp', ind:'士業・コンサルティング', area:'東海', by:'中村 誠一', at:'2026/10/14 08:30', st:'active'},
+  {name:'武田 信也', co:'武田農園株式会社', mail:'takeda@takeda-nouen.co.jp', ind:'農林水産', area:'甲信越・北陸', by:'大西 由美', at:'2026/10/17 13:12', st:'active'},
+  {name:'松本 和彦', co:'松本メディカル株式会社', mail:'matsumoto@matsumoto-medical.co.jp', ind:'医療・介護・福祉', area:'関東', by:'山田 浩司', at:'2026/10/22 11:34', st:'pending'},
+  {name:'渡辺 三郎', co:'渡辺商事株式会社', mail:'watanabe@watanabe-shoji.co.jp', ind:'卸売・小売', area:'関西', by:'佐々木 隆', at:'2026/10/23 08:12', st:'pending'},
+  {name:'石井 亮', co:'石井保険サービス', mail:'ishii@ishii-hoken.jp', ind:'金融・保険', area:'関東', by:'事務局', at:'2026/09/12 10:00', st:'withdrawn', out:'2026/09/29 10:12'}
+];
+const ST = {active:{l:'ご利用中',c:'tag friend'}, pending:{l:'承認待ち',c:'tag wait'}, withdrawn:{l:'退会',c:'tag'}};
+let amOpen = null;
+
+function renderAdminMembers(){
+  const q = (document.getElementById('am-q').value||'').trim().toLowerCase();
+  const hits = ADMIN_MEMBERS.filter(m=>!q || [m.name,m.co,m.mail].join(' ').toLowerCase().includes(q));
+  document.getElementById('am-count').textContent = hits.length+'名';
+  const host = document.getElementById('am-list');
+  host.innerHTML='';
+  hits.forEach((m,i)=>{
+    const wrap = document.createElement('div');
+    wrap.style.background='#fff';
+    const st = ST[m.st];
+    const open = amOpen===m.mail;
+    wrap.innerHTML =
+      '<button class="row-item" style="border-bottom:1px solid var(--line)">'+
+        '<div class="av sm">'+initial(m.name)+'</div>'+
+        '<div class="row-main">'+
+          '<div class="row-name">'+m.name+(m.admin?' <span class="tag admin">事務局</span>':'')+'</div>'+
+          '<div class="row-sub">'+m.co+'</div>'+
+        '</div>'+
+        '<span class="'+st.c+'">'+st.l+'</span>'+
+      '</button>'+
+      (open ?
+        '<div class="pad" style="padding-top:12px">'+
+          '<div class="snap" style="margin-bottom:12px">'+
+            '<div><strong>メール</strong>：'+m.mail+'</div>'+
+            '<div><strong>業種</strong>：'+m.ind+' ／ <strong>地域</strong>：'+m.area+'</div>'+
+            '<div><strong>ご紹介者</strong>：'+m.by+'</div>'+
+            '<div><strong>ご登録</strong>：'+m.at+'</div>'+
+            (m.out?'<div><strong>退会</strong>：'+m.out+'</div>':'')+
+          '</div>'+
+          (m.name==='事務局'
+            ? '<div class="muted">ご自身のアカウントです。ここからの操作はできません。</div>'
+            : (m.st==='active'
+              ? '<div class="rowflex" style="flex-wrap:wrap">'+
+                  (m.admin
+                    ? '<button class="btn sm quiet" onclick="toast(\'am-toast\',\'運営からはずしました。\')">運営からはずす</button>'
+                    : '<button class="btn sm ghost" onclick="toast(\'am-toast\',\'運営に設定しました。\')">運営に設定</button>')+
+                  '<button class="btn sm danger" onclick="toast(\'am-toast\',\'退会の処理をしました。\')">退会させる</button>'+
+                '</div>'
+              : (m.st==='pending'
+                ? '<button class="btn sm ghost" onclick="go(\'admin-pending\')">承認待ちの画面へ</button>'
+                : '')))+
+        '</div>' : '');
+    wrap.querySelector('button').onclick = ()=>{ amOpen = open?null:m.mail; renderAdminMembers(); };
+    host.appendChild(wrap);
+  });
+}
+
+let agOpen = null;
+function renderGroups(){
+  const host = document.getElementById('ag-list');
+  host.innerHTML='';
+  GROUPS.forEach((g,i)=>{
+    const open = agOpen===i;
+    const wrap = document.createElement('div');
+    wrap.style.background='#fff';
+    wrap.innerHTML =
+      '<button class="row-item" style="border-bottom:1px solid var(--line)">'+
+        '<div class="av sm group'+(g.everyone?' everyone':'')+'">'+(g.everyone?'全':'組')+'</div>'+
+        '<div class="row-main">'+
+          '<div class="row-name">'+g.name+'</div>'+
+          '<div class="row-sub">'+g.roster.length+'名 ・ '+g.when+'</div>'+
+        '</div>'+
+        (g.everyone?'<span class="tag admin">全員</span>':'')+
+      '</button>'+
+      (open ?
+        '<div class="pad" style="padding-top:12px">'+
+          (g.everyone?'<div class="note" style="margin-bottom:12px">このグループには、承認した方が自動で入ります。はずすことはできません。</div>':'')+
+          '<div class="sec-label" style="padding:0 0 7px">参加中</div>'+
+          g.roster.map(n=>
+            '<div class="spread" style="padding:7px 0;border-bottom:1px dashed var(--line)">'+
+              '<span style="font-size:13.5px;color:var(--ink)">'+n+'</span>'+
+              (g.everyone?'':'<button class="btn sm quiet" onclick="toast(\'ag-toast\',\'はずしました。\')">はずす</button>')+
+            '</div>').join('')+
+          (g.everyone?'':'<div class="sec-label" style="padding:16px 0 7px">お招きする</div><button class="btn wide ghost" onclick="toast(\'ag-toast\',\'お招きしました。\')">会員を選んでお招きする</button>')+
+        '</div>' : '');
+    wrap.querySelector('button').onclick = ()=>{ agOpen = open?null:i; renderGroups(); };
+    host.appendChild(wrap);
+  });
+
+  const pick = document.getElementById('ag-picker');
+  if(pick && !pick.dataset.done){
+    pick.innerHTML = Object.values(PEOPLE).filter(p=>p.rel!=='self').map(p=>
+      '<label style="display:flex;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line);margin:0">'+
+        '<input type="checkbox" style="width:auto">'+
+        '<span style="font-size:13.5px;color:var(--ink)">'+p.name+'<span class="muted"> ／ '+p.company+'</span></span>'+
+      '</label>').join('');
+    pick.dataset.done='1';
+  }
+}
+function openNewGroup(){
+  document.getElementById('ag-new').style.display='none';
+  document.getElementById('ag-form').style.display='block';
+}
+function closeNewGroup(){
+  document.getElementById('ag-form').style.display='none';
+  document.getElementById('ag-new').style.display='flex';
+}
+
+function checkAnnounce(){
+  const s = document.getElementById('an-subj').value.trim();
+  const b = document.getElementById('an-body').value.trim();
+  const c = document.getElementById('an-confirm').value;
+  document.getElementById('an-go').disabled = !(s && b && c==='送信');
+}
+
+function closeReport(){
+  document.getElementById('rep-1-tag').className='tag friend';
+  document.getElementById('rep-1-tag').textContent='対応済み';
+  document.getElementById('rep-1').style.opacity='.68';
+  document.getElementById('rep-1-actions').innerHTML =
+    '<div class="snap"><div><strong>対応</strong>：いま ／ 事務局</div><div><strong>記録</strong>：（ご入力の内容が入ります）</div></div>';
+  toast('rep-toast','対応済みにしました。');
+}
+
+/* ---------------- 起動 ---------------- */
+renderConvList();
+renderMembers();
+go('home');
+</script>
+</body>
+</html>
