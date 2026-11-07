@@ -2,1552 +2,1028 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>社長の背中SNS モック</title>
+<title>社長の背中SNS スマホ版モック</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <style>
 /* ============================================================
-   外側（モックを置く台）— ここは実際のアプリには存在しません
+   社長の背中SNS　スマートフォン版モック（黒と朱）
    ============================================================ */
 :root{
-  --navy:#001d4a; --navy-soft:#1a3561; --seal:#ae3524;
-  --ink:#1b1b1f; --ink-mid:#5a5f6b; --ink-weak:#8b909c;
-  --line:#e3e5ea; --bg:#f6f7f9; --card:#fff; --mine:#e8eef8;
-  --accent:#c9a227;
-  --r:12px;
-  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --header-h:52px; --tab-h:58px;
-  --serif:'Hiragino Mincho ProN','Yu Mincho','Noto Serif JP',serif;
-  --sans:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP','Yu Gothic UI',Meiryo,sans-serif;
-
-  /* 台の色（ダークモードで変わるのはここだけ） */
-  --stage:#eceef2;
-  --stage-ink:#5a5f6b;
-  --stage-line:#d7dae1;
-  --stage-card:#ffffff;
+  color-scheme: dark;
+  --bg:#1A1A1A; --card:#2A2A2A; --card2:#242424;
+  --line:#383838; --line2:#2E2E2E;
+  --key:#B03633; --keyInk:#FFFFFF; --accent:#B03633;
+  --ink:#FFFFFF; --mid:#A8A8A8; --weak:#757575;
+  --hdH:54px; --tabH:64px;
+  --min:'Noto Serif CJK JP','Hiragino Mincho ProN','Yu Mincho',serif;
+  --got:'Noto Sans CJK JP','Hiragino Sans','Yu Gothic UI',Meiryo,sans-serif;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --stage:#15171c;
-    --stage-ink:#9aa0ab;
-    --stage-line:#2a2e36;
-    --stage-card:#1d2026;
-  }
-}
-:root[data-theme="dark"]{
-  --stage:#15171c; --stage-ink:#9aa0ab; --stage-line:#2a2e36; --stage-card:#1d2026;
-}
-
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
 body{
-  font-family:var(--sans);
-  background:var(--stage);
-  color:var(--stage-ink);
-  min-height:100vh;
+  background:#0E0F10; color:var(--ink);
+  font-family:var(--got); font-size:15px;
+  -webkit-font-smoothing:antialiased;
 }
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left}
+input,textarea,select{font:inherit;color:inherit}
+.ph{border-radius:50%;overflow:hidden;flex-shrink:0;display:block}
+.ph svg{display:block;width:100%;height:100%}
 
-/* 台の上の見出し（パソコンで見たときだけ出る） */
-.stage-head{
-  display:none;
-  text-align:center;
-  padding:26px 16px 14px;
-}
-.stage-head h1{
-  font-family:var(--serif);
-  font-size:19px; font-weight:600; letter-spacing:.06em;
-  margin:0 0 5px; color:var(--stage-ink);
-}
-.stage-head p{margin:0;font-size:12.5px;line-height:1.7;opacity:.8}
+/* ---------- 台と端末の枠 ---------- */
+.stage{min-height:100%;display:flex;flex-direction:column;align-items:center}
+.stageHd{display:none;text-align:center;padding:26px 16px 14px;color:#8A9099}
+.stageHd h1{font-family:var(--min);font-size:19px;font-weight:600;letter-spacing:.05em;
+            margin-bottom:5px;color:#D4D8DD}
+.stageHd p{font-size:12.5px;line-height:1.8}
 
-/* 端末の枠 */
-.phone-wrap{display:flex;justify-content:center;padding:0}
 .phone{
-  width:100%;
-  max-width:420px;
-  background:var(--bg);
-  position:relative;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-  min-height:100dvh;
+  width:100%;max-width:400px;background:var(--bg);
+  display:flex;flex-direction:column;overflow:hidden;position:relative;
+  min-height:100vh;min-height:100dvh;
 }
-@media (min-width:860px){
-  .stage-head{display:block}
-  .idx-btn{bottom:20px}
-  .phone-wrap{padding:0 16px 40px}
+@media (min-width:820px){
+  .stageHd{display:block}
   .phone{
-    height:844px;
-    min-height:0;
-    border-radius:38px;
-    border:9px solid #0d1117;
-    box-shadow:0 22px 60px rgba(0,0,0,.28);
+    height:844px;min-height:0;border-radius:40px;
+    border:10px solid #0A0A0A;box-shadow:0 22px 60px rgba(0,0,0,.6);
+    margin-bottom:40px;
   }
 }
 
-/* 画面の入れ替え */
-.screen{display:none;position:relative;background:var(--bg)}
-.screen.on{
-  display:flex;
-  flex-direction:column;
-  flex:1;
-  min-height:0;
-  overflow-y:auto;
-  overflow-x:hidden;
-}
-/* 本文を伸ばして、下のタブを画面の底に置く */
-.body,.thread{flex:1 0 auto}
+.screen{display:none;flex-direction:column;flex:1;min-height:0;overflow-y:auto;background:var(--bg)}
+.screen.on{display:flex}
+.body{flex:1 0 auto;padding:15px 15px 10px}
+.body.flat{padding:0}
 
-/* 画面一覧を開くボタン */
-.idx-btn{
-  position:fixed; right:14px; bottom:calc(var(--tab-h) + 12px); z-index:300;
-  background:#0d1117; color:#fff; border:0;
-  border-radius:22px; padding:10px 16px;
-  font:inherit; font-size:12.5px; font-weight:700;
-  box-shadow:0 4px 16px rgba(0,0,0,.3); cursor:pointer;
-}
-.idx{
-  position:fixed; inset:0; z-index:310;
-  background:rgba(8,10,14,.92);
-  display:none; overflow-y:auto; padding:22px 16px 90px;
-}
-.idx.on{display:block}
-.idx h2{
-  font-family:var(--serif); color:#fff; font-size:16px;
-  text-align:center; margin:4px 0 4px; font-weight:600; letter-spacing:.05em;
-}
-.idx .idx-note{color:#8b909c;font-size:11.5px;text-align:center;margin:0 0 18px;line-height:1.7}
-.idx-group{
-  color:#8b909c; font-size:10.5px; font-weight:700; letter-spacing:.1em;
-  margin:18px 0 8px; padding-bottom:6px; border-bottom:1px solid #2a2e36;
-}
-.idx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.idx-grid button{
-  background:#1d2026; border:1px solid #2a2e36; color:#e8eaee;
-  border-radius:9px; padding:11px 12px; font:inherit; font-size:12.5px;
-  text-align:left; cursor:pointer; line-height:1.5;
-}
-.idx-grid button:hover{border-color:#4a5160;background:#23272e}
-.idx-grid button b{display:block;font-weight:600}
-.idx-grid button span{color:#8b909c;font-size:10.5px;font-family:ui-monospace,Menlo,monospace}
-.idx-close{
-  position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:320;
-  background:#fff; color:#0d1117; border:0; border-radius:22px;
-  padding:11px 26px; font:inherit; font-size:13px; font-weight:700; cursor:pointer;
-}
-
-/* ============================================================
-   ここから下は、実際のアプリと同じ見た目
-   （src/app/globals.css と同じ内容）
-   ============================================================ */
+/* ---------- 上の帯 ---------- */
 .hd{
-  position:sticky;top:0;z-index:20;height:var(--header-h);
-  display:flex;align-items:center;gap:10px;padding:0 14px;
-  background:var(--navy);color:#fff;
+  position:sticky;top:0;z-index:20;height:var(--hdH);flex-shrink:0;
+  display:flex;align-items:center;gap:10px;padding:0 15px;
+  background:var(--bg);border-bottom:1px solid var(--line2);
 }
-.hd-title{
-  font-family:var(--serif);font-size:17px;font-weight:600;letter-spacing:.04em;
-  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.hd-sub{font-size:11px;color:rgba(255,255,255,.62);font-weight:400;margin-left:6px}
-.hd a,.hd button{
-  color:#fff;text-decoration:none;background:none;border:0;font:inherit;
-  font-size:13px;cursor:pointer;padding:6px;display:inline-flex;align-items:center;
-}
-.hd-back{font-size:20px;line-height:1;margin-left:-6px}
+.hdT{font-family:var(--min);font-size:17.5px;font-weight:600;letter-spacing:.04em;
+     flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hdS{font-family:var(--got);font-size:10.5px;color:var(--weak);margin-left:8px;font-weight:400}
+.bk{font-size:23px;line-height:1;margin-left:-6px;padding:4px 6px;color:var(--ink)}
+.hdA{font-size:12px;color:var(--key);font-weight:700;flex-shrink:0;padding:4px}
 
+/* ---------- 下のタブ ---------- */
 .tabs{
-  position:sticky;bottom:0;z-index:20;height:var(--tab-h);
+  position:sticky;bottom:0;z-index:20;height:var(--tabH);flex-shrink:0;
   display:grid;grid-template-columns:repeat(4,1fr);
-  background:#fff;border-top:1px solid var(--line);
+  background:var(--bg);border-top:1px solid var(--line2);
 }
-.tab{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  text-decoration:none;color:var(--ink-weak);font-size:10px;position:relative;
-  border:0;background:none;font-family:inherit;cursor:pointer;
-}
-.tab.on{color:var(--navy);font-weight:700}
-.tab-ic{font-size:19px;line-height:1}
-.tab-badge{
-  position:absolute;top:7px;left:50%;margin-left:6px;min-width:16px;height:16px;
-  padding:0 4px;border-radius:8px;background:var(--seal);color:#fff;
-  font-size:10px;font-weight:700;line-height:16px;text-align:center;
-}
+.tb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    font-size:10px;color:var(--weak);position:relative}
+.tb.on{color:var(--key);font-weight:700}
+.ti{line-height:0}.ti svg{width:20px;height:20px;display:block}
+.tbn{position:absolute;top:9px;left:50%;margin-left:7px;min-width:17px;height:17px;padding:0 5px;
+     border-radius:9px;background:var(--key);color:var(--keyInk);font-size:10px;font-weight:700;
+     line-height:17px;text-align:center}
 
-.body{padding-bottom:16px}
-.pad{padding:16px}
-.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
-.sec-label{font-size:11px;font-weight:700;color:var(--ink-weak);letter-spacing:.08em;padding:16px 16px 7px}
+/* ---------- やりとり一覧 ---------- */
+.cv{display:flex;gap:13px;align-items:center;background:var(--card);border-radius:12px;
+    padding:13px 14px;margin-bottom:9px;width:100%}
+.cv:active{background:#333}
+.cvM{flex:1;min-width:0;display:flex;flex-direction:column}
+.cvT{display:flex;align-items:baseline;gap:7px}
+.cvN{font-family:var(--min);font-size:15.5px;font-weight:600;white-space:nowrap;
+     overflow:hidden;text-overflow:ellipsis}
+.cvS{font-size:11px;color:var(--weak);white-space:nowrap;flex-shrink:0}
+.cvW{font-size:11px;color:var(--weak);margin-left:auto;flex-shrink:0}
+.cvC{font-size:11px;color:var(--weak);margin-top:1px}
+.cvP{font-size:12.5px;color:var(--mid);margin-top:4px;white-space:nowrap;
+     overflow:hidden;text-overflow:ellipsis}
+.mk{width:50px;height:50px;border-radius:50%;background:var(--card2);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-family:var(--min);
+    font-size:18px;flex-shrink:0}
+.mk.acc{background:var(--key);color:var(--keyInk);border-color:var(--key)}
+.mk.sm{width:34px;height:34px;font-size:13px}
+.bdg{min-width:21px;height:21px;padding:0 6px;border-radius:11px;background:var(--key);
+     color:var(--keyInk);font-size:11px;font-weight:700;line-height:21px;text-align:center;flex-shrink:0}
 
-.conv-list{background:#fff}
-.conv{
-  display:flex;gap:12px;align-items:center;padding:13px 16px;
-  border-bottom:1px solid var(--line);text-decoration:none;color:inherit;
-  cursor:pointer;background:#fff;width:100%;border-left:0;border-right:0;border-top:0;
-  font-family:inherit;text-align:left;
-}
-.conv:last-child{border-bottom:0}
-.av{
-  width:44px;height:44px;border-radius:50%;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--navy);color:#fff;font-family:var(--serif);font-size:17px;font-weight:600;
-}
-.av.group{background:var(--navy-soft);font-size:18px;font-family:var(--sans)}
-.av.everyone{background:var(--seal)}
-.av.sm{width:36px;height:36px;font-size:14px}
-.av.lg{width:64px;height:64px;font-size:24px}
-.conv-main{flex:1;min-width:0}
-.conv-top{display:flex;align-items:baseline;gap:8px}
-.conv-name{font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
-.conv-when{font-size:11px;color:var(--ink-weak);margin-left:auto;flex-shrink:0}
-.conv-prev{font-size:12.5px;color:var(--ink-mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.conv-prev.none{color:var(--ink-weak)}
-.badge{
-  min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--seal);
-  color:#fff;font-size:11px;font-weight:700;line-height:20px;text-align:center;flex-shrink:0;
-}
+/* ---------- 会話 ---------- */
+.thread{flex:1 0 auto;padding:14px 14px 10px;display:flex;flex-direction:column}
+.day{text-align:center;font-size:11px;color:var(--weak);margin:12px 0}
+.mr{display:flex;gap:8px;align-items:flex-end;margin-bottom:11px}
+.mr.cont{margin-bottom:5px}
+.mr.me{flex-direction:row-reverse}
+.sp30{width:30px;flex-shrink:0}
+.mw{max-width:78%;display:flex;flex-direction:column;gap:3px}
+.mr.me .mw{align-items:flex-end}
+.who{font-size:11px;color:var(--mid);padding:0 4px}
+.bub{background:var(--card);border-radius:14px;padding:11px 14px;font-size:14.5px;
+     line-height:1.75;white-space:pre-wrap;word-break:break-word}
+.mr.me .bub{background:var(--key);color:var(--keyInk)}
+.mtime{font-size:10px;color:var(--weak);padding:0 4px}
+.mtime .rep{color:var(--weak);text-decoration:underline;margin-left:6px}
+.cmp{position:sticky;bottom:0;z-index:15;flex-shrink:0;display:flex;gap:9px;align-items:flex-end;
+     padding:10px 13px;background:var(--bg);border-top:1px solid var(--line2)}
+.cmp textarea{flex:1;background:var(--card);border:0;border-radius:20px;padding:11px 16px;
+              font-size:15px;resize:none;outline:none;max-height:110px;line-height:1.6}
+.cmp textarea::placeholder{color:var(--weak)}
+.send{width:42px;height:42px;border-radius:50%;background:var(--key);color:var(--keyInk);
+      display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.send:disabled{background:var(--card);color:var(--weak)}
 
-.thread{padding:14px 14px 16px;display:flex;flex-direction:column;gap:4px}
-.day{text-align:center;font-size:11px;color:var(--ink-weak);margin:14px 0 8px}
-.row{display:flex;gap:8px;align-items:flex-end;margin-top:8px}
-.row.me{flex-direction:row-reverse}
-.row.cont{margin-top:2px}
-.bubble-wrap{max-width:76%;display:flex;flex-direction:column;gap:3px}
-.row.me .bubble-wrap{align-items:flex-end}
-.who{font-size:11px;color:var(--ink-mid);padding:0 4px}
-.bubble{
-  background:#fff;border-radius:14px;padding:9px 13px;font-size:14.5px;line-height:1.65;
-  white-space:pre-wrap;word-break:break-word;box-shadow:var(--shadow);color:var(--ink);
-}
-.row.me .bubble{background:var(--mine)}
-.bubble.gone{color:var(--ink-weak);font-style:italic;background:#f0f1f4;box-shadow:none}
-.meta{font-size:10px;color:var(--ink-weak);padding:0 4px}
-.meta button{
-  background:none;border:0;padding:0;font:inherit;color:var(--ink-weak);
-  text-decoration:underline;cursor:pointer;
-}
+/* ---------- 会員をさがす ---------- */
+.srch{margin-bottom:12px}
+.srch input{width:100%;background:var(--card);border:0;border-radius:21px;
+            padding:11px 17px;font-size:14px;outline:none}
+.srch input::placeholder{color:var(--weak)}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1px solid var(--line);border-radius:15px;padding:5px 13px;font-size:12px;color:var(--mid)}
+.chip.on{background:var(--key);border-color:var(--key);color:var(--keyInk);font-weight:700}
+.cnt{font-size:12px;color:var(--weak);margin-bottom:11px}
+.row{display:flex;gap:12px;background:var(--card);border-radius:12px;padding:13px 14px;
+     margin-bottom:9px;align-items:center;width:100%}
+.row:active{background:#333}
+.rm{flex:1;min-width:0;display:flex;flex-direction:column}
+.rn{font-family:var(--min);font-size:15.5px;font-weight:600}
+.rc{font-size:12px;color:var(--mid);margin-top:2px}
+.ra{font-size:12px;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rb{font-size:11px;color:var(--weak);margin-top:6px}
+.tagA{background:var(--key);color:var(--keyInk);font-size:9px;font-weight:700;
+      border-radius:3px;padding:1px 5px;margin-left:6px;vertical-align:middle}
+.tagA.big{font-size:10.5px;padding:2px 7px;margin-left:8px}
 
-.composer{
-  position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);
-  padding:9px 12px;display:flex;gap:9px;align-items:flex-end;z-index:15;
-}
-.composer textarea{
-  flex:1;border:1px solid var(--line);border-radius:20px;padding:9px 14px;
-  font:inherit;font-size:15px;resize:none;max-height:120px;background:var(--bg);
-  outline:none;font-family:var(--sans);color:var(--ink);
-}
-.composer textarea:focus{border-color:var(--navy);background:#fff}
-.send{
-  width:38px;height:38px;border-radius:50%;border:0;background:var(--navy);
-  color:#fff;font-size:16px;cursor:pointer;flex-shrink:0;
-}
-.send:disabled{background:var(--line);color:var(--ink-weak);cursor:default}
+/* ---------- プロフィール ---------- */
+.hero{background:var(--card2);padding:28px 20px 24px;text-align:center}
+.hero .ph{margin:0 auto}
+.hName{font-family:var(--min);font-size:22px;font-weight:600;margin-top:14px;letter-spacing:.03em}
+.hCo{font-size:13.5px;color:var(--mid);margin-top:5px}
+.tags{display:flex;gap:6px;justify-content:center;margin-top:11px;flex-wrap:wrap}
+.tg{border:1px solid var(--line);border-radius:11px;padding:3px 11px;font-size:11.5px;color:var(--mid)}
+.hBy{font-size:12px;color:var(--weak);text-align:center;padding:15px 20px 0;line-height:1.7}
+.art{margin:14px 15px;background:var(--card);border-left:3px solid var(--accent);
+     border-radius:10px;padding:17px 18px}
+.aK{font-size:10.5px;color:var(--accent);letter-spacing:.12em;font-weight:700;margin-bottom:7px}
+.aT{font-family:var(--min);font-size:16.5px;line-height:1.7;font-weight:600}
+.aL{font-size:12.5px;color:var(--mid);line-height:1.95;margin-top:11px}
+.aG{font-size:12.5px;color:var(--key);font-weight:700;margin-top:14px}
+.btn{display:block;width:100%;background:var(--key);color:var(--keyInk);border-radius:11px;
+     padding:15px;text-align:center;font-size:15px;font-weight:700}
+.btn.ghost{background:none;border:1px solid var(--key);color:var(--key)}
+.btn.quiet{background:none;border:1px solid var(--line);color:var(--mid)}
+.btn.danger{background:none;border:1px solid var(--key);color:var(--key)}
+.btn:disabled{opacity:.45}
+.two{display:flex;gap:10px}
+.two>*{flex:1}
+.pad{padding:0 15px}
+.note2{font-size:11.5px;color:var(--weak);padding:14px 20px;line-height:1.8;text-align:center}
 
-.row-item{
-  display:flex;gap:12px;align-items:center;padding:12px 16px;
-  border-bottom:1px solid var(--line);text-decoration:none;color:inherit;background:#fff;
-  width:100%;border-left:0;border-right:0;border-top:0;font-family:inherit;
-  text-align:left;cursor:pointer;
-}
-.row-item:last-child{border-bottom:0}
-.row-main{flex:1;min-width:0}
-.row-name{font-weight:600;font-size:14.5px;color:var(--ink)}
-.row-sub{font-size:12px;color:var(--ink-mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ---------- 共通の部品 ---------- */
+.note{background:var(--card2);border-left:3px solid var(--accent);border-radius:8px;
+      padding:14px 16px;font-size:12.5px;line-height:1.95;color:var(--mid)}
+.note b{color:var(--ink)}
+.panel{background:var(--card);border-radius:12px;padding:18px}
+.secL{font-size:11px;color:var(--weak);letter-spacing:.09em;font-weight:700;margin:22px 0 9px}
+.secL:first-child{margin-top:4px}
+.fl{display:block;font-size:12px;font-weight:700;color:var(--mid);margin:14px 0 6px}
+.fl:first-child{margin-top:0}
+.fx{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:9px;
+    padding:12px 14px;font-size:15px;outline:none;line-height:1.7}
+.fx:focus{border-color:var(--key)}
+.fx:disabled{color:var(--weak)}
+textarea.fx{resize:vertical}
+.hint{font-size:11.5px;color:var(--weak);margin-top:6px;line-height:1.75}
+.ok{background:#20331F;border:1px solid #38562F;border-radius:9px;padding:13px 15px;
+    font-size:13px;color:#9FCB8E;margin-bottom:14px}
+.codeBox{background:var(--card2);border:1px dashed var(--line);border-radius:9px;padding:14px;
+         text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:17px;
+         letter-spacing:.13em;font-weight:600}
+.muted{font-size:12.5px;color:var(--mid);line-height:1.95}
+.sp{height:13px}
+.ivRow{display:flex;flex-direction:column;gap:4px;background:var(--card);border-radius:11px;
+       padding:13px 14px;margin-bottom:9px}
+.ivTop{display:flex;align-items:center;gap:10px}
+.ivC{font-family:ui-monospace,Menlo,monospace;font-size:13px;letter-spacing:.06em;flex:1}
+.ivD{font-size:11px;color:var(--weak);line-height:1.7}
+.st{display:inline-block;border:1px solid var(--line);border-radius:9px;padding:2px 9px;
+    font-size:10.5px;color:var(--weak);flex-shrink:0}
+.st.ok2{color:#9FCB8E;border-color:#38562F}
+.st.wait{color:#D9A84E;border-color:#5A4722}
 
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:11px 18px;border-radius:9px;border:1px solid var(--navy);
-  background:var(--navy);color:#fff;font:inherit;font-size:14.5px;font-weight:600;
-  text-decoration:none;cursor:pointer;font-family:inherit;
-}
-.btn:disabled{opacity:.45;cursor:default}
-.btn.ghost{background:#fff;color:var(--navy)}
-.btn.quiet{background:#fff;color:var(--ink-mid);border-color:var(--line)}
-.btn.danger{background:#fff;color:var(--seal);border-color:var(--seal)}
-.btn.sm{padding:6px 12px;font-size:12.5px;border-radius:7px}
-.btn.wide{width:100%}
+/* ---------- 運営 ---------- */
+.atabs{display:flex;gap:7px;padding:11px 15px;overflow-x:auto;background:var(--bg);
+       border-bottom:1px solid var(--line2);position:sticky;top:var(--hdH);z-index:15}
+.at{flex-shrink:0;border:1px solid var(--line);border-radius:15px;padding:6px 14px;
+    font-size:12px;color:var(--mid);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.at.on{background:var(--key);border-color:var(--key);color:var(--keyInk);font-weight:700}
+.atn{background:rgba(0,0,0,.28);border-radius:8px;padding:0 5px;font-size:9.5px}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
+.st1{background:var(--card);border-radius:11px;padding:14px 16px}
+.stn{font-size:23px;font-weight:700;font-family:var(--min)}
+.stn.acc{color:var(--key)}
+.stl{font-size:11px;color:var(--weak);margin-top:2px}
+.pcard{background:var(--card);border-radius:12px;padding:17px 18px;margin-bottom:13px}
+.pHd{display:flex;align-items:center;gap:12px;margin-bottom:13px}
+.pN{font-size:15.5px;font-weight:700}
+.pC{font-size:11.5px;color:var(--mid);margin-top:2px}
+.ptbl{display:grid;grid-template-columns:76px 1fr;row-gap:6px;font-size:12px;margin-bottom:15px}
+.pk{color:var(--weak)}
+.pv{word-break:break-all}
+.spread{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.dim{color:var(--weak);font-size:11.5px}
+.snapT{font-size:11px;color:var(--weak);letter-spacing:.08em;font-weight:700;margin:14px 0 8px}
+.snap{background:var(--card2);border-radius:9px;padding:13px 15px;font-size:12.5px;line-height:1.8}
+.snr{padding:7px 0;border-bottom:1px dashed var(--line)}
+.snr:last-child{border-bottom:0}
+.snr.tgt{background:rgba(176,54,51,.15);margin:0 -15px;padding:7px 15px}
+.snw{font-weight:700;color:var(--key);font-size:11.5px}
+.snt{color:var(--weak);font-size:10.5px;margin-left:7px}
+.mark{color:var(--key);font-weight:700;font-size:10.5px;display:block;margin-top:2px}
+.aRow{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:11px;
+      padding:12px 14px;margin-bottom:8px}
+.aN{font-size:14px;font-weight:700}
+.aC{font-size:11.5px;color:var(--mid);margin-top:2px}
 
-.tag{display:inline-block;padding:2px 8px;border-radius:4px;background:var(--bg);border:1px solid var(--line);font-size:11px;color:var(--ink-mid)}
-.tag.friend{background:#eef4ec;border-color:#cfe0ca;color:#3c6b32}
-.tag.wait{background:#fdf6e6;border-color:#efdfb4;color:#8a6d1c}
-.tag.admin{background:#f4ecea;border-color:#e0cac6;color:var(--seal)}
+/* ---------- 空の表示 ---------- */
+.empty{text-align:center;padding:50px 26px;color:var(--weak)}
+.emIc{opacity:.5;margin-bottom:11px}
+.emIc svg{width:30px;height:30px;display:inline-block}
+.emT{font-size:14.5px;color:var(--mid);font-weight:700;margin-bottom:7px}
+.emS{font-size:12.5px;line-height:1.85}
 
-.field{margin-bottom:15px}
-.field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-mid);margin-bottom:5px}
-.field .hint{font-size:11.5px;color:var(--ink-weak);font-weight:400;margin-top:3px}
-.field input,.field select,.field textarea{
-  width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;
-  font:inherit;font-size:15px;background:#fff;outline:none;font-family:var(--sans);color:var(--ink);
-}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--navy)}
-.field textarea{resize:vertical;min-height:92px}
-.field input:disabled{background:var(--bg);color:var(--ink-weak)}
+/* ---------- 入り口の画面 ---------- */
+.sign{text-align:center;padding:40px 26px 24px}
+.signT{font-family:var(--min);font-size:24px;font-weight:600;letter-spacing:.06em;margin-bottom:9px}
+.signS{font-size:12.5px;color:var(--mid);line-height:1.9}
+.link{color:var(--key);text-decoration:underline;text-underline-offset:2px}
 
-.search{padding:11px 14px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:var(--header-h);z-index:10}
-.search input{
-  width:100%;padding:9px 13px;border:1px solid var(--line);border-radius:20px;
-  font:inherit;font-size:14.5px;background:var(--bg);outline:none;color:var(--ink);
-}
-.search input:focus{border-color:var(--navy);background:#fff}
+/* ---------- 画面一覧 ---------- */
+.idxBtn{position:fixed;right:14px;bottom:calc(var(--tabH) + 14px);z-index:60;
+        background:#0A0A0A;border:1px solid var(--line);color:var(--ink);border-radius:22px;
+        padding:10px 17px;font-size:12.5px;font-weight:700;box-shadow:0 4px 18px rgba(0,0,0,.5)}
+@media (min-width:820px){.idxBtn{bottom:22px}}
+.idx{position:fixed;inset:0;z-index:70;background:rgba(6,7,8,.95);display:none;
+     overflow-y:auto;padding:24px 16px 92px}
+.idx.on{display:block}
+.idx h2{font-family:var(--min);font-size:17px;text-align:center;font-weight:600;letter-spacing:.05em}
+.idxNote{color:var(--weak);font-size:11.5px;text-align:center;margin:6px 0 18px;line-height:1.7}
+.idxG{font-size:10.5px;color:var(--weak);font-weight:700;letter-spacing:.1em;
+      margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.idxGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;
+         max-width:760px;margin:0 auto}
+.idxGrid button{background:var(--card);border:1px solid var(--line);border-radius:9px;
+                padding:11px 13px;font-size:12.5px;line-height:1.5}
+.idxGrid button b{display:block;font-weight:600}
+.idxGrid button span{color:var(--weak);font-size:10.5px;font-family:ui-monospace,Menlo,monospace}
+.idxClose{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;z-index:75;
+          background:#fff;color:#0A0A0A;border-radius:22px;padding:11px 28px;
+          font-size:13px;font-weight:700}
 
-.empty{text-align:center;padding:44px 28px;color:var(--ink-weak)}
-.empty-ic{font-size:34px;margin-bottom:10px}
-.empty-ttl{font-size:14.5px;color:var(--ink-mid);font-weight:600;margin-bottom:6px}
-.empty-txt{font-size:12.5px;line-height:1.8}
+.mockTag{position:absolute;left:12px;bottom:calc(var(--tabH) + 10px);z-index:10;
+         pointer-events:none;background:var(--card2);border:1px solid var(--line);
+         border-radius:12px;padding:3px 9px;font-size:9.5px;color:var(--weak);opacity:.8}
 
-.note{background:#fdf9ef;border:1px solid #efe3c6;border-radius:9px;padding:12px 14px;font-size:12.5px;line-height:1.8;color:#6b5b2a}
-.err{background:#fdf0ee;border:1px solid #e8cbc6;border-radius:9px;padding:12px 14px;font-size:13px;color:#8a2e1f;margin-bottom:14px}
-.ok{background:#eef4ec;border:1px solid #cfe0ca;border-radius:9px;padding:12px 14px;font-size:13px;color:#35602c;margin-bottom:14px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabH) + 22px);
+       z-index:80;background:#0A0A0A;border:1px solid var(--line);border-radius:9px;
+       padding:12px 18px;font-size:12.5px;max-width:84%;text-align:center;line-height:1.6;
+       opacity:0;pointer-events:none;transition:opacity .18s}
+.toast.on{opacity:1}
 
-.sign{font-family:var(--serif);text-align:center;padding:34px 24px 22px}
-.sign-ttl{font-size:23px;font-weight:600;color:var(--navy);letter-spacing:.06em;margin-bottom:7px}
-.sign-sub{font-family:var(--sans);font-size:12.5px;color:var(--ink-mid);line-height:1.8}
+::-webkit-scrollbar{width:0;height:0}
+:focus-visible{outline:2px solid var(--key);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
-.link{color:var(--navy);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
-.code{
-  font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:17px;letter-spacing:.12em;
-  background:var(--bg);border:1px dashed var(--line);border-radius:9px;padding:13px;
-  text-align:center;font-weight:600;word-break:break-all;color:var(--ink);
-}
-.doc{font-size:13.5px;line-height:1.95;color:var(--ink)}
-.doc h2{font-family:var(--serif);font-size:16px;color:var(--navy);margin:26px 0 8px}
-.doc h2:first-child{margin-top:0}
-.doc ul{padding-left:1.3em}
-.sp{height:14px}
-.center{text-align:center}
-.muted{color:var(--ink-mid);font-size:12.5px;line-height:1.8}
-.rowflex{display:flex;gap:9px;align-items:center}
-.spread{display:flex;gap:9px;align-items:center;justify-content:space-between}
-
-.adm-nav{
-  display:flex;gap:7px;padding:11px 14px;background:#fff;border-bottom:1px solid var(--line);
-  overflow-x:auto;position:sticky;top:var(--header-h);z-index:10;
-}
-.adm-nav button{
-  flex-shrink:0;padding:6px 12px;border-radius:16px;border:1px solid var(--line);
-  font-size:12.5px;color:var(--ink-mid);white-space:nowrap;background:#fff;
-  font-family:inherit;cursor:pointer;
-}
-.adm-nav button.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:600}
-
-.snap{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px;font-size:12.5px;line-height:1.75;color:var(--ink)}
-.snap-row{padding:5px 0;border-bottom:1px dashed var(--line)}
-.snap-row:last-child{border-bottom:0}
-.snap-row.target{background:#fdf0ee;margin:0 -11px;padding:5px 11px}
-.snap-who{font-weight:700;color:var(--navy);font-size:11.5px}
-
-/* 画面内のお知らせ（モックだけの演出） */
-.toast{
-  position:absolute;left:50%;transform:translateX(-50%);bottom:84px;z-index:120;
-  background:#0d1117;color:#fff;border-radius:9px;padding:10px 16px;
-  font-size:12.5px;max-width:86%;text-align:center;line-height:1.6;
-  opacity:0;pointer-events:none;transition:opacity .18s;
-}
-.toast.on{opacity:.95}
 </style>
 </head>
 <body>
 
-<div class="stage-head">
-  <h1>社長の背中SNS（仮）　画面の見本</h1>
-  <p>実際に作ったものと同じ見た目・同じ操作です。データは架空のものです。<br>
-     右下の「画面一覧」から、どの画面にも飛べます。</p>
-</div>
-
-<div class="phone-wrap">
-  <div class="phone" id="phone">
-
-<!-- ========================= ログイン ========================= -->
-<section class="screen" id="s-login">
-  <div class="sign">
-    <div class="sign-ttl">社長の背中SNS</div>
-    <div class="sign-sub">経営者のための、完全紹介制の場です。<br>ご登録のメールアドレスをご入力ください。</div>
+<div class="stage">
+  <div class="stageHd">
+    <h1>社長の背中SNS（仮）　スマートフォン版</h1>
+    <p>実際に作る画面と同じ見た目・同じ操作です。データは架空のものです。<br>
+       右下の「画面一覧」から、どの画面にも飛べます。</p>
   </div>
-  <div class="pad">
-    <div class="card" style="padding:18px">
-      <div id="login-sent" style="display:none">
-        <div class="ok">nakamura@nakamura-seiki.co.jp にログインのリンクをお送りしました。メールをご確認ください。</div>
-        <div class="muted">メールが届かない場合は、迷惑メールのフォルダもご確認ください。それでも届かないときは、事務局へお知らせください。</div>
-        <div class="sp"></div>
-        <button class="btn wide ghost" onclick="go('home')">（見本）リンクを押したことにして進む</button>
-      </div>
-      <div id="login-form">
-        <div class="field">
-          <label>メールアドレス</label>
-          <input type="email" value="nakamura@nakamura-seiki.co.jp" autocomplete="off">
-        </div>
-        <button class="btn wide" onclick="document.getElementById('login-form').style.display='none';document.getElementById('login-sent').style.display='block'">ログインのリンクを受け取る</button>
-      </div>
-    </div>
-    <div class="sp"></div>
-    <div class="note">
-      <strong>パスワードはありません。</strong><br>
-      ご入力いただいたメールアドレスに、ログイン用のリンクをお送りします。そのリンクを押すだけでログインできます。<br>
-      一度ログインすると、しばらくの間は入力なしでお使いいただけます。
-    </div>
-    <div class="sp"></div>
-    <div class="center muted">
-      ご招待をお持ちの方は、ご案内のリンクからお手続きください。<br>
-      <span class="link" onclick="go('terms')">利用規約</span> ・ <span class="link" onclick="go('privacy')">プライバシーポリシー</span>
-    </div>
-  </div>
-</section>
 
-<!-- ========================= ご招待（入会申し込み） ========================= -->
-<section class="screen" id="s-join">
-  <div class="sign">
-    <div class="sign-ttl">ご招待</div>
-    <div class="sign-sub">山田建設株式会社 山田 浩司 様より、<br>「社長の背中SNS」へのご招待です。</div>
-  </div>
-  <div class="pad">
-    <div class="note">経営者の方だけが集まる、完全紹介制の場です。<br>広告はありません。ご入会には事務局の確認がございます。</div>
-    <div class="sp"></div>
-    <div class="card" style="padding:18px">
-      <div class="field"><label>お名前 ※</label><input value="松本 和彦"></div>
-      <div class="field"><label>会社名 ※</label><input value="松本メディカル株式会社"></div>
-      <div class="field">
-        <label>メールアドレス ※</label>
-        <input type="email" value="matsumoto@matsumoto-medical.co.jp">
-        <div class="hint">ログインと、お知らせのお届けに使います。</div>
-      </div>
-      <div class="field"><label>業種</label>
-        <select><option>医療・介護・福祉</option><option>製造</option><option>建設・不動産</option><option>情報・通信・IT</option></select>
-      </div>
-      <div class="field"><label>地域</label>
-        <select><option>関東</option><option>東海</option><option>関西</option><option>九州・沖縄</option></select>
-      </div>
-      <div class="field">
-        <label style="display:flex;gap:9px;align-items:flex-start;font-weight:400">
-          <input type="checkbox" checked style="width:auto;margin-top:4px">
-          <span style="font-size:13px;line-height:1.7">
-            <span class="link" onclick="go('terms')">利用規約</span>と<span class="link" onclick="go('privacy')">プライバシーポリシー</span>に同意します
-          </span>
-        </label>
-      </div>
-      <button class="btn wide" onclick="go('pending')">この内容でお申し込みする</button>
-    </div>
-  </div>
-</section>
-
-<!-- ========================= 承認待ち ========================= -->
-<section class="screen" id="s-pending">
-  <div class="sign">
-    <div class="sign-ttl">お申し込みを承りました</div>
-    <div class="sign-sub">松本メディカル株式会社 松本 和彦 様</div>
-  </div>
-  <div class="pad">
-    <div class="note">
-      ただいま事務局が確認をしております。<br>
-      確認が済みましたら、ご登録のメールアドレスへご連絡いたします。<br><br>
-      お時間をいただく場合がございます。このままお待ちいただければ、お手続きは不要です。
-    </div>
-    <div class="sp"></div>
-    <div class="muted center">確認が済んだあとは、同じメールアドレスでログインいただけます。</div>
-    <div class="sp"></div>
-    <button class="btn wide quiet" onclick="go('login')">ログアウトする</button>
-  </div>
-</section>
-
-<!-- ========================= やりとり一覧（トップ） ========================= -->
-<section class="screen" id="s-home">
-  <div class="hd">
-    <div class="hd-title">やりとり</div>
-    <button onclick="go('admin-pending')" style="font-size:12px">運営</button>
-  </div>
-  <div class="body">
-    <div id="home-reqs">
-      <div class="sec-label">友達の申し込みが届いています</div>
-      <div class="card" style="margin:0 16px">
-        <button class="row-item" onclick="openMember('kobayashi')">
-          <div class="av sm">小</div>
-          <div class="row-main">
-            <div class="row-name">小林 健吾</div>
-            <div class="row-sub">小林会計事務所</div>
-          </div>
-          <span class="tag wait">確認する</span>
-        </button>
-      </div>
-      <div class="sp"></div>
-    </div>
-    <div class="conv-list" id="conv-list"></div>
-  </div>
-  <nav class="tabs">
-    <button class="tab on" onclick="go('home')"><span class="tab-ic">✉️</span><span>やりとり</span><span class="tab-badge" id="tab-unread">3</span></button>
-    <button class="tab" onclick="go('members')"><span class="tab-ic">👥</span><span>会員をさがす</span><span class="tab-badge">1</span></button>
-    <button class="tab" onclick="go('invite')"><span class="tab-ic">✉</span><span>招待する</span></button>
-    <button class="tab" onclick="go('me')"><span class="tab-ic">⚙</span><span>自分の設定</span></button>
-  </nav>
-</section>
-
-<!-- ========================= 会話の画面 ========================= -->
-<section class="screen" id="s-thread">
-  <div class="hd">
-    <button class="hd-back" onclick="go('home')">‹</button>
-    <div class="hd-title"><span id="th-name"></span><span class="hd-sub" id="th-sub"></span></div>
-    <button id="th-prof" onclick="openMember(currentOther)" style="font-size:12px">プロフィール</button>
-  </div>
-  <div class="thread" id="th-body"></div>
-  <div class="composer">
-    <textarea id="th-input" rows="1" placeholder="メッセージを入力" oninput="onType()"></textarea>
-    <button class="send" id="th-send" onclick="sendMsg()" disabled>↑</button>
-  </div>
-  <div class="toast" id="th-toast"></div>
-</section>
-
-<!-- ========================= 会員をさがす ========================= -->
-<section class="screen" id="s-members">
-  <div class="hd"><div class="hd-title">会員をさがす</div></div>
-  <div class="body">
-    <div class="search">
-      <input id="mem-q" placeholder="お名前・会社名・業種・地域でさがす" oninput="renderMembers()">
-    </div>
-    <div id="mem-reqs">
-      <div class="sec-label">友達の申し込みが届いています</div>
-      <div class="row-item" style="cursor:default">
-        <div class="av sm">小</div>
-        <div class="row-main">
-          <div class="row-name">小林 健吾</div>
-          <div class="row-sub">小林会計事務所</div>
-        </div>
-        <div class="rowflex">
-          <button class="btn sm" onclick="acceptKobayashi()">友達になる</button>
-          <button class="btn sm quiet" onclick="declineKobayashi()">見送る</button>
-        </div>
-      </div>
-    </div>
-    <div class="sec-label" id="mem-count"></div>
-    <div id="mem-list"></div>
-  </div>
-  <nav class="tabs">
-    <button class="tab" onclick="go('home')"><span class="tab-ic">✉️</span><span>やりとり</span></button>
-    <button class="tab on" onclick="go('members')"><span class="tab-ic">👥</span><span>会員をさがす</span></button>
-    <button class="tab" onclick="go('invite')"><span class="tab-ic">✉</span><span>招待する</span></button>
-    <button class="tab" onclick="go('me')"><span class="tab-ic">⚙</span><span>自分の設定</span></button>
-  </nav>
-  <div class="toast" id="mem-toast"></div>
-</section>
-
-<!-- ========================= プロフィール ========================= -->
-<section class="screen" id="s-member">
-  <div class="hd">
-    <button class="hd-back" onclick="go('members')">‹</button>
-    <div class="hd-title">プロフィール</div>
-  </div>
-  <div class="body">
-    <div style="background:#fff;padding:26px 18px;text-align:center">
-      <div class="av lg" id="pf-av" style="margin:0 auto"></div>
-      <div style="font-family:var(--serif);font-size:19px;font-weight:600;margin-top:11px;color:var(--ink)" id="pf-name"></div>
-      <div class="muted" style="margin-top:3px" id="pf-co"></div>
-      <div class="rowflex" style="justify-content:center;margin-top:9px" id="pf-tags"></div>
-    </div>
-    <div class="pad" id="pf-actions"></div>
-  </div>
-  <nav class="tabs">
-    <button class="tab" onclick="go('home')"><span class="tab-ic">✉️</span><span>やりとり</span></button>
-    <button class="tab on" onclick="go('members')"><span class="tab-ic">👥</span><span>会員をさがす</span></button>
-    <button class="tab" onclick="go('invite')"><span class="tab-ic">✉</span><span>招待する</span></button>
-    <button class="tab" onclick="go('me')"><span class="tab-ic">⚙</span><span>自分の設定</span></button>
-  </nav>
-  <div class="toast" id="pf-toast"></div>
-</section>
-
-<!-- ========================= 招待する ========================= -->
-<section class="screen" id="s-invite">
-  <div class="hd"><div class="hd-title">招待する</div></div>
-  <div class="body">
-    <div class="pad">
-      <div class="note">
-        この場は完全紹介制です。<br>
-        ご一緒したい経営者の方がいらっしゃれば、ご招待のリンクを発行してお送りください。<br>
-        ご入会には事務局の確認がございます。
-      </div>
-      <div class="sp"></div>
-
-      <div class="card" style="padding:18px" id="inv-form">
-        <div class="field">
-          <label>お招きしたい理由（任意）</label>
-          <textarea rows="3" id="inv-reason" placeholder="例）同じ業界で長くお付き合いがあり、この場でもご一緒したい方です。"></textarea>
-          <div class="hint">事務局が確認のときに参考にします。ご本人やほかの会員には見えません。</div>
-        </div>
-        <button class="btn wide" onclick="issueInvite()">ご招待のリンクを発行する</button>
-      </div>
-
-      <div class="card" style="padding:18px;display:none" id="inv-done">
-        <div class="ok">ご招待のリンクを発行しました。</div>
-        <div class="code" id="inv-code">KHTM-7FQ2-RBXN</div>
-        <div class="sp"></div>
-        <div class="field">
-          <label>お送りする文面</label>
-          <textarea rows="10" readonly id="inv-text"></textarea>
-          <div class="hint">メールやメッセージアプリに貼り付けてお送りください。</div>
-        </div>
-        <button class="btn wide" onclick="toast('inv-toast','文面をコピーしました')">文面をコピーする</button>
-        <div class="sp"></div>
-        <button class="btn wide quiet" onclick="resetInvite()">続けて発行する</button>
-      </div>
-    </div>
-
-    <div class="sec-label">お送りしたご招待</div>
-    <div id="inv-list">
-      <div class="row-item" style="cursor:default">
-        <div class="row-main">
-          <div class="row-name" style="font-family:ui-monospace,Menlo,monospace;letter-spacing:.06em;font-size:13.5px">PQVD-3KM8-YTZR</div>
-          <div class="row-sub">2026/10/02 14:20 発行 ・ 長年お世話になっている先輩経営者です。</div>
-        </div>
-        <span class="tag friend">ご入会済み</span>
-      </div>
-      <div class="row-item" style="cursor:default">
-        <div class="row-main">
-          <div class="row-name" style="font-family:ui-monospace,Menlo,monospace;letter-spacing:.06em;font-size:13.5px">WFJN-6BQ4-HMXC</div>
-          <div class="row-sub">2026/10/18 09:05 発行</div>
-        </div>
-        <span class="tag wait">確認中</span>
-      </div>
-    </div>
-  </div>
-  <nav class="tabs">
-    <button class="tab" onclick="go('home')"><span class="tab-ic">✉️</span><span>やりとり</span></button>
-    <button class="tab" onclick="go('members')"><span class="tab-ic">👥</span><span>会員をさがす</span></button>
-    <button class="tab on" onclick="go('invite')"><span class="tab-ic">✉</span><span>招待する</span></button>
-    <button class="tab" onclick="go('me')"><span class="tab-ic">⚙</span><span>自分の設定</span></button>
-  </nav>
-  <div class="toast" id="inv-toast"></div>
-</section>
-
-<!-- ========================= 自分の設定 ========================= -->
-<section class="screen" id="s-me">
-  <div class="hd">
-    <div class="hd-title">自分の設定</div>
-    <button onclick="go('admin-pending')" style="font-size:12px">運営</button>
-  </div>
-  <div class="body">
-    <div style="background:#fff;padding:22px 18px;text-align:center">
-      <div class="av lg" style="margin:0 auto">中</div>
-      <div style="font-family:var(--serif);font-size:18px;font-weight:600;margin-top:10px;color:var(--ink)">中村 誠一</div>
-      <div class="muted">nakamura@nakamura-seiki.co.jp</div>
-    </div>
-
-    <div class="sec-label">プロフィール</div>
-    <div class="pad" style="padding-top:0">
-      <div class="card" style="padding:18px">
-        <div class="field"><label>お名前</label><input value="中村 誠一"></div>
-        <div class="field"><label>会社名</label><input value="中村精機株式会社"></div>
-        <div class="field"><label>業種</label>
-          <select><option>製造</option><option>建設・不動産</option><option>情報・通信・IT</option></select>
-        </div>
-        <div class="field"><label>地域</label>
-          <select><option>東海</option><option>関東</option><option>関西</option></select>
-        </div>
-        <div class="field">
-          <label>メールアドレス</label>
-          <input value="nakamura@nakamura-seiki.co.jp" disabled>
-          <div class="hint">変更をご希望の場合は、事務局へお知らせください。</div>
-        </div>
-        <button class="btn wide" onclick="toast('me-toast','保存しました')">保存する</button>
-      </div>
-    </div>
-
-    <div class="sec-label">お知らせメール</div>
-    <div class="pad" style="padding-top:0">
-      <div class="card" style="padding:16px">
-        <div class="muted">
-          新しいメッセージが届いたとき、ご登録のメールアドレスへお知らせをお送りしています。<br><br>
-          ・まとめて1通でお送りします（10分ごと）<br>
-          ・メールの本文には、やりとりの中身は書きません<br><br>
-          お知らせの停止をご希望の場合は、事務局へお知らせください。
-        </div>
-      </div>
-    </div>
-
-    <div class="sec-label">この場について</div>
-    <div class="pad" style="padding-top:0">
-      <div class="card">
-        <button class="row-item" onclick="go('terms')">
-          <div class="row-main"><div class="row-name">利用規約</div></div>
-          <span style="color:var(--ink-weak)">›</span>
-        </button>
-        <button class="row-item" onclick="go('privacy')">
-          <div class="row-main"><div class="row-name">プライバシーポリシー</div></div>
-          <span style="color:var(--ink-weak)">›</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="pad">
-      <button class="btn wide quiet" onclick="go('login')">ログアウトする</button>
-    </div>
-
-    <div class="sec-label">退会</div>
-    <div class="pad" style="padding-top:0">
-      <button class="btn wide danger" id="wd-open" onclick="openWithdraw()">退会の手続きをする</button>
-      <div class="card" style="padding:18px;display:none" id="wd-box">
-        <div class="muted">
-          退会されますと、次のようになります。<br><br>
-          ・会員一覧に表示されなくなります<br>
-          ・やりとりの画面が開けなくなります<br>
-          ・これまでのやりとりの記録は、相手の方の画面に残ります<br><br>
-          お続けになる場合は、下の欄に<strong>「退会する」</strong>とご入力ください。
-        </div>
-        <div class="sp"></div>
-        <div class="field"><input id="wd-input" placeholder="退会する" oninput="document.getElementById('wd-go').disabled = this.value!=='退会する'"></div>
-        <button class="btn wide danger" id="wd-go" disabled onclick="go('withdrawn')">退会する</button>
-        <div class="sp"></div>
-        <button class="btn wide quiet" onclick="document.getElementById('wd-box').style.display='none';document.getElementById('wd-open').style.display='flex'">やめる</button>
-      </div>
-    </div>
-  </div>
-  <nav class="tabs">
-    <button class="tab" onclick="go('home')"><span class="tab-ic">✉️</span><span>やりとり</span></button>
-    <button class="tab" onclick="go('members')"><span class="tab-ic">👥</span><span>会員をさがす</span></button>
-    <button class="tab" onclick="go('invite')"><span class="tab-ic">✉</span><span>招待する</span></button>
-    <button class="tab on" onclick="go('me')"><span class="tab-ic">⚙</span><span>自分の設定</span></button>
-  </nav>
-  <div class="toast" id="me-toast"></div>
-</section>
-
-<!-- ========================= 退会済み ========================= -->
-<section class="screen" id="s-withdrawn">
-  <div class="sign"><div class="sign-ttl">ご退会の手続きが済んでいます</div></div>
-  <div class="pad">
-    <div class="note">
-      長らくありがとうございました。<br>
-      あらためてご参加をご希望の場合は、会員の方からのご招待が必要になります。事務局へお問い合わせください。
-    </div>
-    <div class="sp"></div>
-    <button class="btn wide quiet" onclick="go('login')">ログアウトする</button>
-  </div>
-</section>
-
-<!-- ========================= 利用規約 ========================= -->
-<section class="screen" id="s-terms">
-  <div class="hd"><button class="hd-back" onclick="go('me')">‹</button><div class="hd-title">利用規約</div></div>
-  <div class="body"><div class="pad">
-    <div class="note">※ この文面はたたき台です。公開前に運営元でご確認ください。</div>
-    <div class="sp"></div>
-    <div class="doc">
-      <h2>第1条（この規約について）</h2>
-      <p>この規約は、LIVE Doctor株式会社（以下「当社」）が運営する「社長の背中SNS」（以下「本サービス」）のご利用について定めるものです。</p>
-      <h2>第2条（入会）</h2>
-      <ul>
-        <li>本サービスは完全紹介制です。会員からの招待を受けた方のみお申し込みいただけます。</li>
-        <li>お申し込みののち、当社が確認を行い、承認した方に会員としてご利用いただきます。</li>
-        <li>会員は、経営者ご本人であることを前提とします。</li>
-      </ul>
-      <h2>第5条（やりとりについて）</h2>
-      <ul>
-        <li>1対1のやりとりは、相互に承認した会員同士の間でのみ行えます。</li>
-        <li>グループは当社が作成し、当社が招待した会員のみが参加できます。</li>
-        <li>当社は、会員同士の1対1のやりとりの内容を閲覧いたしません。ただし、会員から通報があった場合は、その前後を含むやりとりの写しを確認いたします。</li>
-      </ul>
-      <h2>第6条（してはいけないこと）</h2>
-      <ul>
-        <li>他の会員に対する誹謗中傷、嫌がらせ、脅迫</li>
-        <li>執拗な勧誘、強引な営業、ねずみ講・マルチ商法などの勧誘</li>
-        <li>他の会員の情報を、本サービス外へ無断で持ち出すこと</li>
-        <li>ご本人以外によるご利用、アカウントの貸与・譲渡</li>
-      </ul>
-      <p class="muted" style="margin-top:22px">（以下、第12条まで続きます）</p>
-    </div>
-  </div></div>
-</section>
-
-<!-- ========================= プライバシーポリシー ========================= -->
-<section class="screen" id="s-privacy">
-  <div class="hd"><button class="hd-back" onclick="go('me')">‹</button><div class="hd-title">プライバシーポリシー</div></div>
-  <div class="body"><div class="pad">
-    <div class="note">※ この文面はたたき台です。公開前に運営元でご確認ください。</div>
-    <div class="sp"></div>
-    <div class="doc">
-      <h2>1. お預かりする情報</h2>
-      <ul><li>お名前、会社名、業種、地域</li><li>メールアドレス</li><li>ご紹介者</li><li>本サービス内でお送りいただいたメッセージ</li></ul>
-      <h2>2. 何に使うか</h2>
-      <p>本サービスのご提供、お知らせのお届け、ご入会の確認、違反の確認と対応に使います。<br>
-      広告は掲載しません。お預かりした情報を、広告のために使うことはありません。</p>
-      <h2>3. メッセージの取り扱い</h2>
-      <p>会員同士の1対1のやりとりの内容は、当社では閲覧いたしません。データベースの仕組みとして、やりとりの当事者以外には表示されないようにしています。</p>
-      <p>ただし、会員から通報があった場合は、その前後を含むやりとりの写しが事務局に渡り、確認いたします。これは、嫌がらせや執拗な勧誘から会員をお守りするためです。</p>
-      <p class="muted" style="margin-top:22px">（以下、第9項まで続きます）</p>
-    </div>
-  </div></div>
-</section>
-
-<!-- ========================= 運営：承認待ち ========================= -->
-<section class="screen" id="s-admin-pending">
-  <div class="hd"><button class="hd-back" onclick="go('home')">‹</button><div class="hd-title">運営<span class="hd-sub">承認待ち</span></div></div>
-  <nav class="adm-nav">
-    <button class="on" onclick="go('admin-pending')">承認待ち</button>
-    <button onclick="go('admin-members')">会員管理</button>
-    <button onclick="go('admin-groups')">グループ</button>
-    <button onclick="go('admin-announce')">一斉連絡</button>
-    <button onclick="go('admin-reports')">通報</button>
-  </nav>
-  <div class="body"><div class="pad">
-    <div class="muted" style="margin-bottom:12px" id="ap-count">2件のお申し込みがあります。</div>
-    <div id="ap-list">
-      <div class="card" style="padding:16px;margin-bottom:13px" data-ap="1">
-        <div class="rowflex" style="margin-bottom:11px">
-          <div class="av sm">松</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:600;font-size:15px;color:var(--ink)">松本 和彦</div>
-            <div class="muted">松本メディカル株式会社</div>
-          </div>
-        </div>
-        <div class="snap" style="margin-bottom:13px">
-          <div><strong>メール</strong>：matsumoto@matsumoto-medical.co.jp</div>
-          <div><strong>業種</strong>：医療・介護・福祉 ／ <strong>地域</strong>：関東</div>
-          <div><strong>ご紹介者</strong>：山田建設株式会社 山田 浩司</div>
-          <div><strong>招く理由</strong>：地元の商工会でご一緒しており、人柄をよく存じ上げています。</div>
-          <div><strong>お申し込み</strong>：2026/10/22 11:34</div>
-        </div>
-        <div class="rowflex">
-          <button class="btn" style="flex:1" onclick="approve(1,'松本 和彦')">承認する</button>
-          <button class="btn quiet" style="flex:1" onclick="reject(1)">お断りする</button>
-        </div>
-        <div class="muted" style="margin-top:9px;font-size:11.5px">
-          承認すると、ご本人へご案内のメールが届き、「会員全員のグループ」に自動で入ります。
-        </div>
-      </div>
-
-      <div class="card" style="padding:16px;margin-bottom:13px" data-ap="2">
-        <div class="rowflex" style="margin-bottom:11px">
-          <div class="av sm">渡</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-weight:600;font-size:15px;color:var(--ink)">渡辺 三郎</div>
-            <div class="muted">渡辺商事株式会社</div>
-          </div>
-        </div>
-        <div class="snap" style="margin-bottom:13px">
-          <div><strong>メール</strong>：watanabe@watanabe-shoji.co.jp</div>
-          <div><strong>業種</strong>：卸売・小売 ／ <strong>地域</strong>：関西</div>
-          <div><strong>ご紹介者</strong>：ササキフーズ株式会社 佐々木 隆</div>
-          <div><strong>招く理由</strong>：（記載なし）</div>
-          <div><strong>お申し込み</strong>：2026/10/23 08:12</div>
-        </div>
-        <div class="rowflex">
-          <button class="btn" style="flex:1" onclick="approve(2,'渡辺 三郎')">承認する</button>
-          <button class="btn quiet" style="flex:1" onclick="reject(2)">お断りする</button>
-        </div>
-      </div>
-    </div>
-    <div id="ap-empty" style="display:none">
-      <div class="empty">
-        <div class="empty-ic">✓</div>
-        <div class="empty-ttl">承認待ちはありません</div>
-        <div class="empty-txt">新しいお申し込みがあると、ここに表示されます。<br>メールでもお知らせします。</div>
-      </div>
-    </div>
-  </div></div>
-  <div class="toast" id="ap-toast"></div>
-</section>
-
-<!-- ========================= 運営：会員管理 ========================= -->
-<section class="screen" id="s-admin-members">
-  <div class="hd"><button class="hd-back" onclick="go('home')">‹</button><div class="hd-title">運営<span class="hd-sub">会員管理</span></div></div>
-  <nav class="adm-nav">
-    <button onclick="go('admin-pending')">承認待ち</button>
-    <button class="on" onclick="go('admin-members')">会員管理</button>
-    <button onclick="go('admin-groups')">グループ</button>
-    <button onclick="go('admin-announce')">一斉連絡</button>
-    <button onclick="go('admin-reports')">通報</button>
-  </nav>
-  <div class="body">
-    <div class="pad" style="padding-bottom:0">
-      <div class="snap">ご利用中 <strong>8名</strong> ／ 承認待ち <strong>2名</strong> ／ 退会 <strong>1名</strong></div>
-    </div>
-    <div class="search" style="margin-top:14px;top:auto;position:static">
-      <input placeholder="お名前・会社名・メールでさがす" id="am-q" oninput="renderAdminMembers()">
-    </div>
-    <div class="sec-label" id="am-count"></div>
-    <div id="am-list"></div>
-  </div>
-  <div class="toast" id="am-toast"></div>
-</section>
-
-<!-- ========================= 運営：グループ ========================= -->
-<section class="screen" id="s-admin-groups">
-  <div class="hd"><button class="hd-back" onclick="go('home')">‹</button><div class="hd-title">運営<span class="hd-sub">グループ</span></div></div>
-  <nav class="adm-nav">
-    <button onclick="go('admin-pending')">承認待ち</button>
-    <button onclick="go('admin-members')">会員管理</button>
-    <button class="on" onclick="go('admin-groups')">グループ</button>
-    <button onclick="go('admin-announce')">一斉連絡</button>
-    <button onclick="go('admin-reports')">通報</button>
-  </nav>
-  <div class="body">
-    <div class="pad">
-      <div class="note">
-        グループは事務局がつくり、お招きした方だけが参加できます。<br>
-        会員がご自身でグループをつくることはできません。
-      </div>
-      <div class="sp"></div>
-      <button class="btn wide" id="ag-new" onclick="openNewGroup()">新しいグループをつくる</button>
-      <div class="card" style="padding:18px;display:none" id="ag-form">
-        <div class="field">
-          <label>グループ名</label>
-          <input placeholder="例）東海エリアの会">
-        </div>
-        <div class="field">
-          <label>お招きする方</label>
-          <div style="max-height:200px;overflow-y:auto;border:1px solid var(--line);border-radius:9px" id="ag-picker"></div>
-          <div class="hint">あとから足したり、はずしたりできます。事務局（ご自身）は自動で参加します。</div>
-        </div>
-        <button class="btn wide" onclick="toast('ag-toast','グループを作りました');closeNewGroup()">このグループを作る</button>
-        <div class="sp"></div>
-        <button class="btn wide quiet" onclick="closeNewGroup()">やめる</button>
-      </div>
-    </div>
-
-    <div class="sec-label">グループ一覧（3件）</div>
-    <div id="ag-list"></div>
-  </div>
-  <div class="toast" id="ag-toast"></div>
-</section>
-
-<!-- ========================= 運営：一斉連絡 ========================= -->
-<section class="screen" id="s-admin-announce">
-  <div class="hd"><button class="hd-back" onclick="go('home')">‹</button><div class="hd-title">運営<span class="hd-sub">一斉連絡</span></div></div>
-  <nav class="adm-nav">
-    <button onclick="go('admin-pending')">承認待ち</button>
-    <button onclick="go('admin-members')">会員管理</button>
-    <button onclick="go('admin-groups')">グループ</button>
-    <button class="on" onclick="go('admin-announce')">一斉連絡</button>
-    <button onclick="go('admin-reports')">通報</button>
-  </nav>
-  <div class="body">
-    <div class="pad">
-      <div class="card" style="padding:18px">
-        <div class="note" style="margin-bottom:16px">
-          ご利用中の会員 <strong>8名</strong> のメールアドレスへ、一斉にお送りします。<br>
-          送信したあとの取り消しはできません。
-        </div>
-        <div class="field">
-          <label>件名</label>
-          <input id="an-subj" placeholder="例）新しい会員の方のご紹介" oninput="checkAnnounce()">
-          <div class="hint">メールの件名は「【社長の背中SNS】件名」の形でお届けします。</div>
-        </div>
-        <div class="field">
-          <label>本文</label>
-          <textarea id="an-body" rows="8" placeholder="いつもありがとうございます。&#10;事務局よりご連絡いたします。" oninput="checkAnnounce()"></textarea>
-          <div class="hint">冒頭に「○○ 様」が自動で入ります。末尾に「社長の背中SNS 事務局」が自動で入ります。</div>
-        </div>
-        <div class="field">
-          <label>確認のため「送信」とご入力ください</label>
-          <input id="an-confirm" placeholder="送信" oninput="checkAnnounce()">
-        </div>
-        <button class="btn wide" id="an-go" disabled onclick="toast('an-toast','8名へお送りしました')">会員全員へお送りする</button>
-      </div>
-    </div>
-    <div class="sec-label">これまでにお送りしたもの</div>
-    <div>
-      <div class="row-item" style="cursor:default">
-        <div class="row-main">
-          <div class="row-name">はじめまして。この場のご案内です</div>
-          <div class="row-sub">2026/10/05 10:00 ・ 6名へ</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="toast" id="an-toast"></div>
-</section>
-
-<!-- ========================= 運営：通報 ========================= -->
-<section class="screen" id="s-admin-reports">
-  <div class="hd"><button class="hd-back" onclick="go('home')">‹</button><div class="hd-title">運営<span class="hd-sub">通報</span></div></div>
-  <nav class="adm-nav">
-    <button onclick="go('admin-pending')">承認待ち</button>
-    <button onclick="go('admin-members')">会員管理</button>
-    <button onclick="go('admin-groups')">グループ</button>
-    <button onclick="go('admin-announce')">一斉連絡</button>
-    <button class="on" onclick="go('admin-reports')">通報</button>
-  </nav>
-  <div class="body">
-    <div class="pad">
-      <div class="note">
-        会員から「事務局に知らせる」が押されたときに、そのメッセージと前後のやりとりの<strong>写し</strong>がここに届きます。<br><br>
-        事務局は、会員同士の1対1のやりとりそのものを読むことはできません。通報があった分の写しだけを確認する仕組みです。
-      </div>
-    </div>
-    <div class="pad" style="padding-top:0">
-      <div class="muted" style="margin-bottom:12px">未対応 1件 ／ 全2件</div>
-
-      <div class="card" style="padding:16px;margin-bottom:13px" id="rep-1">
-        <div class="spread" style="margin-bottom:11px">
-          <span class="tag wait" id="rep-1-tag">未対応</span>
-          <span class="muted" style="font-size:11.5px">2026/10/21 19:42</span>
-        </div>
-        <div class="snap" style="margin-bottom:11px">
-          <div><strong>知らせた方</strong>：大西 由美（大西運輸株式会社）</div>
-          <div><strong>対象の方</strong>：藤本 剛（フジモトITソリューションズ）</div>
-          <div><strong>気になった点</strong>：断ったあとも投資のお誘いが続いています。</div>
-        </div>
-        <div class="sec-label" style="padding:0 0 6px">やりとりの写し（通報された時点のもの）</div>
-        <div class="snap" style="margin-bottom:13px">
-          <div class="snap-row">
-            <div class="snap-who">藤本 剛（フジモトITソリューションズ）<span style="color:var(--ink-weak);font-weight:400;margin-left:6px">19:21</span></div>
-            <div>先日のお話、ご検討いただけましたでしょうか。</div>
-          </div>
-          <div class="snap-row">
-            <div class="snap-who">大西 由美（大西運輸株式会社）<span style="color:var(--ink-weak);font-weight:400;margin-left:6px">19:33</span></div>
-            <div>申し訳ありませんが、今回は見送らせていただきます。</div>
-          </div>
-          <div class="snap-row target">
-            <div class="snap-who">藤本 剛（フジモトITソリューションズ）<span style="color:var(--ink-weak);font-weight:400;margin-left:6px">19:40</span><span style="color:var(--seal);font-weight:700;margin-left:6px">← 通報されたメッセージ</span></div>
-            <div>そうおっしゃらずに。今月中なら特別な条件をご用意できます。他の社長さんも皆さん入られていますよ。</div>
-          </div>
-        </div>
-        <div id="rep-1-actions">
-          <div class="rowflex" style="flex-wrap:wrap;margin-bottom:11px">
-            <button class="btn sm ghost" onclick="toast('rep-toast','メッセージを非表示にしました')">メッセージを非表示にする</button>
-            <button class="btn sm danger" onclick="toast('rep-toast','退会の処理をしました')">対象の方を退会させる</button>
-          </div>
-          <div class="field">
-            <label>対応の記録（あとから見返すため）</label>
-            <textarea rows="2" placeholder="例）お電話で状況を伺い、ご本人に注意をお伝えした。"></textarea>
-          </div>
-          <button class="btn wide quiet" onclick="closeReport()">対応済みにする</button>
-        </div>
-      </div>
-
-      <div class="card" style="padding:16px;margin-bottom:13px;opacity:.68">
-        <div class="spread" style="margin-bottom:11px">
-          <span class="tag friend">対応済み</span>
-          <span class="muted" style="font-size:11.5px">2026/09/28 14:05</span>
-        </div>
-        <div class="snap" style="margin-bottom:11px">
-          <div><strong>知らせた方</strong>：小林 健吾（小林会計事務所）</div>
-          <div><strong>対象の方</strong>：（退会済みの方）</div>
-          <div><strong>気になった点</strong>：保険の勧誘が繰り返し届きます。</div>
-        </div>
-        <div class="snap">
-          <div><strong>対応</strong>：2026/09/29 10:12 ／ 事務局</div>
-          <div><strong>記録</strong>：お電話で注意をお伝えし、ご本人の希望により退会となった。</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="toast" id="rep-toast"></div>
-</section>
-
+  <div class="phone">
+    <div class="mockTag">モック</div>
+    <div class="screen on" id="screen"></div>
   </div>
 </div>
 
-<button class="idx-btn" onclick="openIndex()">画面一覧</button>
+<button class="idxBtn" id="idxOpen">画面一覧</button>
 
 <div class="idx" id="idx">
   <h2>画面一覧</h2>
-  <p class="idx-note">実装した20画面です。どれでもお選びいただけます。</p>
-
-  <div class="idx-group">入り口</div>
-  <div class="idx-grid">
-    <button onclick="jump('login')"><b>ログイン</b><span>/login</span></button>
-    <button onclick="jump('join')"><b>ご招待・入会のお申し込み</b><span>/join/[コード]</span></button>
-    <button onclick="jump('pending')"><b>確認中</b><span>/pending</span></button>
-    <button onclick="jump('withdrawn')"><b>退会済み</b><span>/withdrawn</span></button>
-  </div>
-
-  <div class="idx-group">会員の画面</div>
-  <div class="idx-grid">
-    <button onclick="jump('home')"><b>やりとり一覧</b><span>/</span></button>
-    <button onclick="jumpThread('dm')"><b>1対1のやりとり</b><span>/t/[id]</span></button>
-    <button onclick="jumpThread('everyone')"><b>会員全員のグループ</b><span>/t/[id]</span></button>
-    <button onclick="jumpThread('tokai')"><b>グループのやりとり</b><span>/t/[id]</span></button>
-    <button onclick="jump('members')"><b>会員をさがす</b><span>/members</span></button>
-    <button onclick="jumpMember('yamada')"><b>プロフィール（友達）</b><span>/members/[id]</span></button>
-    <button onclick="jumpMember('sasaki')"><b>プロフィール（未申込）</b><span>/members/[id]</span></button>
-    <button onclick="jump('invite')"><b>招待する</b><span>/invite</span></button>
-    <button onclick="jump('me')"><b>自分の設定・退会</b><span>/me</span></button>
-    <button onclick="jump('terms')"><b>利用規約</b><span>/terms</span></button>
-    <button onclick="jump('privacy')"><b>プライバシーポリシー</b><span>/privacy</span></button>
-  </div>
-
-  <div class="idx-group">運営（事務局）の画面</div>
-  <div class="idx-grid">
-    <button onclick="jump('admin-pending')"><b>承認待ち</b><span>/admin</span></button>
-    <button onclick="jump('admin-members')"><b>会員管理</b><span>/admin/members</span></button>
-    <button onclick="jump('admin-groups')"><b>グループ</b><span>/admin/groups</span></button>
-    <button onclick="jump('admin-announce')"><b>一斉連絡</b><span>/admin/announce</span></button>
-    <button onclick="jump('admin-reports')"><b>通報</b><span>/admin/reports</span></button>
-  </div>
-
-  <button class="idx-close" onclick="closeIndex()">閉じる</button>
+  <p class="idxNote">どの画面にも飛べます。</p>
+  <div class="idxG">入り口</div><div class="idxGrid"><button data-jump="login"><b>ログイン</b><span>/login</span></button><button data-jump="join"><b>ご招待・お申し込み</b><span>/join/[コード]</span></button><button data-jump="pending"><b>確認中</b><span>/pending</span></button></div>
+  <div class="idxG">会員の画面</div><div class="idxGrid"><button data-jump="home"><b>やりとり一覧</b><span>/</span></button><button data-jump="thread:yamada"><b>1対1のやりとり</b><span>/t/[id]</span></button><button data-jump="thread:everyone"><b>会員全員のつどい</b><span>/t/[id]</span></button><button data-jump="thread:tokai"><b>グループのやりとり</b><span>/t/[id]</span></button><button data-jump="members"><b>会員をさがす</b><span>/members</span></button><button data-jump="member:yamada"><b>プロフィール（友達）</b><span>/members/[id]</span></button><button data-jump="member:sasaki"><b>プロフィール（未申込）</b><span>/members/[id]</span></button><button data-jump="invite"><b>招待する</b><span>/invite</span></button><button data-jump="me"><b>自分の設定</b><span>/me</span></button></div>
+  <div class="idxG">運営（事務局）の画面</div><div class="idxGrid"><button data-jump="admin:pending"><b>承認待ち</b><span>/admin</span></button><button data-jump="admin:members"><b>会員管理</b><span>/admin/members</span></button><button data-jump="admin:groups"><b>グループ</b><span>/admin/groups</span></button><button data-jump="admin:announce"><b>一斉連絡</b><span>/admin/announce</span></button><button data-jump="admin:reports"><b>通報</b><span>/admin/reports</span></button></div>
+  <button class="idxClose" id="idxClose">閉じる</button>
 </div>
 
-<script>
-'use strict';
+<div class="toast" id="toast"></div>
 
-/* ---------------- 架空のデータ ---------------- */
-const ME = {id:'me', name:'中村 誠一', company:'中村精機株式会社'};
+<script>
+const FACES = {"yamada":"<svg class=\"pf\" viewBox=\"0 0 100 100\" width=\"100\" height=\"100\">\n  <defs>\n    <linearGradient id=\"bpagvlus\" x1=\"0.15\" y1=\"0\" x2=\"0.85\" y2=\"1\">\n      <stop offset=\"0\" stop-color=\"#8FA6BC\"/><stop offset=\"1\" stop-color=\"#5A7087\"/>\n    </linearGradient>\n    <radialGradient id=\"gpagvlus\" cx=\"0.3\" cy=\"0.22\" r=\"0.8\">\n      <stop offset=\"0\" stop-color=\"#ffffff\" stop-opacity=\"0.22\"/>\n      <stop offset=\"1\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <clipPath id=\"cpagvlus\"><circle cx=\"50\" cy=\"50\" r=\"50\"/></clipPath>\n  </defs>\n  <g clip-path=\"url(#cpagvlus)\">\n    <rect width=\"100\" height=\"100\" fill=\"url(#bpagvlus)\"/>\n    <rect width=\"100\" height=\"100\" fill=\"url(#gpagvlus)\"/>\n\n    <!-- 肩・上着 -->\n    <ellipse cx=\"50\" cy=\"107\" rx=\"49\" ry=\"38\" fill=\"#2C3540\"/>\n    <!-- 襟もと -->\n    <path d=\"M38 71 L50 95 L62 71 L70 76 L64 100 L36 100 L30 76 Z\" fill=\"#F2F4F6\"/>\n    <path d=\"M50 80 L45 88 L50 100 L55 88 Z\" fill=\"#7B3B3B\"/>\n    <!-- 首 -->\n    <path d=\"M42 56h16v16a8 8 0 0 1-16 0z\" fill=\"#d2ad8a\"/>\n    <!-- 顔 -->\n    <ellipse cx=\"50\" cy=\"42\" rx=\"21\" ry=\"25\" fill=\"#E8C3A0\"/>\n    <ellipse cx=\"50\" cy=\"60\" rx=\"14\" ry=\"7\" fill=\"#deb996\" opacity=\"0.5\"/>\n    <!-- 耳 -->\n    <ellipse cx=\"28.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#deb996\"/>\n    <ellipse cx=\"71.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#deb996\"/>\n    <!-- 髪 -->\n    \n    <path d=\"M29 47C29 24.5 36.5 16.5 50 16.5S71 24.5 71 47c0-8-1.8-13-5-15.5-5.5 4.5-25.5 4.5-31 0-3.2 2.5-5 7.5-5 15.5z\" fill=\"#5A544E\"/>\n    <path d=\"M30 42c-.8 3-1 6-.8 9M70 42c.8 3 1 6 .8 9\" stroke=\"#5A544E\" stroke-width=\"3.4\" fill=\"none\" stroke-linecap=\"round\"/>\n  </g>\n</svg>","onishi":"<svg class=\"pf\" viewBox=\"0 0 100 100\" width=\"100\" height=\"100\">\n  <defs>\n    <linearGradient id=\"bpn2utcz\" x1=\"0.15\" y1=\"0\" x2=\"0.85\" y2=\"1\">\n      <stop offset=\"0\" stop-color=\"#CDB8A8\"/><stop offset=\"1\" stop-color=\"#9A8373\"/>\n    </linearGradient>\n    <radialGradient id=\"gpn2utcz\" cx=\"0.3\" cy=\"0.22\" r=\"0.8\">\n      <stop offset=\"0\" stop-color=\"#ffffff\" stop-opacity=\"0.22\"/>\n      <stop offset=\"1\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <clipPath id=\"cpn2utcz\"><circle cx=\"50\" cy=\"50\" r=\"50\"/></clipPath>\n  </defs>\n  <g clip-path=\"url(#cpn2utcz)\">\n    <rect width=\"100\" height=\"100\" fill=\"url(#bpn2utcz)\"/>\n    <rect width=\"100\" height=\"100\" fill=\"url(#gpn2utcz)\"/>\n\n    <!-- 肩・上着 -->\n    <ellipse cx=\"50\" cy=\"107\" rx=\"49\" ry=\"38\" fill=\"#5E4F56\"/>\n    <!-- 襟もと -->\n    <path d=\"M38 71 L50 95 L62 71 L70 76 L64 100 L36 100 L30 76 Z\" fill=\"#F6F2EE\"/>\n    \n    <!-- 首 -->\n    <path d=\"M42 56h16v16a8 8 0 0 1-16 0z\" fill=\"#d9b796\"/>\n    <!-- 顔 -->\n    <ellipse cx=\"50\" cy=\"42\" rx=\"21\" ry=\"25\" fill=\"#EFCDAC\"/>\n    <ellipse cx=\"50\" cy=\"60\" rx=\"14\" ry=\"7\" fill=\"#e5c3a2\" opacity=\"0.5\"/>\n    <!-- 耳 -->\n    <ellipse cx=\"28.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#e5c3a2\"/>\n    <ellipse cx=\"71.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#e5c3a2\"/>\n    <!-- 髪 -->\n    \n    <path d=\"M26.5 60C24 31 32.5 14 50 14s26 17 23.5 46c-1-8.5-2.2-16-5-22-7.5 5.5-29.5 5.5-37 0-2.8 6-4 13.5-5 22z\" fill=\"#3A3230\"/>\n  </g>\n</svg>","sasaki":"<svg class=\"pf\" viewBox=\"0 0 100 100\" width=\"100\" height=\"100\">\n  <defs>\n    <linearGradient id=\"bpxo8356\" x1=\"0.15\" y1=\"0\" x2=\"0.85\" y2=\"1\">\n      <stop offset=\"0\" stop-color=\"#A9BA9D\"/><stop offset=\"1\" stop-color=\"#6D8265\"/>\n    </linearGradient>\n    <radialGradient id=\"gpxo8356\" cx=\"0.3\" cy=\"0.22\" r=\"0.8\">\n      <stop offset=\"0\" stop-color=\"#ffffff\" stop-opacity=\"0.22\"/>\n      <stop offset=\"1\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <clipPath id=\"cpxo8356\"><circle cx=\"50\" cy=\"50\" r=\"50\"/></clipPath>\n  </defs>\n  <g clip-path=\"url(#cpxo8356)\">\n    <rect width=\"100\" height=\"100\" fill=\"url(#bpxo8356)\"/>\n    <rect width=\"100\" height=\"100\" fill=\"url(#gpxo8356)\"/>\n\n    <!-- 肩・上着 -->\n    <ellipse cx=\"50\" cy=\"107\" rx=\"49\" ry=\"38\" fill=\"#36332F\"/>\n    <!-- 襟もと -->\n    <path d=\"M38 71 L50 95 L62 71 L70 76 L64 100 L36 100 L30 76 Z\" fill=\"#F4F3EF\"/>\n    <path d=\"M50 80 L45 88 L50 100 L55 88 Z\" fill=\"#8C4A3A\"/>\n    <!-- 首 -->\n    <path d=\"M42 56h16v16a8 8 0 0 1-16 0z\" fill=\"#d1aa85\"/>\n    <!-- 顔 -->\n    <ellipse cx=\"50\" cy=\"42\" rx=\"21\" ry=\"25\" fill=\"#E7C09B\"/>\n    <ellipse cx=\"50\" cy=\"60\" rx=\"14\" ry=\"7\" fill=\"#ddb691\" opacity=\"0.5\"/>\n    <!-- 耳 -->\n    <ellipse cx=\"28.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#ddb691\"/>\n    <ellipse cx=\"71.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#ddb691\"/>\n    <!-- 髪 -->\n    \n    <path d=\"M28.5 46C28.5 23 36 15.5 50 15.5S71.5 23 71.5 46c0-8.5-2-14-5.5-16.5-8 6.5-22 5.5-28.5-.5-3.5 2-7 8.5-8.5 17z\" fill=\"#332B26\"/>\n  </g>\n</svg>","kobayashi":"<svg class=\"pf\" viewBox=\"0 0 100 100\" width=\"100\" height=\"100\">\n  <defs>\n    <linearGradient id=\"bpfmvezt\" x1=\"0.15\" y1=\"0\" x2=\"0.85\" y2=\"1\">\n      <stop offset=\"0\" stop-color=\"#9FACC2\"/><stop offset=\"1\" stop-color=\"#66738B\"/>\n    </linearGradient>\n    <radialGradient id=\"gpfmvezt\" cx=\"0.3\" cy=\"0.22\" r=\"0.8\">\n      <stop offset=\"0\" stop-color=\"#ffffff\" stop-opacity=\"0.22\"/>\n      <stop offset=\"1\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <clipPath id=\"cpfmvezt\"><circle cx=\"50\" cy=\"50\" r=\"50\"/></clipPath>\n  </defs>\n  <g clip-path=\"url(#cpfmvezt)\">\n    <rect width=\"100\" height=\"100\" fill=\"url(#bpfmvezt)\"/>\n    <rect width=\"100\" height=\"100\" fill=\"url(#gpfmvezt)\"/>\n\n    <!-- 肩・上着 -->\n    <ellipse cx=\"50\" cy=\"107\" rx=\"49\" ry=\"38\" fill=\"#3A3F4A\"/>\n    <!-- 襟もと -->\n    <path d=\"M38 71 L50 95 L62 71 L70 76 L64 100 L36 100 L30 76 Z\" fill=\"#F3F5F8\"/>\n    <path d=\"M50 80 L45 88 L50 100 L55 88 Z\" fill=\"#3C5578\"/>\n    <!-- 首 -->\n    <path d=\"M42 56h16v16a8 8 0 0 1-16 0z\" fill=\"#d4b190\"/>\n    <!-- 顔 -->\n    <ellipse cx=\"50\" cy=\"42\" rx=\"21\" ry=\"25\" fill=\"#EAC7A6\"/>\n    <ellipse cx=\"50\" cy=\"60\" rx=\"14\" ry=\"7\" fill=\"#e0bd9c\" opacity=\"0.5\"/>\n    <!-- 耳 -->\n    <ellipse cx=\"28.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#e0bd9c\"/>\n    <ellipse cx=\"71.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#e0bd9c\"/>\n    <!-- 髪 -->\n    \n    <path d=\"M28.5 46C28.5 23 36 15.5 50 15.5S71.5 23 71.5 46c0-8-2-13.5-5.5-16-6 5-26 5-32 0-3.5 2.5-5.5 8-5.5 16z\" fill=\"#2A2622\"/>\n  </g>\n</svg>","nakamura":"<svg class=\"pf\" viewBox=\"0 0 100 100\" width=\"100\" height=\"100\">\n  <defs>\n    <linearGradient id=\"bpd7ebvj\" x1=\"0.15\" y1=\"0\" x2=\"0.85\" y2=\"1\">\n      <stop offset=\"0\" stop-color=\"#BAB2A6\"/><stop offset=\"1\" stop-color=\"#847C6F\"/>\n    </linearGradient>\n    <radialGradient id=\"gpd7ebvj\" cx=\"0.3\" cy=\"0.22\" r=\"0.8\">\n      <stop offset=\"0\" stop-color=\"#ffffff\" stop-opacity=\"0.22\"/>\n      <stop offset=\"1\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <clipPath id=\"cpd7ebvj\"><circle cx=\"50\" cy=\"50\" r=\"50\"/></clipPath>\n  </defs>\n  <g clip-path=\"url(#cpd7ebvj)\">\n    <rect width=\"100\" height=\"100\" fill=\"url(#bpd7ebvj)\"/>\n    <rect width=\"100\" height=\"100\" fill=\"url(#gpd7ebvj)\"/>\n\n    <!-- 肩・上着 -->\n    <ellipse cx=\"50\" cy=\"107\" rx=\"49\" ry=\"38\" fill=\"#333A42\"/>\n    <!-- 襟もと -->\n    <path d=\"M38 71 L50 95 L62 71 L70 76 L64 100 L36 100 L30 76 Z\" fill=\"#F2F4F6\"/>\n    <path d=\"M50 80 L45 88 L50 100 L55 88 Z\" fill=\"#55606E\"/>\n    <!-- 首 -->\n    <path d=\"M42 56h16v16a8 8 0 0 1-16 0z\" fill=\"#d0aa86\"/>\n    <!-- 顔 -->\n    <ellipse cx=\"50\" cy=\"42\" rx=\"21\" ry=\"25\" fill=\"#E6C09C\"/>\n    <ellipse cx=\"50\" cy=\"60\" rx=\"14\" ry=\"7\" fill=\"#dcb692\" opacity=\"0.5\"/>\n    <!-- 耳 -->\n    <ellipse cx=\"28.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#dcb692\"/>\n    <ellipse cx=\"71.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#dcb692\"/>\n    <!-- 髪 -->\n    \n    <path d=\"M29 47C29 24.5 36.5 16.5 50 16.5S71 24.5 71 47c0-8-1.8-13-5-15.5-5.5 4.5-25.5 4.5-31 0-3.2 2.5-5 7.5-5 15.5z\" fill=\"#5C564F\"/>\n    <path d=\"M30 42c-.8 3-1 6-.8 9M70 42c.8 3 1 6 .8 9\" stroke=\"#5C564F\" stroke-width=\"3.4\" fill=\"none\" stroke-linecap=\"round\"/>\n  </g>\n</svg>","takeda":"<svg class=\"pf\" viewBox=\"0 0 100 100\" width=\"100\" height=\"100\">\n  <defs>\n    <linearGradient id=\"bp2lr1nw\" x1=\"0.15\" y1=\"0\" x2=\"0.85\" y2=\"1\">\n      <stop offset=\"0\" stop-color=\"#B0BFA7\"/><stop offset=\"1\" stop-color=\"#74856B\"/>\n    </linearGradient>\n    <radialGradient id=\"gp2lr1nw\" cx=\"0.3\" cy=\"0.22\" r=\"0.8\">\n      <stop offset=\"0\" stop-color=\"#ffffff\" stop-opacity=\"0.22\"/>\n      <stop offset=\"1\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <clipPath id=\"cp2lr1nw\"><circle cx=\"50\" cy=\"50\" r=\"50\"/></clipPath>\n  </defs>\n  <g clip-path=\"url(#cp2lr1nw)\">\n    <rect width=\"100\" height=\"100\" fill=\"url(#bp2lr1nw)\"/>\n    <rect width=\"100\" height=\"100\" fill=\"url(#gp2lr1nw)\"/>\n\n    <!-- 肩・上着 -->\n    <ellipse cx=\"50\" cy=\"107\" rx=\"49\" ry=\"38\" fill=\"#434A42\"/>\n    <!-- 襟もと -->\n    <path d=\"M38 71 L50 95 L62 71 L70 76 L64 100 L36 100 L30 76 Z\" fill=\"#F3F4F0\"/>\n    \n    <!-- 首 -->\n    <path d=\"M42 56h16v16a8 8 0 0 1-16 0z\" fill=\"#cea67f\"/>\n    <!-- 顔 -->\n    <ellipse cx=\"50\" cy=\"42\" rx=\"21\" ry=\"25\" fill=\"#E4BC95\"/>\n    <ellipse cx=\"50\" cy=\"60\" rx=\"14\" ry=\"7\" fill=\"#dab28b\" opacity=\"0.5\"/>\n    <!-- 耳 -->\n    <ellipse cx=\"28.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#dab28b\"/>\n    <ellipse cx=\"71.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#dab28b\"/>\n    <!-- 髪 -->\n    \n    <path d=\"M28.5 46C28.5 23 36 15.5 50 15.5S71.5 23 71.5 46c0-8-2-13.5-5.5-16-6 5-26 5-32 0-3.5 2.5-5.5 8-5.5 16z\" fill=\"#352E28\"/>\n  </g>\n</svg>","fujimoto":"<svg class=\"pf\" viewBox=\"0 0 100 100\" width=\"100\" height=\"100\">\n  <defs>\n    <linearGradient id=\"bpuanaqy\" x1=\"0.15\" y1=\"0\" x2=\"0.85\" y2=\"1\">\n      <stop offset=\"0\" stop-color=\"#A9ACBE\"/><stop offset=\"1\" stop-color=\"#6E7288\"/>\n    </linearGradient>\n    <radialGradient id=\"gpuanaqy\" cx=\"0.3\" cy=\"0.22\" r=\"0.8\">\n      <stop offset=\"0\" stop-color=\"#ffffff\" stop-opacity=\"0.22\"/>\n      <stop offset=\"1\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <clipPath id=\"cpuanaqy\"><circle cx=\"50\" cy=\"50\" r=\"50\"/></clipPath>\n  </defs>\n  <g clip-path=\"url(#cpuanaqy)\">\n    <rect width=\"100\" height=\"100\" fill=\"url(#bpuanaqy)\"/>\n    <rect width=\"100\" height=\"100\" fill=\"url(#gpuanaqy)\"/>\n\n    <!-- 肩・上着 -->\n    <ellipse cx=\"50\" cy=\"107\" rx=\"49\" ry=\"38\" fill=\"#2F3340\"/>\n    <!-- 襟もと -->\n    <path d=\"M38 71 L50 95 L62 71 L70 76 L64 100 L36 100 L30 76 Z\" fill=\"#F4F5F8\"/>\n    <path d=\"M50 80 L45 88 L50 100 L55 88 Z\" fill=\"#4A6B8A\"/>\n    <!-- 首 -->\n    <path d=\"M42 56h16v16a8 8 0 0 1-16 0z\" fill=\"#d7b595\"/>\n    <!-- 顔 -->\n    <ellipse cx=\"50\" cy=\"42\" rx=\"21\" ry=\"25\" fill=\"#EDCBAB\"/>\n    <ellipse cx=\"50\" cy=\"60\" rx=\"14\" ry=\"7\" fill=\"#e3c1a1\" opacity=\"0.5\"/>\n    <!-- 耳 -->\n    <ellipse cx=\"28.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#e3c1a1\"/>\n    <ellipse cx=\"71.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#e3c1a1\"/>\n    <!-- 髪 -->\n    \n    <path d=\"M28.5 46C28.5 23 36 15.5 50 15.5S71.5 23 71.5 46c0-8.5-2-14-5.5-16.5-8 6.5-22 5.5-28.5-.5-3.5 2-7 8.5-8.5 17z\" fill=\"#241F1C\"/>\n  </g>\n</svg>","jimu":"<svg class=\"pf\" viewBox=\"0 0 100 100\" width=\"100\" height=\"100\">\n  <defs>\n    <linearGradient id=\"bp1mra8z\" x1=\"0.15\" y1=\"0\" x2=\"0.85\" y2=\"1\">\n      <stop offset=\"0\" stop-color=\"#BCB1C1\"/><stop offset=\"1\" stop-color=\"#847A8B\"/>\n    </linearGradient>\n    <radialGradient id=\"gp1mra8z\" cx=\"0.3\" cy=\"0.22\" r=\"0.8\">\n      <stop offset=\"0\" stop-color=\"#ffffff\" stop-opacity=\"0.22\"/>\n      <stop offset=\"1\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <clipPath id=\"cp1mra8z\"><circle cx=\"50\" cy=\"50\" r=\"50\"/></clipPath>\n  </defs>\n  <g clip-path=\"url(#cp1mra8z)\">\n    <rect width=\"100\" height=\"100\" fill=\"url(#bp1mra8z)\"/>\n    <rect width=\"100\" height=\"100\" fill=\"url(#gp1mra8z)\"/>\n\n    <!-- 肩・上着 -->\n    <ellipse cx=\"50\" cy=\"107\" rx=\"49\" ry=\"38\" fill=\"#484048\"/>\n    <!-- 襟もと -->\n    <path d=\"M38 71 L50 95 L62 71 L70 76 L64 100 L36 100 L30 76 Z\" fill=\"#F6F3F0\"/>\n    \n    <!-- 首 -->\n    <path d=\"M42 56h16v16a8 8 0 0 1-16 0z\" fill=\"#d9ba9c\"/>\n    <!-- 顔 -->\n    <ellipse cx=\"50\" cy=\"42\" rx=\"21\" ry=\"25\" fill=\"#EFD0B2\"/>\n    <ellipse cx=\"50\" cy=\"60\" rx=\"14\" ry=\"7\" fill=\"#e5c6a8\" opacity=\"0.5\"/>\n    <!-- 耳 -->\n    <ellipse cx=\"28.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#e5c6a8\"/>\n    <ellipse cx=\"71.5\" cy=\"44\" rx=\"3.6\" ry=\"5.2\" fill=\"#e5c6a8\"/>\n    <!-- 髪 -->\n    \n    <path d=\"M29 46C29 23.5 36.5 16 50 16s21 7.5 21 30c0-8-2-13.5-5.5-16-6 5-25 5-31 0-3.5 2.5-5.5 8-5.5 16z\" fill=\"#322A2E\"/>\n    <circle cx=\"50\" cy=\"12\" r=\"7\" fill=\"#322A2E\"/>\n  </g>\n</svg>"};
+'use strict';
+/* ============================================================
+   社長の背中SNS　スマートフォン版モック
+   データはすべて架空です。
+   ============================================================ */
+
+const ME = { id: 'me', name: '中村 誠一', co: '中村精機株式会社', face: 'nakamura' };
 
 const PEOPLE = {
-  jimukyoku:{id:'jimukyoku', name:'事務局', company:'LIVE Doctor株式会社', industry:'', area:'', rel:'none', admin:true},
-  yamada:{id:'yamada', name:'山田 浩司', company:'山田建設株式会社', industry:'建設・不動産', area:'関東', rel:'friend'},
-  sasaki:{id:'sasaki', name:'佐々木 隆', company:'ササキフーズ株式会社', industry:'飲食・宿泊', area:'関西', rel:'none'},
-  onishi:{id:'onishi', name:'大西 由美', company:'大西運輸株式会社', industry:'運輸・物流', area:'九州・沖縄', rel:'friend'},
-  fujimoto:{id:'fujimoto', name:'藤本 剛', company:'フジモトITソリューションズ', industry:'情報・通信・IT', area:'関東', rel:'sent'},
-  kobayashi:{id:'kobayashi', name:'小林 健吾', company:'小林会計事務所', industry:'士業・コンサルティング', area:'東海', rel:'received'},
-  takeda:{id:'takeda', name:'武田 信也', company:'武田農園株式会社', industry:'農林水産', area:'甲信越・北陸', rel:'none'},
-  me:{id:'me', name:'中村 誠一', company:'中村精機株式会社', industry:'製造', area:'東海', rel:'self'}
+  yamada: {
+    id: 'yamada', face: 'yamada', name: '山田 浩司', co: '山田建設株式会社',
+    ind: '建設・不動産', area: '関東', by: '事務局', rel: 'friend',
+    art: '三代目として継いだ会社を、一度畳む覚悟で立て直した',
+    lead: '祖父が興した建設会社を継いだのは32歳のとき。帳簿を開いて最初に思ったのは「これは畳むしかない」だった。それでも社員の顔が浮かんで、踏みとどまった。',
+    joined: '2026年10月',
+  },
+  onishi: {
+    id: 'onishi', face: 'onishi', name: '大西 由美', co: '大西運輸株式会社',
+    ind: '運輸', area: '九州・沖縄', by: '山田 浩司', rel: 'friend',
+    art: '女性が働きにくい業界を、内側から変える',
+    lead: 'トラックに女性ドライバーを採用すると言ったとき、古参の社員は全員反対した。それでも押し通したのは、自分が入社したときに同じ目で見られたからだ。',
+    joined: '2026年10月',
+  },
+  sasaki: {
+    id: 'sasaki', face: 'sasaki', name: '佐々木 隆', co: 'ササキフーズ株式会社',
+    ind: '飲食・宿泊', area: '関西', by: '事務局', rel: 'none',
+    art: '20店舗の閉店から学んだ、本当に守るべきもの',
+    lead: '最盛期は58店舗あった。三年かけて20店舗を閉めた。残ったのは、店ではなく、ついてきてくれた人たちだった。',
+    joined: '2026年10月',
+  },
+  kobayashi: {
+    id: 'kobayashi', face: 'kobayashi', name: '小林 健吾', co: '小林会計事務所',
+    ind: '士業', area: '東海', by: '中村 誠一', rel: 'received',
+    art: '数字の向こうにある、社長の孤独に寄り添う',
+    lead: '決算書を見れば、その会社が何に悩んでいるかは大体わかる。けれど本当に聞きたいことは、数字のどこにも書いていない。',
+    joined: '2026年10月',
+  },
+  fujimoto: {
+    id: 'fujimoto', face: 'fujimoto', name: '藤本 剛', co: 'フジモトITソリューションズ',
+    ind: '情報・IT', area: '関東', by: '佐々木 隆', rel: 'sent',
+    art: '地方の中小企業にこそ、AIが要る',
+    lead: '東京の会社はもう使っている。使えていないのは、人手が足りなくて一番困っている会社のほうだ。この逆転をどうにかしたい。',
+    joined: '2026年10月',
+  },
+  takeda: {
+    id: 'takeda', face: 'takeda', name: '武田 信也', co: '武田農園株式会社',
+    ind: '農林水産', area: '北陸', by: '大西 由美', rel: 'none',
+    art: '農業を、継ぎたくなる仕事にする',
+    lead: '息子に継がせたいかと聞かれて、即答できなかった。その情けなさが、法人化を決めたきっかけだった。',
+    joined: '2026年10月',
+  },
+  jimu: {
+    id: 'jimu', face: 'jimu', name: '事務局', co: 'LIVE Doctor株式会社',
+    ind: '', area: '', by: '—', rel: 'admin', admin: true,
+    art: 'この場の成り立ちについて',
+    lead: '社長の背中に登場いただいた経営者の方々が、記事の外でもつながれる場をつくりたい。そう考えて始めました。',
+    joined: '2026年10月',
+  },
+  me: {
+    id: 'me', face: 'nakamura', name: '中村 誠一', co: '中村精機株式会社',
+    ind: '製造', area: '東海', by: '事務局', rel: 'self',
+    art: '図面が読める営業は、なぜ強いのか',
+    lead: '町工場の二代目として、現場も営業も両方やってきた。どちらかしか知らない人には見えない景色がある。',
+    joined: '2026年10月',
+  },
 };
+const ORDER = ['yamada', 'onishi', 'sasaki', 'kobayashi', 'fujimoto', 'takeda', 'jimu', 'me'];
 
 const CONV = {
-  yamada:{
-    id:'yamada', kind:'dm', other:'yamada', name:'山田 浩司', sub:'山田建設株式会社',
-    unread:2,
-    msgs:[
-      {who:'me', t:'10月20日（月）', at:'14:02', body:'山田社長、先日は展示会でお声がけいただきありがとうございました。'},
-      {who:'yamada', at:'14:31', body:'こちらこそ。御社の加工精度の話、たいへん勉強になりました。'},
-      {who:'yamada', at:'14:33', body:'うちの現場でも似た悩みを抱えておりまして、一度ゆっくり伺えませんか。'},
-      {who:'me', at:'15:10', body:'ぜひ。来月でしたら、第2週あたりが動きやすいです。'},
-      {who:'yamada', t:'10月23日（金）', at:'09:14', body:'ありがとうございます。11日の午後はいかがでしょう。'},
-      {who:'yamada', at:'09:15', body:'よろしければ、工場もご覧いただければと思います。'}
-    ]
+  yamada: {
+    id: 'yamada', kind: 'dm', other: 'yamada', unread: 2, when: '09:15',
+    msgs: [
+      { d: '10月20日（月）' },
+      { who: 'me', t: '14:02', b: '山田社長、先日は展示会でお声がけいただきありがとうございました。' },
+      { who: 'yamada', t: '14:31', b: 'こちらこそ。御社の加工精度の話、たいへん勉強になりました。' },
+      { who: 'yamada', t: '14:33', b: 'うちの現場でも似た悩みを抱えておりまして、一度ゆっくり伺えませんか。' },
+      { who: 'me', t: '15:10', b: 'ぜひ。来月でしたら、第2週あたりが動きやすいです。' },
+      { d: '10月23日（金）' },
+      { who: 'yamada', t: '09:14', b: 'ありがとうございます。11日の午後はいかがでしょう。' },
+      { who: 'yamada', t: '09:15', b: 'よろしければ、工場もご覧いただければと思います。' },
+    ],
   },
-  everyone:{
-    id:'everyone', kind:'group', everyone:true, name:'会員全員のグループ', sub:'8名',
-    unread:1,
-    msgs:[
-      {who:'jimukyoku', t:'10月5日（月）', at:'10:00', body:'みなさま、はじめまして。事務局です。\n\nこの場は、社長の背中に登場いただいた経営者の方だけが集まる、完全紹介制の場です。広告はありません。\n\nまずは「会員をさがす」から、お知り合いを見つけてみてください。'},
-      {who:'onishi', at:'11:22', body:'大西運輸の大西です。よろしくお願いいたします。'},
-      {who:'yamada', at:'13:40', body:'山田建設の山田です。こういう場をお待ちしておりました。'},
-      {who:'jimukyoku', t:'10月22日（木）', at:'16:30', body:'新しく2名の方がご入会されました。プロフィールをご覧いただけます。'}
-    ]
+  everyone: {
+    id: 'everyone', kind: 'group', everyone: true, title: '会員全員のつどい', count: 8,
+    unread: 1, when: '10/22',
+    msgs: [
+      { d: '10月5日（月）' },
+      { who: 'jimu', t: '10:00', b: 'みなさま、はじめまして。事務局です。\n\nこの場は、社長の背中に登場いただいた経営者の方だけが集まる、完全紹介制の場です。広告はありません。\n\nまずは「会員をさがす」から、お知り合いを見つけてみてください。' },
+      { who: 'onishi', t: '11:22', b: '大西運輸の大西です。よろしくお願いいたします。' },
+      { who: 'yamada', t: '13:40', b: '山田建設の山田です。こういう場をお待ちしておりました。' },
+      { d: '10月22日（木）' },
+      { who: 'jimu', t: '16:30', b: '新しく2名の方がご入会されました。プロフィールをご覧いただけます。' },
+    ],
   },
-  tokai:{
-    id:'tokai', kind:'group', name:'東海エリアの会', sub:'4名',
-    unread:0,
-    msgs:[
-      {who:'kobayashi', t:'10月19日（日）', at:'20:05', body:'小林です。来月の集まりですが、名古屋駅の近くで会場を押さえられそうです。'},
-      {who:'me', at:'21:12', body:'ありがとうございます。助かります。'},
-      {who:'jimukyoku', at:'22:30', body:'事務局からも何名かお声がけしてみます。'}
-    ]
-  }
+  tokai: {
+    id: 'tokai', kind: 'group', title: '東海エリアの会', count: 4, unread: 0, when: '10/19',
+    msgs: [
+      { d: '10月19日（日）' },
+      { who: 'kobayashi', t: '20:05', b: '小林です。来月の集まりですが、名古屋駅の近くで会場を押さえられそうです。' },
+      { who: 'me', t: '21:12', b: 'ありがとうございます。助かります。' },
+      { who: 'jimu', t: '22:30', b: '事務局からも何名かお声がけしてみます。' },
+    ],
+  },
+  onishi: {
+    id: 'onishi', kind: 'dm', other: 'onishi', unread: 0, when: '10/18',
+    msgs: [
+      { d: '10月18日（土）' },
+      { who: 'onishi', t: '11:05', b: '先日はありがとうございました。' },
+      { who: 'me', t: '12:40', b: 'こちらこそ、勉強になりました。' },
+    ],
+  },
+  sasaki: {
+    id: 'sasaki', kind: 'dm', other: 'sasaki', unread: 0, when: '10/14',
+    msgs: [
+      { d: '10月14日（火）' },
+      { who: 'sasaki', t: '18:20', b: '承知しました。改めてご連絡いたします。' },
+    ],
+  },
+};
+const CONV_ORDER = ['yamada', 'everyone', 'tokai', 'onishi', 'sasaki'];
+const INDUSTRIES = ['すべて', '製造', '建設・不動産', '医療・介護', '情報・IT', '士業', '飲食・宿泊', '運輸', '農林水産'];
+
+/* ---------------- 部品 ---------------- */
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const face = (k, n) => `<span class="ph" style="width:${n}px;height:${n}px">${FACES[k] || ''}</span>`;
+const $ = (s) => document.querySelector(s);
+
+const IC = {
+  mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M3 7l9 6 9-6"/></svg>',
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.3"/><path d="M15.2 15.2L21 21"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4.5v15M4.5 12h15"/></svg>',
+  person: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="3.8"/><path d="M4.5 20.5c0-4.1 3.4-6.4 7.5-6.4s7.5 2.3 7.5 6.4"/></svg>',
 };
 
-const ORDER = ['yamada','everyone','tokai'];
-const GROUPS = [
-  {name:'会員全員のグループ', everyone:true, when:'2026/10/01 09:00', roster:['事務局','中村 誠一','山田 浩司','佐々木 隆','大西 由美','藤本 剛','小林 健吾','武田 信也']},
-  {name:'東海エリアの会', everyone:false, when:'2026/10/12 15:20', roster:['事務局','中村 誠一','小林 健吾','武田 信也']},
-  {name:'ものづくり分科会', everyone:false, when:'2026/10/18 11:05', roster:['事務局','中村 誠一','山田 浩司']}
+let view = 'home';
+let curConv = 'yamada';
+let curMember = 'yamada';
+let admTab = 'pending';
+let memQ = '';
+let memInd = 'すべて';
+let inviteCode = null;
+let repOpen = true;
+let pend = [
+  { id: 1, face: 'fujimoto', name: '松本 和彦', co: '松本メディカル株式会社',
+    mail: 'matsumoto@matsumoto-medical.co.jp', ind: '医療・介護', area: '関東',
+    by: '山田建設株式会社 山田 浩司',
+    why: '地元の商工会でご一緒しており、人柄をよく存じ上げています。', at: '2026/10/22 11:34' },
+  { id: 2, face: 'takeda', name: '渡辺 三郎', co: '渡辺商事株式会社',
+    mail: 'watanabe@watanabe-shoji.co.jp', ind: '卸売・小売', area: '関西',
+    by: 'ササキフーズ株式会社 佐々木 隆', why: '（記載なし）', at: '2026/10/23 08:12' },
 ];
 
-let currentConv = 'yamada';
-let currentOther = 'yamada';
+const unreadTotal = () => CONV_ORDER.reduce((n, k) => n + CONV[k].unread, 0);
+const reqCount = () => Object.values(PEOPLE).filter((p) => p.rel === 'received').length;
 
-/* ---------------- 画面の切り替え ---------------- */
-let threadReady = false, memberReady = false;
-
-function go(id){
-  // 会話・プロフィールは中身を入れてから出す（直接飛んできた場合の備え）
-  if(id==='thread' && !threadReady) return openConv(currentConv);
-  if(id==='member' && !memberReady) return openMember(currentOther || 'yamada');
-
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-  const el = document.getElementById('s-'+id);
-  if(el){ el.classList.add('on'); el.scrollTop = 0; }
-  const ph = document.getElementById('phone');
-  if(ph) ph.scrollTop = 0;
-  window.scrollTo(0,0);
-  if(id==='home') renderConvList();
-  if(id==='members') renderMembers();
-  if(id==='admin-members') renderAdminMembers();
-  if(id==='admin-groups') renderGroups();
-}
-function jump(id){ closeIndex(); go(id); }
-function jumpThread(c){ closeIndex(); openConv(c); }
-function jumpMember(m){ closeIndex(); openMember(m); }
-function openIndex(){ document.getElementById('idx').classList.add('on'); }
-function closeIndex(){ document.getElementById('idx').classList.remove('on'); }
-
-function toast(id,msg){
-  const t = document.getElementById(id);
-  if(!t) return;
+function toast(msg) {
+  const t = $('#toast');
   t.textContent = msg;
   t.classList.add('on');
   clearTimeout(t._tm);
-  t._tm = setTimeout(()=>t.classList.remove('on'), 2200);
+  t._tm = setTimeout(() => t.classList.remove('on'), 2400);
 }
 
-function initial(name){ return (name||'？').trim().charAt(0); }
+const tabs = (on) => {
+  const items = [
+    ['home', 'mail', 'やりとり', unreadTotal()],
+    ['members', 'search', '会員をさがす', reqCount()],
+    ['invite', 'plus', '招待する', 0],
+    ['me', 'person', '自分の設定', 0],
+  ];
+  return `<nav class="tabs">${items.map(([v, ic, l, n]) => `
+    <button class="tb${on === v ? ' on' : ''}" data-view="${v}">
+      <span class="ti">${IC[ic]}</span><span>${l}</span>
+      ${n ? `<span class="tbn">${n}</span>` : ''}
+    </button>`).join('')}</nav>`;
+};
+
+const hd = (title, opt = {}) => `
+  <div class="hd">
+    ${opt.back ? `<button class="bk" data-view="${opt.back}" aria-label="戻る">‹</button>` : ''}
+    <div class="hdT">${esc(title)}${opt.sub ? `<span class="hdS">${esc(opt.sub)}</span>` : ''}</div>
+    ${opt.action || ''}
+  </div>`;
 
 /* ---------------- やりとり一覧 ---------------- */
-function renderConvList(){
-  const host = document.getElementById('conv-list');
-  host.innerHTML = '';
-  let total = 0;
-  ORDER.forEach(k=>{
-    const c = CONV[k];
-    total += c.unread;
-    const last = c.msgs[c.msgs.length-1];
-    const avCls = c.kind==='group' ? ('av group'+(c.everyone?' everyone':'')) : 'av';
-    const avTxt = c.kind==='group' ? (c.everyone?'全':'組') : initial(c.name);
-    const when = k==='yamada' ? '09:15' : (k==='everyone' ? '10/22' : '10/19');
-    const b = document.createElement('button');
-    b.className = 'conv';
-    b.onclick = ()=>openConv(k);
-    b.innerHTML =
-      '<div class="'+avCls+'">'+avTxt+'</div>'+
-      '<div class="conv-main">'+
-        '<div class="conv-top">'+
-          '<span class="conv-name">'+c.name+'</span>'+
-          (c.kind==='group' ? '<span style="font-size:11px;color:var(--ink-weak)">'+c.sub+'</span>' : '')+
-          '<span class="conv-when">'+when+'</span>'+
-        '</div>'+
-        '<div class="conv-prev">'+esc(last.body.replace(/\n/g,' ')).slice(0,40)+'…</div>'+
-      '</div>'+
-      (c.unread>0 ? '<span class="badge">'+c.unread+'</span>' : '');
-    host.appendChild(b);
-  });
-  const tb = document.getElementById('tab-unread');
-  if(total>0){ tb.textContent = total; tb.style.display=''; } else { tb.style.display='none'; }
+function screenHome() {
+  const reqs = Object.values(PEOPLE).filter((p) => p.rel === 'received');
+  return hd('やりとり', { action: '<button class="hdA" data-view="admin">運営</button>' })
+    + `<div class="body">
+      ${reqs.length ? `<div class="secL">友達の申し込みが届いています</div>
+        ${reqs.map((p) => `
+        <button class="row" data-member="${p.id}">
+          ${face(p.face, 44)}
+          <span class="rm"><span class="rn">${p.name}</span><span class="rc">${esc(p.co)}</span></span>
+          <span class="st wait">確認する</span>
+        </button>`).join('')}
+        <div class="secL">やりとり</div>` : ''}
+      ${CONV_ORDER.map((k) => {
+      const c = CONV[k];
+      const last = [...c.msgs].reverse().find((m) => m.b);
+      const p = c.other ? PEOPLE[c.other] : null;
+      const name = c.kind === 'dm' ? p.name : c.title;
+      const av = c.kind === 'dm' ? face(p.face, 50)
+        : `<span class="mk${c.everyone ? ' acc' : ''}">${c.everyone ? '全' : '組'}</span>`;
+      return `
+        <button class="cv" data-conv="${k}">
+          ${av}
+          <span class="cvM">
+            <span class="cvT"><span class="cvN">${esc(name)}</span>
+              ${c.kind === 'group' ? `<span class="cvS">${c.count}名</span>` : ''}
+              <span class="cvW">${c.when}</span></span>
+            ${p ? `<span class="cvC">${esc(p.co)}</span>` : ''}
+            <span class="cvP">${esc((last ? last.b : '').replace(/\n/g, ' ')).slice(0, 30)}…</span>
+          </span>
+          ${c.unread ? `<span class="bdg">${c.unread}</span>` : ''}
+        </button>`;
+    }).join('')}
+    </div>` + tabs('home');
 }
 
-function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+/* ---------------- 会話 ---------------- */
+function screenThread() {
+  const c = CONV[curConv];
+  const p = c.other ? PEOPLE[c.other] : null;
+  const title = c.kind === 'dm' ? p.name : c.title;
+  const sub = c.kind === 'dm' ? p.co : `${c.count}名`;
+  const action = c.kind === 'dm' ? `<button class="hdA" data-member="${p.id}">プロフィール</button>` : '';
 
-/* ---------------- 会話の画面 ---------------- */
-function openConv(k){
-  currentConv = k;
-  const c = CONV[k];
-  c.unread = 0;
-  currentOther = c.other || null;
-  document.getElementById('th-name').textContent = c.name;
-  document.getElementById('th-sub').textContent = c.sub || '';
-  document.getElementById('th-prof').style.display = c.kind==='dm' ? '' : 'none';
-  renderThread();
-  threadReady = true;
-  go('thread');
-  const b = document.getElementById('th-body');
-  setTimeout(()=>{ b.scrollIntoView(false); const sc=document.getElementById('s-thread'); sc.scrollTop = sc.scrollHeight; }, 20);
-}
-
-function renderThread(){
-  const c = CONV[currentConv];
-  const host = document.getElementById('th-body');
-  host.innerHTML = '';
   let lastWho = '';
-  c.msgs.forEach(m=>{
-    if(m.t){
-      const d = document.createElement('div');
-      d.className='day'; d.textContent=m.t; host.appendChild(d); lastWho='';
-    }
-    const mine = m.who==='me';
-    const cont = lastWho===m.who && !m.t;
+  const body = c.msgs.map((m) => {
+    if (m.d) { lastWho = ''; return `<div class="day">${m.d}</div>`; }
+    const mine = m.who === 'me';
+    const cont = lastWho === m.who;
     lastWho = m.who;
-    const row = document.createElement('div');
-    row.className = 'row'+(mine?' me':'')+(cont?' cont':'');
-    const who = PEOPLE[m.who] ? PEOPLE[m.who].name : '';
-    row.innerHTML =
-      '<div class="bubble-wrap">'+
-        ((c.kind==='group' && !mine && !cont) ? '<div class="who">'+who+'</div>' : '')+
-        '<div class="bubble">'+esc(m.body)+'</div>'+
-        '<div class="meta">'+m.at+
-          (!mine ? ' ・ <button onclick="reportMsg()">事務局に知らせる</button>' : '')+
-        '</div>'+
-      '</div>';
-    host.appendChild(row);
-  });
-}
+    const w = PEOPLE[m.who];
+    return `
+    <div class="mr${mine ? ' me' : ''}${cont ? ' cont' : ''}">
+      ${mine ? '' : (cont ? '<span class="sp30"></span>' : face(w.face, 30))}
+      <div class="mw">
+        ${(c.kind === 'group' && !mine && !cont) ? `<div class="who">${w.name}</div>` : ''}
+        <div class="bub">${esc(m.b)}</div>
+        <div class="mtime">${m.t}${mine ? '' : '<button class="rep" data-report="1">事務局に知らせる</button>'}</div>
+      </div>
+    </div>`;
+  }).join('');
 
-function onType(){
-  const i = document.getElementById('th-input');
-  i.style.height='auto';
-  i.style.height = Math.min(i.scrollHeight,120)+'px';
-  document.getElementById('th-send').disabled = !i.value.trim();
-}
-
-function sendMsg(){
-  const i = document.getElementById('th-input');
-  const v = i.value.trim();
-  if(!v) return;
-  const now = new Date();
-  const hh = String(now.getHours()).padStart(2,'0');
-  const mm = String(now.getMinutes()).padStart(2,'0');
-  CONV[currentConv].msgs.push({who:'me', at:hh+':'+mm, body:v});
-  i.value=''; i.style.height='auto';
-  document.getElementById('th-send').disabled = true;
-  renderThread();
-  const sc = document.getElementById('s-thread');
-  setTimeout(()=>{ sc.scrollTop = sc.scrollHeight; }, 20);
-}
-
-function reportMsg(){
-  toast('th-toast','事務局にお知らせしました。前後のやりとりを含めて確認いたします。');
+  return hd(title, { back: 'home', sub, action })
+    + `<div class="thread" id="thread">${body}</div>
+    <div class="cmp">
+      <textarea id="msgIn" rows="1" placeholder="メッセージを入力"></textarea>
+      <button class="send" id="sendBtn" disabled aria-label="送信">↑</button>
+    </div>`;
 }
 
 /* ---------------- 会員をさがす ---------------- */
-const REL_TAG = {
-  self:{l:'自分',c:'tag'},
-  friend:{l:'友達',c:'tag friend'},
-  sent:{l:'申し込み中',c:'tag wait'},
-  received:{l:'申し込みが届いています',c:'tag wait'},
-  none:null
+const memberHit = (p) => {
+  if (memInd !== 'すべて' && p.ind !== memInd) return false;
+  const q = memQ.trim().toLowerCase();
+  if (!q) return true;
+  return [p.name, p.co, p.ind, p.area].join(' ').toLowerCase().includes(q);
 };
 
-function renderMembers(){
-  const q = (document.getElementById('mem-q').value||'').trim().toLowerCase();
-  const all = Object.values(PEOPLE);
-  const hits = all.filter(p=>!q || [p.name,p.company,p.industry,p.area].join(' ').toLowerCase().includes(q));
-  document.getElementById('mem-count').textContent =
-    '会員一覧（'+hits.length+'名'+(q?' / 全'+all.length+'名':'')+'）';
-  const host = document.getElementById('mem-list');
-  host.innerHTML='';
-  if(hits.length===0){
-    host.innerHTML = '<div class="empty"><div class="empty-ic">🔍</div><div class="empty-ttl">見つかりませんでした</div><div class="empty-txt">別のことばでお試しください。</div></div>';
-    return;
-  }
-  hits.forEach(p=>{
-    const tag = REL_TAG[p.rel];
-    const b = document.createElement('button');
-    b.className='row-item';
-    b.onclick = ()=>openMember(p.id);
-    b.innerHTML =
-      '<div class="av sm">'+initial(p.name)+'</div>'+
-      '<div class="row-main">'+
-        '<div class="row-name">'+p.name+(p.admin?' <span class="tag admin">事務局</span>':'')+'</div>'+
-        '<div class="row-sub">'+[p.company,p.industry,p.area].filter(Boolean).join(' ・ ')+'</div>'+
-      '</div>'+
-      (tag ? '<span class="'+tag.c+'">'+tag.l+'</span>' : '');
-    host.appendChild(b);
-  });
-}
-
-function acceptKobayashi(){
-  PEOPLE.kobayashi.rel='friend';
-  document.getElementById('mem-reqs').style.display='none';
-  document.getElementById('home-reqs').style.display='none';
-  renderMembers();
-  toast('mem-toast','友達になりました。');
-}
-function declineKobayashi(){
-  PEOPLE.kobayashi.rel='none';
-  document.getElementById('mem-reqs').style.display='none';
-  document.getElementById('home-reqs').style.display='none';
-  renderMembers();
+function screenMembers() {
+  const hits = ORDER.map((k) => PEOPLE[k]).filter(memberHit);
+  return hd('会員をさがす')
+    + `<div class="body">
+      <div class="srch"><input id="memQ" placeholder="お名前・会社名・業種でさがす" value="${esc(memQ)}" autocomplete="off"></div>
+      <div class="chips">${INDUSTRIES.map((c) => `<button class="chip${memInd === c ? ' on' : ''}" data-ind="${c}">${c}</button>`).join('')}</div>
+      <div class="cnt">${hits.length}名${(memQ || memInd !== 'すべて') ? ` / 全${ORDER.length}名` : ''}</div>
+      ${hits.length === 0
+      ? `<div class="empty"><div class="emIc">${IC.search}</div><div class="emT">見つかりませんでした</div><div class="emS">別のことばでお試しください。</div></div>`
+      : hits.map((p) => `
+        <button class="row" data-member="${p.id}">
+          ${face(p.face, 50)}
+          <span class="rm">
+            <span class="rn">${p.name}${p.admin ? '<span class="tagA">事務局</span>' : ''}</span>
+            <span class="rc">${esc(p.co)}</span>
+            <span class="ra">「${esc(p.art)}」</span>
+            <span class="rb">${p.by} さんのご紹介</span>
+          </span>
+        </button>`).join('')}
+    </div>` + tabs('members');
 }
 
 /* ---------------- プロフィール ---------------- */
-function openMember(id){
-  const p = PEOPLE[id];
-  if(!p) return;
-  currentOther = id;
-  document.getElementById('pf-av').textContent = initial(p.name);
-  document.getElementById('pf-name').innerHTML = p.name + (p.admin?' <span class="tag admin">事務局</span>':'');
-  document.getElementById('pf-co').textContent = p.company;
-  document.getElementById('pf-tags').innerHTML =
-    (p.industry?'<span class="tag">'+p.industry+'</span>':'') +
-    (p.area?'<span class="tag">'+p.area+'</span>':'');
+function screenMember() {
+  const p = PEOPLE[curMember];
+  let act = '';
+  if (p.rel === 'self') act = `<button class="btn ghost" data-view="me">自分の設定を開く</button>`;
+  else if (p.rel === 'friend' || p.admin) act = `<button class="btn" data-open="${p.id}">メッセージを送る</button>`;
+  else if (p.rel === 'none') act = `<button class="btn ghost" data-friend="${p.id}">友達の申し込みをする</button>`;
+  else if (p.rel === 'sent') act = `<button class="btn quiet" disabled>申し込み中です</button>
+      <div class="sp"></div><button class="btn quiet" data-cancel="${p.id}">申し込みを取り消す</button>`;
+  else if (p.rel === 'received') act = `<div class="two">
+      <button class="btn" data-accept="${p.id}">友達になる</button>
+      <button class="btn quiet" data-cancel="${p.id}">見送る</button></div>`;
 
-  const canMsg = p.rel==='friend' || p.admin;
-  let h = '';
-  if(p.rel==='self'){
-    h = '<button class="btn wide ghost" onclick="go(\'me\')">自分の設定を開く</button>';
-  } else {
-    if(canMsg) h += '<button class="btn wide" onclick="openConvFor(\''+id+'\')">メッセージを送る</button><div class="sp"></div>';
-    if(p.rel==='none') h += '<button class="btn wide ghost" onclick="applyFriend(\''+id+'\')">友達の申し込みをする</button>';
-    if(p.rel==='sent') h += '<button class="btn wide quiet" disabled>申し込み中です</button><div class="sp"></div><button class="btn wide quiet" onclick="cancelFriend(\''+id+'\')">申し込みを取り消す</button>';
-    if(p.rel==='received') h += '<div class="rowflex"><button class="btn" style="flex:1" onclick="acceptFrom(\''+id+'\')">友達になる</button><button class="btn quiet" style="flex:1" onclick="cancelFriend(\''+id+'\')">見送る</button></div>';
-    if(p.rel==='friend') h += '<button class="btn wide quiet" onclick="unfriend(\''+id+'\')">友達の関係を解除する</button>';
-    h += '<div class="sp"></div><div class="muted" style="font-size:11.5px">※ この場では、友達になった方とだけ1対1のやりとりができます。'+(p.admin?'事務局へは、いつでもご連絡いただけます。':'')+'</div>';
-  }
-  document.getElementById('pf-actions').innerHTML = h;
-  memberReady = true;
-  go('member');
-}
-function applyFriend(id){ PEOPLE[id].rel='sent'; openMember(id); toast('pf-toast','お申し込みをお送りしました。'); }
-function cancelFriend(id){ PEOPLE[id].rel='none'; openMember(id); }
-function acceptFrom(id){ PEOPLE[id].rel='friend'; openMember(id); toast('pf-toast','友達になりました。'); }
-function unfriend(id){ PEOPLE[id].rel='none'; openMember(id); }
-function openConvFor(id){
-  if(CONV[id]) return openConv(id);
-  CONV[id] = {id:id, kind:'dm', other:id, name:PEOPLE[id].name, sub:PEOPLE[id].company, unread:0, msgs:[]};
-  if(!ORDER.includes(id)) ORDER.unshift(id);
-  openConv(id);
+  return hd('プロフィール', { back: 'members' })
+    + `<div class="body flat">
+      <div class="hero">
+        ${face(p.face, 104)}
+        <div class="hName">${p.name}${p.admin ? '<span class="tagA big">事務局</span>' : ''}</div>
+        <div class="hCo">${esc(p.co)}</div>
+        <div class="tags">${p.ind ? `<span class="tg">${p.ind}</span>` : ''}${p.area ? `<span class="tg">${p.area}</span>` : ''}</div>
+      </div>
+      <div class="hBy">${p.by === '—' ? '運営アカウントです' : `${p.by} さんのご紹介で、${p.joined}にご入会`}</div>
+      <div class="art">
+        <div class="aK">社長の背中　インタビュー</div>
+        <div class="aT">${esc(p.art)}</div>
+        <div class="aL">${esc(p.lead)}</div>
+        <button class="aG" data-art="1">記事の続きを読む　→</button>
+      </div>
+      <div class="pad">${act}</div>
+      <div class="note2">この場では、友達になった方とだけ1対1のやりとりができます。${p.admin ? '事務局へはいつでもご連絡いただけます。' : ''}</div>
+    </div>` + tabs('members');
 }
 
 /* ---------------- 招待する ---------------- */
-function issueInvite(){
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let s='';
-  for(let i=0;i<12;i++) s += chars[Math.floor(Math.random()*chars.length)];
-  const code = s.slice(0,4)+'-'+s.slice(4,8)+'-'+s.slice(8,12);
-  document.getElementById('inv-code').textContent = code;
-  document.getElementById('inv-text').value =
-    '中村 誠一 より、「社長の背中SNS」へのご招待です。\n\n'+
-    '経営者の方だけが集まる、完全紹介制の場です。\n'+
-    '下のリンクからお手続きいただけます。\n\n'+
-    'https://sns.livedoctor.jp/join/'+code+'\n\n'+
-    '※ このリンクはご本人のみお使いください。\n'+
-    '※ 30日でお使いいただけなくなります。';
-  document.getElementById('inv-form').style.display='none';
-  document.getElementById('inv-done').style.display='block';
-}
-function resetInvite(){
-  document.getElementById('inv-done').style.display='none';
-  document.getElementById('inv-form').style.display='block';
-  document.getElementById('inv-reason').value='';
+const inviteText = (c) => `中村 誠一 より、「社長の背中SNS」へのご招待です。
+
+経営者の方だけが集まる、完全紹介制の場です。
+下のリンクからお手続きいただけます。
+
+https://sns.livedoctor.jp/join/${c}
+
+※ このリンクはご本人のみお使いください。
+※ 30日でお使いいただけなくなります。`;
+
+function screenInvite() {
+  const panel = inviteCode ? `
+      <div class="ok">ご招待のリンクを発行しました。</div>
+      <div class="codeBox">${inviteCode}</div>
+      <label class="fl">お送りする文面</label>
+      <textarea class="fx" rows="9" readonly id="invText">${esc(inviteText(inviteCode))}</textarea>
+      <div class="sp"></div>
+      <button class="btn" id="copyInv">文面をコピーする</button>
+      <div class="sp"></div>
+      <button class="btn quiet" id="againInv">続けて発行する</button>`
+    : `
+      <label class="fl">お招きしたい理由（任意）</label>
+      <textarea class="fx" rows="4" placeholder="例）同じ業界で長くお付き合いがあり、この場でもご一緒したい方です。"></textarea>
+      <div class="hint">事務局が確認のときに参考にします。ご本人やほかの会員には見えません。</div>
+      <div class="sp"></div>
+      <button class="btn" id="issueInv">ご招待のリンクを発行する</button>`;
+
+  return hd('招待する')
+    + `<div class="body">
+      <div class="note">この場は完全紹介制です。ご一緒したい経営者の方がいらっしゃれば、ご招待のリンクを発行してお送りください。ご入会には事務局の確認がございます。</div>
+      <div class="sp"></div>
+      <div class="panel">${panel}</div>
+      <div class="secL">お送りしたご招待</div>
+      <div class="ivRow">
+        <div class="ivTop"><span class="ivC">PQVD-3KM8-YTZR</span><span class="st ok2">ご入会済み</span></div>
+        <div class="ivD">2026/10/02 発行 ・ 長年お世話になっている先輩経営者です。</div>
+      </div>
+      <div class="ivRow">
+        <div class="ivTop"><span class="ivC">WFJN-6BQ4-HMXC</span><span class="st wait">確認中</span></div>
+        <div class="ivD">2026/10/18 発行</div>
+      </div>
+    </div>` + tabs('invite');
 }
 
 /* ---------------- 自分の設定 ---------------- */
-function openWithdraw(){
-  document.getElementById('wd-open').style.display='none';
-  document.getElementById('wd-box').style.display='block';
+function screenMe() {
+  return hd('自分の設定', { action: '<button class="hdA" data-view="admin">運営</button>' })
+    + `<div class="body flat">
+      <div class="hero">
+        ${face(ME.face, 86)}
+        <div class="hName" style="font-size:19px">${ME.name}</div>
+        <div class="hCo">nakamura@nakamura-seiki.co.jp</div>
+      </div>
+      <div style="padding:0 15px">
+        <div class="secL">プロフィール</div>
+        <div class="panel">
+          <label class="fl">お名前</label><input class="fx" value="中村 誠一">
+          <label class="fl">会社名</label><input class="fx" value="中村精機株式会社">
+          <label class="fl">業種</label><select class="fx"><option>製造</option><option>建設・不動産</option><option>情報・IT</option></select>
+          <label class="fl">地域</label><select class="fx"><option>東海</option><option>関東</option><option>関西</option></select>
+          <label class="fl">メールアドレス</label><input class="fx" value="nakamura@nakamura-seiki.co.jp" disabled>
+          <div class="hint">変更をご希望の場合は、事務局へお知らせください。</div>
+          <div class="sp"></div>
+          <button class="btn" id="saveMe">保存する</button>
+        </div>
+        <div class="secL">お知らせメール</div>
+        <div class="panel"><div class="muted">
+          新しいメッセージが届いたとき、ご登録のメールアドレスへお知らせをお送りしています。<br><br>
+          ・まとめて1通でお送りします（10分ごと）<br>
+          ・メールの本文には、やりとりの中身は書きません
+        </div></div>
+        <div class="secL">この場について</div>
+        <div class="panel"><div class="muted">
+          <span class="link" data-noop="1">利用規約</span>　／　<span class="link" data-noop="1">プライバシーポリシー</span>
+        </div></div>
+        <div class="sp"></div>
+        <button class="btn quiet" id="logout">ログアウトする</button>
+        <div class="secL">退会</div>
+        <button class="btn danger" id="withdraw">退会の手続きをする</button>
+        <div class="sp"></div><div class="sp"></div>
+      </div>
+    </div>` + tabs('me');
 }
 
 /* ---------------- 運営 ---------------- */
-function approve(n,name){
-  const c = document.querySelector('[data-ap="'+n+'"]');
-  if(c) c.remove();
-  toast('ap-toast', name+' さんを承認しました。');
-  afterApprove();
+function screenAdmin() {
+  const t = [['pending', '承認待ち', pend.length], ['members', '会員管理', 0],
+  ['groups', 'グループ', 0], ['announce', '一斉連絡', 0], ['reports', '通報', repOpen ? 1 : 0]];
+  let body = '';
+
+  if (admTab === 'pending') {
+    body = `
+      <div class="stat">
+        <div class="st1"><div class="stn">8</div><div class="stl">ご利用中</div></div>
+        <div class="st1"><div class="stn acc">${pend.length}</div><div class="stl">承認待ち</div></div>
+        <div class="st1"><div class="stn">1</div><div class="stl">退会</div></div>
+        <div class="st1"><div class="stn ${repOpen ? 'acc' : ''}">${repOpen ? 1 : 0}</div><div class="stl">未対応の通報</div></div>
+      </div>
+      ${pend.length === 0
+        ? `<div class="empty"><div class="emT">承認待ちはありません</div><div class="emS">新しいお申し込みがあると、ここに表示されます。<br>メールでもお知らせします。</div></div>`
+        : `<div class="cnt">${pend.length}件のお申し込みがあります。</div>
+        ${pend.map((p) => `
+        <div class="pcard">
+          <div class="pHd">${face(p.face, 44)}
+            <div><div class="pN">${p.name}</div><div class="pC">${p.co}</div></div></div>
+          <div class="ptbl">
+            <div class="pk">メール</div><div class="pv">${p.mail}</div>
+            <div class="pk">業種／地域</div><div class="pv">${p.ind} ／ ${p.area}</div>
+            <div class="pk">ご紹介者</div><div class="pv">${p.by}</div>
+            <div class="pk">招く理由</div><div class="pv">${p.why}</div>
+            <div class="pk">お申し込み</div><div class="pv">${p.at}</div>
+          </div>
+          <div class="two">
+            <button class="btn" data-ap="${p.id}">承認する</button>
+            <button class="btn quiet" data-rj="${p.id}">お断りする</button>
+          </div>
+        </div>`).join('')}
+        <div class="hint">承認すると、ご本人へご案内のメールが届き、「会員全員のつどい」に自動で入ります。</div>`}`;
+  }
+
+  if (admTab === 'members') {
+    const rows = [['事務局', 'LIVE Doctor株式会社', 'jimu', true], ['中村 誠一', '中村精機株式会社', 'nakamura', false],
+    ['山田 浩司', '山田建設株式会社', 'yamada', false], ['大西 由美', '大西運輸株式会社', 'onishi', false],
+    ['佐々木 隆', 'ササキフーズ株式会社', 'sasaki', false], ['小林 健吾', '小林会計事務所', 'kobayashi', false],
+    ['藤本 剛', 'フジモトITソリューションズ', 'fujimoto', false], ['武田 信也', '武田農園株式会社', 'takeda', false]];
+    body = `<div class="srch"><input placeholder="お名前・会社名でさがす" autocomplete="off"></div>
+      <div class="cnt">8名</div>
+      ${rows.map(([n, c, f, adm]) => `
+      <button class="aRow" data-noop="1">${face(f, 40)}
+        <span class="rm"><span class="aN">${n}${adm ? '<span class="tagA">事務局</span>' : ''}</span>
+          <span class="aC">${c}</span></span>
+        <span class="st ok2">ご利用中</span>
+      </button>`).join('')}`;
+  }
+
+  if (admTab === 'groups') {
+    const gs = [['会員全員のつどい', 8, true], ['東海エリアの会', 4, false], ['ものづくり分科会', 3, false]];
+    body = `<div class="note">グループは事務局がつくり、お招きした方だけが参加できます。会員がご自身でつくることはできません。</div>
+      <div class="sp"></div>
+      <button class="btn" data-noop="1">新しいグループをつくる</button>
+      <div class="secL">グループ一覧（3件）</div>
+      ${gs.map(([n, c, all]) => `
+      <button class="aRow" data-noop="1">
+        <span class="mk sm${all ? ' acc' : ''}">${all ? '全' : '組'}</span>
+        <span class="rm"><span class="aN">${n}</span><span class="aC">${c}名</span></span>
+        ${all ? '<span class="st">全員が自動参加</span>' : '<span class="st">変更する</span>'}
+      </button>`).join('')}`;
+  }
+
+  if (admTab === 'announce') {
+    body = `<div class="note">ご利用中の会員 <b>8名</b> のメールアドレスへ、一斉にお送りします。送信したあとの取り消しはできません。</div>
+      <div class="sp"></div>
+      <div class="panel">
+        <label class="fl">件名</label><input class="fx" id="anS" placeholder="例）新しい会員の方のご紹介">
+        <label class="fl">本文</label><textarea class="fx" id="anB" rows="6" placeholder="いつもありがとうございます。&#10;事務局よりご連絡いたします。"></textarea>
+        <div class="hint">冒頭に「○○ 様」、末尾に「社長の背中SNS 事務局」が自動で入ります。</div>
+        <label class="fl">確認のため「送信」とご入力ください</label><input class="fx" id="anC" placeholder="送信">
+        <div class="sp"></div>
+        <button class="btn" id="anGo" disabled>会員全員へお送りする</button>
+      </div>`;
+  }
+
+  if (admTab === 'reports') {
+    body = `<div class="note">
+        会員から「事務局に知らせる」が押されたときに、そのメッセージと前後のやりとりの<b>写し</b>がここに届きます。<br><br>
+        事務局は、会員同士の1対1のやりとりそのものを読むことはできません。通報があった分の写しだけを確認する仕組みです。
+      </div>
+      <div class="sp"></div>
+      <div class="pcard">
+        <div class="spread">
+          <span class="st ${repOpen ? 'wait' : 'ok2'}" id="repTag">${repOpen ? '未対応' : '対応済み'}</span>
+          <span class="dim">2026/10/21 19:42</span>
+        </div>
+        <div class="ptbl" style="margin-top:13px">
+          <div class="pk">知らせた方</div><div class="pv">大西 由美</div>
+          <div class="pk">対象の方</div><div class="pv">藤本 剛</div>
+          <div class="pk">気になった点</div><div class="pv">断ったあとも投資のお誘いが続いています。</div>
+        </div>
+        <div class="snapT">やりとりの写し（通報された時点のもの）</div>
+        <div class="snap">
+          <div class="snr"><span class="snw">藤本 剛</span><span class="snt">19:21</span>
+            <div>先日のお話、ご検討いただけましたでしょうか。</div></div>
+          <div class="snr"><span class="snw">大西 由美</span><span class="snt">19:33</span>
+            <div>申し訳ありませんが、今回は見送らせていただきます。</div></div>
+          <div class="snr tgt"><span class="snw">藤本 剛</span><span class="snt">19:40</span>
+            <span class="mark">← 通報されたメッセージ</span>
+            <div>そうおっしゃらずに。今月中なら特別な条件をご用意できます。他の社長さんも皆さん入られていますよ。</div></div>
+        </div>
+        ${repOpen ? `<div class="sp"></div>
+          <button class="btn ghost" data-noop="1">メッセージを非表示にする</button>
+          <div class="sp"></div>
+          <button class="btn danger" data-noop="1">対象の方を退会させる</button>
+          <div class="sp"></div>
+          <button class="btn quiet" id="closeRep">対応済みにする</button>`
+        : `<div class="hint" style="margin-top:13px">対応：いま ／ 事務局</div>`}
+      </div>`;
+  }
+
+  return hd('運営', { back: 'home' })
+    + `<div class="atabs">${t.map(([k, l, n]) => `
+      <button class="at${admTab === k ? ' on' : ''}" data-atab="${k}">${l}${n ? `<span class="atn">${n}</span>` : ''}</button>`).join('')}</div>
+    <div class="body">${body}</div>`;
 }
-function reject(n){
-  const c = document.querySelector('[data-ap="'+n+'"]');
-  if(c) c.remove();
-  toast('ap-toast','お断りの処理をしました。');
-  afterApprove();
-}
-function afterApprove(){
-  const left = document.querySelectorAll('[data-ap]').length;
-  document.getElementById('ap-count').textContent = left+'件のお申し込みがあります。';
-  if(left===0){
-    document.getElementById('ap-count').style.display='none';
-    document.getElementById('ap-empty').style.display='block';
+
+/* ---------------- 入り口 ---------------- */
+const screenLogin = () => `
+  <div class="body flat">
+    <div class="sign">
+      <div class="signT">社長の背中SNS</div>
+      <div class="signS">経営者のための、完全紹介制の場です。<br>ご登録のメールアドレスをご入力ください。</div>
+    </div>
+    <div class="pad">
+      <div class="panel">
+        <label class="fl">メールアドレス</label>
+        <input class="fx" value="nakamura@nakamura-seiki.co.jp">
+        <div class="sp"></div>
+        <button class="btn" data-view="home">ログインのリンクを受け取る</button>
+      </div>
+      <div class="sp"></div>
+      <div class="note"><b>パスワードはありません。</b><br>
+        ご入力いただいたメールアドレスに、ログイン用のリンクをお送りします。そのリンクを押すだけでログインできます。</div>
+      <div class="sp"></div>
+      <div class="note2">ご招待をお持ちの方は、ご案内のリンクからお手続きください。<br>
+        <span class="link" data-noop="1">利用規約</span>　<span class="link" data-noop="1">プライバシーポリシー</span></div>
+    </div>
+  </div>`;
+
+const screenJoin = () => `
+  <div class="body flat">
+    <div class="sign">
+      <div class="signT">ご招待</div>
+      <div class="signS">山田建設株式会社 山田 浩司 様より、<br>「社長の背中SNS」へのご招待です。</div>
+    </div>
+    <div class="pad">
+      <div class="note">経営者の方だけが集まる、完全紹介制の場です。<br>広告はありません。ご入会には事務局の確認がございます。</div>
+      <div class="sp"></div>
+      <div class="panel">
+        <label class="fl">お名前 ※</label><input class="fx" value="松本 和彦">
+        <label class="fl">会社名 ※</label><input class="fx" value="松本メディカル株式会社">
+        <label class="fl">メールアドレス ※</label><input class="fx" value="matsumoto@matsumoto-medical.co.jp">
+        <label class="fl">業種</label><select class="fx"><option>医療・介護</option><option>製造</option></select>
+        <label class="fl">地域</label><select class="fx"><option>関東</option><option>関西</option></select>
+        <div class="sp"></div>
+        <div class="muted" style="font-size:12px">
+          <label style="display:flex;gap:9px;align-items:flex-start">
+            <input type="checkbox" checked style="width:auto;margin-top:3px">
+            <span><span class="link" data-noop="1">利用規約</span>と<span class="link" data-noop="1">プライバシーポリシー</span>に同意します</span>
+          </label>
+        </div>
+        <div class="sp"></div>
+        <button class="btn" data-view="pending">この内容でお申し込みする</button>
+      </div>
+      <div class="sp"></div><div class="sp"></div>
+    </div>
+  </div>`;
+
+const screenPending = () => `
+  <div class="body flat">
+    <div class="sign">
+      <div class="signT">お申し込みを承りました</div>
+      <div class="signS">松本メディカル株式会社 松本 和彦 様</div>
+    </div>
+    <div class="pad">
+      <div class="note">ただいま事務局が確認をしております。<br>
+        確認が済みましたら、ご登録のメールアドレスへご連絡いたします。<br><br>
+        お時間をいただく場合がございます。このままお待ちいただければ、お手続きは不要です。</div>
+      <div class="sp"></div>
+      <button class="btn quiet" data-view="login">ログアウトする</button>
+    </div>
+  </div>`;
+
+/* ---------------- 描画 ---------------- */
+const SCREENS = {
+  login: screenLogin, join: screenJoin, pending: screenPending,
+  home: screenHome, thread: screenThread, members: screenMembers,
+  member: screenMember, invite: screenInvite, me: screenMe, admin: screenAdmin,
+};
+
+function render() {
+  const st = $('#screen');
+  st.innerHTML = SCREENS[view]();
+  st.scrollTop = 0;
+  if (view === 'thread') {
+    const th = $('#thread');
+    if (th) st.scrollTop = st.scrollHeight;
   }
 }
 
-const ADMIN_MEMBERS = [
-  {name:'事務局', co:'LIVE Doctor株式会社', mail:'office@livedoctor.jp', ind:'—', area:'—', by:'—', at:'2026/10/01 09:00', st:'active', admin:true},
-  {name:'中村 誠一', co:'中村精機株式会社', mail:'nakamura@nakamura-seiki.co.jp', ind:'製造', area:'東海', by:'事務局', at:'2026/10/03 10:15', st:'active'},
-  {name:'山田 浩司', co:'山田建設株式会社', mail:'yamada@yamada-kensetsu.co.jp', ind:'建設・不動産', area:'関東', by:'事務局', at:'2026/10/03 11:02', st:'active'},
-  {name:'佐々木 隆', co:'ササキフーズ株式会社', mail:'sasaki@sasaki-foods.co.jp', ind:'飲食・宿泊', area:'関西', by:'事務局', at:'2026/10/04 09:40', st:'active'},
-  {name:'大西 由美', co:'大西運輸株式会社', mail:'onishi@onishi-unyu.co.jp', ind:'運輸・物流', area:'九州・沖縄', by:'山田 浩司', at:'2026/10/08 14:22', st:'active'},
-  {name:'藤本 剛', co:'フジモトITソリューションズ', mail:'fujimoto@fujimoto-it.co.jp', ind:'情報・通信・IT', area:'関東', by:'佐々木 隆', at:'2026/10/11 16:50', st:'active'},
-  {name:'小林 健吾', co:'小林会計事務所', mail:'kobayashi@kobayashi-kaikei.jp', ind:'士業・コンサルティング', area:'東海', by:'中村 誠一', at:'2026/10/14 08:30', st:'active'},
-  {name:'武田 信也', co:'武田農園株式会社', mail:'takeda@takeda-nouen.co.jp', ind:'農林水産', area:'甲信越・北陸', by:'大西 由美', at:'2026/10/17 13:12', st:'active'},
-  {name:'松本 和彦', co:'松本メディカル株式会社', mail:'matsumoto@matsumoto-medical.co.jp', ind:'医療・介護・福祉', area:'関東', by:'山田 浩司', at:'2026/10/22 11:34', st:'pending'},
-  {name:'渡辺 三郎', co:'渡辺商事株式会社', mail:'watanabe@watanabe-shoji.co.jp', ind:'卸売・小売', area:'関西', by:'佐々木 隆', at:'2026/10/23 08:12', st:'pending'},
-  {name:'石井 亮', co:'石井保険サービス', mail:'ishii@ishii-hoken.jp', ind:'金融・保険', area:'関東', by:'事務局', at:'2026/09/12 10:00', st:'withdrawn', out:'2026/09/29 10:12'}
-];
-const ST = {active:{l:'ご利用中',c:'tag friend'}, pending:{l:'承認待ち',c:'tag wait'}, withdrawn:{l:'退会',c:'tag'}};
-let amOpen = null;
+/* ---------------- 操作 ---------------- */
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-view],[data-conv],[data-member],[data-ind],[data-atab],[data-ap],[data-rj],[data-friend],[data-accept],[data-cancel],[data-open],[data-art],[data-noop],[data-report],[data-jump],#sendBtn,#issueInv,#againInv,#copyInv,#saveMe,#logout,#withdraw,#anGo,#closeRep,#idxOpen,#idxClose');
+  if (!t) return;
 
-function renderAdminMembers(){
-  const q = (document.getElementById('am-q').value||'').trim().toLowerCase();
-  const hits = ADMIN_MEMBERS.filter(m=>!q || [m.name,m.co,m.mail].join(' ').toLowerCase().includes(q));
-  document.getElementById('am-count').textContent = hits.length+'名';
-  const host = document.getElementById('am-list');
-  host.innerHTML='';
-  hits.forEach((m,i)=>{
-    const wrap = document.createElement('div');
-    wrap.style.background='#fff';
-    const st = ST[m.st];
-    const open = amOpen===m.mail;
-    wrap.innerHTML =
-      '<button class="row-item" style="border-bottom:1px solid var(--line)">'+
-        '<div class="av sm">'+initial(m.name)+'</div>'+
-        '<div class="row-main">'+
-          '<div class="row-name">'+m.name+(m.admin?' <span class="tag admin">事務局</span>':'')+'</div>'+
-          '<div class="row-sub">'+m.co+'</div>'+
-        '</div>'+
-        '<span class="'+st.c+'">'+st.l+'</span>'+
-      '</button>'+
-      (open ?
-        '<div class="pad" style="padding-top:12px">'+
-          '<div class="snap" style="margin-bottom:12px">'+
-            '<div><strong>メール</strong>：'+m.mail+'</div>'+
-            '<div><strong>業種</strong>：'+m.ind+' ／ <strong>地域</strong>：'+m.area+'</div>'+
-            '<div><strong>ご紹介者</strong>：'+m.by+'</div>'+
-            '<div><strong>ご登録</strong>：'+m.at+'</div>'+
-            (m.out?'<div><strong>退会</strong>：'+m.out+'</div>':'')+
-          '</div>'+
-          (m.name==='事務局'
-            ? '<div class="muted">ご自身のアカウントです。ここからの操作はできません。</div>'
-            : (m.st==='active'
-              ? '<div class="rowflex" style="flex-wrap:wrap">'+
-                  (m.admin
-                    ? '<button class="btn sm quiet" onclick="toast(\'am-toast\',\'運営からはずしました。\')">運営からはずす</button>'
-                    : '<button class="btn sm ghost" onclick="toast(\'am-toast\',\'運営に設定しました。\')">運営に設定</button>')+
-                  '<button class="btn sm danger" onclick="toast(\'am-toast\',\'退会の処理をしました。\')">退会させる</button>'+
-                '</div>'
-              : (m.st==='pending'
-                ? '<button class="btn sm ghost" onclick="go(\'admin-pending\')">承認待ちの画面へ</button>'
-                : '')))+
-        '</div>' : '');
-    wrap.querySelector('button').onclick = ()=>{ amOpen = open?null:m.mail; renderAdminMembers(); };
-    host.appendChild(wrap);
-  });
-}
-
-let agOpen = null;
-function renderGroups(){
-  const host = document.getElementById('ag-list');
-  host.innerHTML='';
-  GROUPS.forEach((g,i)=>{
-    const open = agOpen===i;
-    const wrap = document.createElement('div');
-    wrap.style.background='#fff';
-    wrap.innerHTML =
-      '<button class="row-item" style="border-bottom:1px solid var(--line)">'+
-        '<div class="av sm group'+(g.everyone?' everyone':'')+'">'+(g.everyone?'全':'組')+'</div>'+
-        '<div class="row-main">'+
-          '<div class="row-name">'+g.name+'</div>'+
-          '<div class="row-sub">'+g.roster.length+'名 ・ '+g.when+'</div>'+
-        '</div>'+
-        (g.everyone?'<span class="tag admin">全員</span>':'')+
-      '</button>'+
-      (open ?
-        '<div class="pad" style="padding-top:12px">'+
-          (g.everyone?'<div class="note" style="margin-bottom:12px">このグループには、承認した方が自動で入ります。はずすことはできません。</div>':'')+
-          '<div class="sec-label" style="padding:0 0 7px">参加中</div>'+
-          g.roster.map(n=>
-            '<div class="spread" style="padding:7px 0;border-bottom:1px dashed var(--line)">'+
-              '<span style="font-size:13.5px;color:var(--ink)">'+n+'</span>'+
-              (g.everyone?'':'<button class="btn sm quiet" onclick="toast(\'ag-toast\',\'はずしました。\')">はずす</button>')+
-            '</div>').join('')+
-          (g.everyone?'':'<div class="sec-label" style="padding:16px 0 7px">お招きする</div><button class="btn wide ghost" onclick="toast(\'ag-toast\',\'お招きしました。\')">会員を選んでお招きする</button>')+
-        '</div>' : '');
-    wrap.querySelector('button').onclick = ()=>{ agOpen = open?null:i; renderGroups(); };
-    host.appendChild(wrap);
-  });
-
-  const pick = document.getElementById('ag-picker');
-  if(pick && !pick.dataset.done){
-    pick.innerHTML = Object.values(PEOPLE).filter(p=>p.rel!=='self').map(p=>
-      '<label style="display:flex;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line);margin:0">'+
-        '<input type="checkbox" style="width:auto">'+
-        '<span style="font-size:13.5px;color:var(--ink)">'+p.name+'<span class="muted"> ／ '+p.company+'</span></span>'+
-      '</label>').join('');
-    pick.dataset.done='1';
+  if (t.id === 'idxOpen') { $('#idx').classList.add('on'); return; }
+  if (t.id === 'idxClose') { $('#idx').classList.remove('on'); return; }
+  if (t.dataset.jump) {
+    const [v, arg] = t.dataset.jump.split(':');
+    if (v === 'thread') { curConv = arg; CONV[arg].unread = 0; }
+    if (v === 'member') curMember = arg;
+    if (v === 'admin') admTab = arg;
+    view = v === 'admin' ? 'admin' : v;
+    $('#idx').classList.remove('on');
+    render(); return;
   }
-}
-function openNewGroup(){
-  document.getElementById('ag-new').style.display='none';
-  document.getElementById('ag-form').style.display='block';
-}
-function closeNewGroup(){
-  document.getElementById('ag-form').style.display='none';
-  document.getElementById('ag-new').style.display='flex';
+
+  if (t.dataset.view) { view = t.dataset.view; render(); return; }
+  if (t.dataset.conv) { curConv = t.dataset.conv; CONV[curConv].unread = 0; view = 'thread'; render(); return; }
+  if (t.dataset.member) { curMember = t.dataset.member; view = 'member'; render(); return; }
+  if (t.dataset.ind) { memInd = t.dataset.ind; render(); return; }
+  if (t.dataset.atab) { admTab = t.dataset.atab; render(); return; }
+
+  if (t.dataset.friend) { PEOPLE[t.dataset.friend].rel = 'sent'; render(); toast('お申し込みをお送りしました。'); return; }
+  if (t.dataset.accept) { PEOPLE[t.dataset.accept].rel = 'friend'; render(); toast('友達になりました。'); return; }
+  if (t.dataset.cancel) { PEOPLE[t.dataset.cancel].rel = 'none'; render(); return; }
+  if (t.dataset.open) {
+    const id = t.dataset.open;
+    if (!CONV[id]) { CONV[id] = { id, kind: 'dm', other: id, unread: 0, when: 'いま', msgs: [] }; CONV_ORDER.unshift(id); }
+    curConv = id; view = 'thread'; render(); return;
+  }
+  if (t.dataset.report) { toast('事務局にお知らせしました。前後のやりとりを含めて確認いたします。'); return; }
+  if (t.dataset.art) { toast('本番では、社長の背中の記事ページが開きます。'); return; }
+  if (t.dataset.noop) { toast('モックのため、この操作は動きません。'); return; }
+
+  if (t.id === 'sendBtn') { send(); return; }
+  if (t.id === 'issueInv') { inviteCode = makeCode(); render(); return; }
+  if (t.id === 'againInv') { inviteCode = null; render(); return; }
+  if (t.id === 'copyInv') { toast('文面をコピーしました。'); return; }
+  if (t.id === 'saveMe') { toast('保存しました。'); return; }
+  if (t.id === 'logout') { view = 'login'; render(); return; }
+  if (t.id === 'withdraw') { toast('本番では確認の入力を求めます。'); return; }
+  if (t.id === 'anGo') { toast('8名へお送りしました。'); return; }
+  if (t.id === 'closeRep') { repOpen = false; render(); toast('対応済みにしました。'); return; }
+
+  if (t.dataset.ap) {
+    const id = +t.dataset.ap;
+    const p = pend.find((x) => x.id === id);
+    pend = pend.filter((x) => x.id !== id);
+    render(); toast(`${p.name} さんを承認しました。`); return;
+  }
+  if (t.dataset.rj) { pend = pend.filter((x) => x.id !== +t.dataset.rj); render(); toast('お断りの処理をしました。'); return; }
+});
+
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'memQ') {
+    memQ = e.target.value;
+    const s = e.target.selectionStart;
+    render();
+    const n = $('#memQ');
+    if (n) { n.focus(); n.setSelectionRange(s, s); }
+  }
+  if (e.target.id === 'msgIn') {
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.min(e.target.scrollHeight, 110) + 'px';
+    $('#sendBtn').disabled = !e.target.value.trim();
+  }
+  if (['anS', 'anB', 'anC'].includes(e.target.id)) {
+    const ok = $('#anS').value.trim() && $('#anB').value.trim() && $('#anC').value === '送信';
+    $('#anGo').disabled = !ok;
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.id === 'msgIn' && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); send(); }
+});
+
+function send() {
+  const i = $('#msgIn');
+  const v = i.value.trim();
+  if (!v) return;
+  const d = new Date();
+  const t = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  CONV[curConv].msgs.push({ who: 'me', t, b: v });
+  render();
+  const st = $('#screen');
+  st.scrollTop = st.scrollHeight;
 }
 
-function checkAnnounce(){
-  const s = document.getElementById('an-subj').value.trim();
-  const b = document.getElementById('an-body').value.trim();
-  const c = document.getElementById('an-confirm').value;
-  document.getElementById('an-go').disabled = !(s && b && c==='送信');
+function makeCode() {
+  const ch = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for (let i = 0; i < 12; i++) s += ch[Math.floor(Math.random() * ch.length)];
+  return `${s.slice(0, 4)}-${s.slice(4, 8)}-${s.slice(8, 12)}`;
 }
 
-function closeReport(){
-  document.getElementById('rep-1-tag').className='tag friend';
-  document.getElementById('rep-1-tag').textContent='対応済み';
-  document.getElementById('rep-1').style.opacity='.68';
-  document.getElementById('rep-1-actions').innerHTML =
-    '<div class="snap"><div><strong>対応</strong>：いま ／ 事務局</div><div><strong>記録</strong>：（ご入力の内容が入ります）</div></div>';
-  toast('rep-toast','対応済みにしました。');
-}
+render();
 
-/* ---------------- 起動 ---------------- */
-renderConvList();
-renderMembers();
-go('home');
 </script>
 </body>
 </html>
